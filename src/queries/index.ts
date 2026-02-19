@@ -190,3 +190,40 @@ query ($name: String!) {
     ${USER_FIELDS}
   }
 }`;
+
+export const QUERY_AIRING_SCHEDULE = `
+query ($airingAt_greater: Int, $airingAt_lesser: Int, $sort: [AiringSort], $page: Int, $perPage: Int) {
+  Page(page: $page, perPage: $perPage) {
+    pageInfo { total perPage currentPage lastPage hasNextPage }
+    airingSchedules(airingAt_greater: $airingAt_greater, airingAt_lesser: $airingAt_lesser, sort: $sort) {
+      id
+      airingAt
+      timeUntilAiring
+      episode
+      mediaId
+      media {
+        ${MEDIA_FIELDS}
+      }
+    }
+  }
+}`;
+
+export const QUERY_RECENT_CHAPTERS = `
+query ($page: Int, $perPage: Int) {
+  Page(page: $page, perPage: $perPage) {
+    pageInfo { total perPage currentPage lastPage hasNextPage }
+    media(type: MANGA, status: RELEASING, sort: UPDATED_AT_DESC) {
+      ${MEDIA_FIELDS}
+    }
+  }
+}`;
+
+export const QUERY_PLANNING = `
+query ($type: MediaType, $sort: [MediaSort], $page: Int, $perPage: Int) {
+  Page(page: $page, perPage: $perPage) {
+    pageInfo { total perPage currentPage lastPage hasNextPage }
+    media(type: $type, status: NOT_YET_RELEASED, sort: $sort) {
+      ${MEDIA_FIELDS}
+    }
+  }
+}`;

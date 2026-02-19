@@ -111,6 +111,51 @@ async function run() {
     assert(user.name.toLowerCase() === "anilist", "name should be AniList");
   });
 
+  // ── Airing / Chapters / Planning ──
+  console.log("\nAiring / Chapters / Planning:");
+
+  await test("getAiredEpisodes() returns recently aired episodes", async () => {
+    const result = await client.getAiredEpisodes({ perPage: 5 });
+    assert(Array.isArray(result.results), "results should be an array");
+    assert(result.pageInfo !== undefined, "pageInfo should exist");
+    if (result.results.length > 0) {
+      assert(typeof result.results[0].episode === "number", "episode should be a number");
+      assert(result.results[0].media !== undefined, "media should be present");
+    }
+  });
+
+  await test("getAiredEpisodes() with custom time range", async () => {
+    const now = Math.floor(Date.now() / 1000);
+    const result = await client.getAiredEpisodes({
+      airingAtGreater: now - 7 * 24 * 3600,
+      airingAtLesser: now,
+      perPage: 3,
+    });
+    assert(Array.isArray(result.results), "results should be an array");
+    assert(result.results.length > 0, "should have episodes aired in the last 7 days");
+  });
+
+  await test("getAiredChapters() returns recently updated manga", async () => {
+    const result = await client.getAiredChapters({ perPage: 5 });
+    assert(result.results.length > 0, "should return at least 1 manga");
+    assert(result.results.every((m) => m.type === "MANGA"), "all should be MANGA");
+  });
+
+  await test("getPlanning() returns upcoming media", async () => {
+    const result = await client.getPlanning({ perPage: 5 });
+    assert(result.results.length > 0, "should return at least 1 planned media");
+    assert(
+      result.results.every((m) => m.status === "NOT_YET_RELEASED"),
+      "all should be NOT_YET_RELEASED",
+    );
+  });
+
+  await test("getPlanning({ type: ANIME })", async () => {
+    const result = await client.getPlanning({ type: MediaType.ANIME, perPage: 5 });
+    assert(result.results.length > 0, "should return at least 1 planned anime");
+    assert(result.results.every((m) => m.type === "ANIME"), "all should be ANIME");
+  });
+
   // ── Error handling ──
   console.log("\nError handling:");
 

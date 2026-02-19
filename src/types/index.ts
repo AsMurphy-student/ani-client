@@ -51,6 +51,17 @@ export enum MediaSort {
   SEARCH_MATCH = "SEARCH_MATCH",
 }
 
+export enum AiringSort {
+  ID = "ID",
+  ID_DESC = "ID_DESC",
+  MEDIA_ID = "MEDIA_ID",
+  MEDIA_ID_DESC = "MEDIA_ID_DESC",
+  TIME = "TIME",
+  TIME_DESC = "TIME_DESC",
+  EPISODE = "EPISODE",
+  EPISODE_DESC = "EPISODE_DESC",
+}
+
 export enum CharacterSort {
   ID = "ID",
   ROLE = "ROLE",
@@ -233,6 +244,15 @@ export interface User {
   } | null;
 }
 
+export interface AiringSchedule {
+  id: number;
+  airingAt: number;
+  timeUntilAiring: number;
+  episode: number;
+  mediaId: number;
+  media: Media;
+}
+
 export interface PageInfo {
   total: number | null;
   perPage: number | null;
@@ -272,6 +292,33 @@ export interface SearchStaffOptions {
 export interface PagedResult<T> {
   pageInfo: PageInfo;
   results: T[];
+}
+
+export interface GetAiringOptions {
+  /** Only show episodes that aired after this UNIX timestamp */
+  airingAtGreater?: number;
+  /** Only show episodes that aired before this UNIX timestamp */
+  airingAtLesser?: number;
+  /** Sort order (default: TIME_DESC) */
+  sort?: AiringSort[];
+  page?: number;
+  perPage?: number;
+}
+
+export interface GetRecentChaptersOptions {
+  /** Page number (default: 1) */
+  page?: number;
+  /** Results per page (default: 20, max 50) */
+  perPage?: number;
+}
+
+export interface GetPlanningOptions {
+  /** Filter by ANIME or MANGA (returns both if omitted) */
+  type?: MediaType;
+  /** Sort order (default: POPULARITY_DESC) */
+  sort?: MediaSort[];
+  page?: number;
+  perPage?: number;
 }
 
 export interface AniListClientOptions {

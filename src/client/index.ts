@@ -8,6 +8,9 @@ import {
   QUERY_STAFF_SEARCH,
   QUERY_USER_BY_ID,
   QUERY_USER_BY_NAME,
+  QUERY_AIRING_SCHEDULE,
+  QUERY_RECENT_CHAPTERS,
+  QUERY_PLANNING,
 } from "../queries";
 
 import { AniListError } from "../errors";
@@ -20,10 +23,14 @@ import type {
   Character,
   Staff,
   User,
+  AiringSchedule,
   PagedResult,
   SearchMediaOptions,
   SearchCharacterOptions,
   SearchStaffOptions,
+  GetAiringOptions,
+  GetRecentChaptersOptions,
+  GetPlanningOptions,
   MediaType,
 } from "../types";
 
@@ -238,6 +245,95 @@ export class AniListClient {
    */
   async raw<T = unknown>(query: string, variables?: Record<string, unknown>): Promise<T> {
     return this.request<T>(query, variables);
+  }
+
+  /**
+   * Get recently aired anime episodes.
+   *
+   * By default returns episodes that aired in the last 24 hours.
+   *
+   * @param options - Filter / pagination parameters
+   * @returns Paginated list of airing schedule entries
+   *
+   * @example
+   * ```ts
+   * // Episodes that aired in the last 48h
+   * const recent = await client.getAiredEpisodes({
+   *   airingAtGreater: Math.floor(Date.now() / 1000) - 48 * 3600,
+   * });
+   * ```
+   */
+  async getAiredEpisodes(options: GetAiringOptions = {}): Promise<PagedResult<AiringSchedule>> {
+    const now = Math.floor(Date.now() / 1000);
+    const variables: Record<string, unknown> = {
+      airingAt_greater: options.airingAtGreater ?? now - 24 * 3600,
+      airingAt_lesser: options.airingAtLesser ?? now,
+      sort: options.sort ?? ["TIME_DESC"],
+      page: options.page ?? 1,
+      perPage: options.perPage ?? 20,
+    };
+
+    const data = await this.request<{
+      Page: { pageInfo: PagedResult<AiringSchedule>["pageInfo"]; airingSchedules: AiringSchedule[] };
+    }>(QUERY_AIRING_SCHEDULE, variables);
+
+    return { pageInfo: data.Page.pageInfo, results: data.Page.airingSchedules };
+  }
+
+  /**
+   * Get manga that are currently releasing, sorted by most recently updated.
+   *
+   * This is the closest equivalent to "recently released chapters" on AniList,
+   * since the API does not expose per-chapter airing schedules for manga.
+   *
+   * @param options - Pagination parameters
+   * @returns Paginated list of currently releasing manga
+   *
+   * @example
+   * ```ts
+   * const chapters = await client.getAiredChapters({ perPage: 10 });
+   * ```
+   */
+  async getAiredChapters(options: GetRecentChaptersOptions = {}): Promise<PagedResult<Media>> {
+    const variables: Record<string, unknown> = {
+      page: options.page ?? 1,
+      perPage: options.perPage ?? 20,
+    };
+
+    const data = await this.request<{
+      Page: { pageInfo: PagedResult<Media>["pageInfo"]; media: Media[] };
+    }>(QUERY_RECENT_CHAPTERS, variables);
+
+    return { pageInfo: data.Page.pageInfo, results: data.Page.media };
+  }
+
+  /**
+   * Get upcoming (not yet released) anime and/or manga, sorted by popularity.
+   *
+   * @param options - Filter / pagination parameters
+   * @returns Paginated list of planned media
+   *
+   * @example
+   * ```ts
+   * import { MediaType } from "ani-client";
+   *
+   * // Most anticipated upcoming anime
+   * const planning = await client.getPlanning({ type: MediaType.ANIME, perPage: 10 });
+   * ```
+   */
+  async getPlanning(options: GetPlanningOptions = {}): Promise<PagedResult<Media>> {
+    const variables: Record<string, unknown> = {
+      type: options.type,
+      sort: options.sort ?? ["POPULARITY_DESC"],
+      page: options.page ?? 1,
+      perPage: options.perPage ?? 20,
+    };
+
+    const data = await this.request<{
+      Page: { pageInfo: PagedResult<Media>["pageInfo"]; media: Media[] };
+    }>(QUERY_PLANNING, variables);
+
+    return { pageInfo: data.Page.pageInfo, results: data.Page.media };
   }
 
   /**
