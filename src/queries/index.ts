@@ -258,6 +258,28 @@ const MEDIA_LIST_FIELDS = `
   }
 `;
 
+export const QUERY_RECOMMENDATIONS = `
+query ($mediaId: Int!, $page: Int, $perPage: Int, $sort: [RecommendationSort]) {
+  Media(id: $mediaId) {
+    recommendations(page: $page, perPage: $perPage, sort: $sort) {
+      pageInfo { total perPage currentPage lastPage hasNextPage }
+      nodes {
+        id
+        rating
+        userRating
+        mediaRecommendation {
+          ${MEDIA_FIELDS}
+        }
+        user {
+          id
+          name
+          avatar { large medium }
+        }
+      }
+    }
+  }
+}`;
+
 export const QUERY_USER_MEDIA_LIST = `
 query ($userId: Int, $userName: String, $type: MediaType!, $status: MediaListStatus, $sort: [MediaListSort], $page: Int, $perPage: Int) {
   Page(page: $page, perPage: $perPage) {

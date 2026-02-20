@@ -13,6 +13,7 @@ import {
   QUERY_PLANNING,
   QUERY_MEDIA_BY_SEASON,
   QUERY_USER_MEDIA_LIST,
+  QUERY_RECOMMENDATIONS,
 } from "../queries";
 
 import { AniListError } from "../errors";
@@ -27,6 +28,7 @@ import type {
   User,
   AiringSchedule,
   MediaListEntry,
+  Recommendation,
   PagedResult,
   SearchMediaOptions,
   SearchCharacterOptions,
@@ -36,6 +38,7 @@ import type {
   GetPlanningOptions,
   GetSeasonOptions,
   GetUserMediaListOptions,
+  GetRecommendationsOptions,
   MediaType,
 } from "../types";
 
@@ -339,6 +342,50 @@ export class AniListClient {
     }>(QUERY_PLANNING, variables);
 
     return { pageInfo: data.Page.pageInfo, results: data.Page.media };
+  }
+
+  /**
+   * Get recommendations for a specific media.
+   *
+   * Returns other anime/manga that users have recommended based on the given media.
+   *
+   * @param mediaId - The AniList media ID
+   * @param options - Optional sort / pagination parameters
+   * @returns Paginated list of recommendations
+   *
+   * @example
+   * ```ts
+   * // Get recommendations for Cowboy Bebop
+   * const recs = await client.getRecommendations(1);
+   * recs.results.forEach((r) =>
+   *   console.log(`${r.mediaRecommendation.title.romaji} (rating: ${r.rating})`)
+   * );
+   * ```
+   */
+  async getRecommendations(
+    mediaId: number,
+    options: Omit<GetRecommendationsOptions, "mediaId"> = {},
+  ): Promise<PagedResult<Recommendation>> {
+    const variables: Record<string, unknown> = {
+      mediaId,
+      sort: options.sort ?? ["RATING_DESC"],
+      page: options.page ?? 1,
+      perPage: options.perPage ?? 20,
+    };
+
+    const data = await this.request<{
+      Media: {
+        recommendations: {
+          pageInfo: PagedResult<Recommendation>["pageInfo"];
+          nodes: Recommendation[];
+        };
+      };
+    }>(QUERY_RECOMMENDATIONS, variables);
+
+    return {
+      pageInfo: data.Media.recommendations.pageInfo,
+      results: data.Media.recommendations.nodes,
+    };
   }
 
   /**

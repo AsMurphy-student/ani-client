@@ -10,6 +10,7 @@ export {
   MediaSort,
   CharacterSort,
   AiringSort,
+  RecommendationSort,
   MediaListStatus,
   MediaListSort,
   type Media,
@@ -31,6 +32,7 @@ export {
   type UserStatistics,
   type AiringSchedule,
   type MediaListEntry,
+  type Recommendation,
   type PageInfo,
   type PagedResult,
   type SearchMediaOptions,
@@ -41,5 +43,6 @@ export {
   type GetPlanningOptions,
   type GetSeasonOptions,
   type GetUserMediaListOptions,
+  type GetRecommendationsOptions,
   type AniListClientOptions,
 } from "./types";

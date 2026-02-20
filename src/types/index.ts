@@ -321,6 +321,34 @@ export interface GetPlanningOptions {
   perPage?: number;
 }
 
+export enum RecommendationSort {
+  ID = "ID",
+  ID_DESC = "ID_DESC",
+  RATING = "RATING",
+  RATING_DESC = "RATING_DESC",
+}
+
+export interface Recommendation {
+  id: number;
+  rating: number | null;
+  userRating: string | null;
+  mediaRecommendation: Media;
+  user: {
+    id: number;
+    name: string;
+    avatar: UserAvatar;
+  } | null;
+}
+
+export interface GetRecommendationsOptions {
+  /** The AniList media ID to get recommendations for */
+  mediaId: number;
+  /** Sort order (default: RATING_DESC) */
+  sort?: RecommendationSort[];
+  page?: number;
+  perPage?: number;
+}
+
 export enum MediaListStatus {
   CURRENT = "CURRENT",
   PLANNING = "PLANNING",

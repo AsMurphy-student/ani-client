@@ -70,6 +70,7 @@ client.getMedia(1).then((anime) => console.log(anime.title.romaji));
 | `searchMedia(options?)`             | Search & filter anime / manga        |
 | `getTrending(type?, page?, perPage?)` | Get currently trending entries      |
 | `getMediaBySeason(options)`         | Get all anime/manga for a given season & year |
+| `getRecommendations(mediaId, options?)` | Get user recommendations for a media |
 
 ### Characters
 
@@ -301,6 +302,33 @@ const byId = await client.getUserMediaList({
 });
 ```
 
+## Recommendations
+
+Get user-submitted recommendations for a specific anime or manga.
+
+### `getRecommendations(mediaId, options?)`
+
+| Option    | Type                   | Default            | Description             |
+| --------- | ---------------------- | ------------------ | ----------------------- |
+| `sort`    | `RecommendationSort[]` | `["RATING_DESC"]`  | Sort order              |
+| `page`    | `number`               | `1`                | Page number             |
+| `perPage` | `number`               | `20`               | Results per page        |
+
+```ts
+import { AniListClient } from "ani-client";
+
+const client = new AniListClient();
+
+// Recommendations for Cowboy Bebop
+const recs = await client.getRecommendations(1);
+recs.results.forEach((r) =>
+  console.log(`${r.mediaRecommendation.title.romaji} (rating: ${r.rating})`)
+);
+
+// With pagination
+const page2 = await client.getRecommendations(20, { page: 2, perPage: 10 });
+```
+
 ## Error handling
 
 All API errors throw an `AniListError` with:
@@ -333,6 +361,7 @@ import type {
   User,
   AiringSchedule,
   MediaListEntry,
+  Recommendation,
   PagedResult,
   SearchMediaOptions,
   GetAiringOptions,
@@ -340,6 +369,7 @@ import type {
   GetPlanningOptions,
   GetSeasonOptions,
   GetUserMediaListOptions,
+  GetRecommendationsOptions,
 } from "ani-client";
 ```
 

@@ -3,7 +3,7 @@
  * Hits the real AniList API (no mock).
  */
 
-import { AniListClient, MediaType, MediaSeason, MediaListStatus, AniListError } from "../src";
+import { AniListClient, MediaType, MediaSeason, MediaListStatus, RecommendationSort, AniListError } from "../src";
 
 const client = new AniListClient();
 
@@ -227,6 +227,31 @@ async function run() {
         "should mention userId or userName",
       );
     }
+  });
+
+  // ── Recommendations ──
+  console.log("\nRecommendations:");
+
+  await test("getRecommendations(1) returns recommendations for Cowboy Bebop", async () => {
+    const result = await client.getRecommendations(1);
+    assert(Array.isArray(result.results), "results should be an array");
+    assert(result.pageInfo !== undefined, "pageInfo should exist");
+    if (result.results.length > 0) {
+      assert(
+        result.results[0].mediaRecommendation !== undefined,
+        "should have mediaRecommendation",
+      );
+      assert(
+        typeof result.results[0].mediaRecommendation.id === "number",
+        "recommended media should have an id",
+      );
+    }
+  });
+
+  await test("getRecommendations with pagination", async () => {
+    const result = await client.getRecommendations(20, { perPage: 3 });
+    assert(Array.isArray(result.results), "results should be an array");
+    assert(result.results.length <= 3, "should respect perPage limit");
   });
 
   // ── Error handling ──
