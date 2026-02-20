@@ -30,6 +30,20 @@ const MEDIA_FIELDS = `
   trending
   tags { id name description category rank isMediaSpoiler }
   studios { nodes { id name isAnimationStudio siteUrl } }
+  relations {
+    edges {
+      relationType(version: 2)
+      node {
+        id
+        title { romaji english native userPreferred }
+        type
+        format
+        status
+        coverImage { large medium }
+        siteUrl
+      }
+    }
+  }
   isAdult
   siteUrl
 `;
@@ -268,7 +282,20 @@ query ($mediaId: Int!, $page: Int, $perPage: Int, $sort: [RecommendationSort]) {
         rating
         userRating
         mediaRecommendation {
-          ${MEDIA_FIELDS}
+          id
+          idMal
+          title { romaji english native userPreferred }
+          type
+          format
+          status
+          coverImage { extraLarge large medium color }
+          bannerImage
+          genres
+          averageScore
+          meanScore
+          popularity
+          favourites
+          siteUrl
         }
         user {
           id
@@ -287,5 +314,57 @@ query ($userId: Int, $userName: String, $type: MediaType!, $status: MediaListSta
     mediaList(userId: $userId, userName: $userName, type: $type, status: $status, sort: $sort) {
       ${MEDIA_LIST_FIELDS}
     }
+  }
+}`;
+
+const STUDIO_FIELDS = `
+  id
+  name
+  isAnimationStudio
+  siteUrl
+  favourites
+  media(page: 1, perPage: 25, sort: POPULARITY_DESC) {
+    pageInfo { total perPage currentPage lastPage hasNextPage }
+    nodes {
+      id
+      title { romaji english native userPreferred }
+      type
+      format
+      coverImage { large medium }
+      siteUrl
+    }
+  }
+`;
+
+export const QUERY_STUDIO_BY_ID = `
+query ($id: Int!) {
+  Studio(id: $id) {
+    ${STUDIO_FIELDS}
+  }
+}`;
+
+export const QUERY_STUDIO_SEARCH = `
+query ($search: String, $page: Int, $perPage: Int) {
+  Page(page: $page, perPage: $perPage) {
+    pageInfo { total perPage currentPage lastPage hasNextPage }
+    studios(search: $search) {
+      ${STUDIO_FIELDS}
+    }
+  }
+}`;
+
+export const QUERY_GENRES = `
+query {
+  GenreCollection
+}`;
+
+export const QUERY_TAGS = `
+query {
+  MediaTagCollection {
+    id
+    name
+    description
+    category
+    isAdult
   }
 }`;

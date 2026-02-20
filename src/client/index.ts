@@ -14,6 +14,10 @@ import {
   QUERY_MEDIA_BY_SEASON,
   QUERY_USER_MEDIA_LIST,
   QUERY_RECOMMENDATIONS,
+  QUERY_STUDIO_BY_ID,
+  QUERY_STUDIO_SEARCH,
+  QUERY_GENRES,
+  QUERY_TAGS,
 } from "../queries";
 
 import { AniListError } from "../errors";
@@ -29,10 +33,13 @@ import type {
   AiringSchedule,
   MediaListEntry,
   Recommendation,
+  StudioDetail,
+  MediaTag,
   PagedResult,
   SearchMediaOptions,
   SearchCharacterOptions,
   SearchStaffOptions,
+  SearchStudioOptions,
   GetAiringOptions,
   GetRecentChaptersOptions,
   GetPlanningOptions,
@@ -466,6 +473,108 @@ export class AniListClient {
     }>(QUERY_USER_MEDIA_LIST, variables);
 
     return { pageInfo: data.Page.pageInfo, results: data.Page.mediaList };
+  }
+
+  /**
+   * Fetch a studio by its AniList ID.
+   *
+   * Returns studio details along with its most popular productions.
+   *
+   * @param id - The AniList studio ID
+   */
+  async getStudio(id: number): Promise<StudioDetail> {
+    const data = await this.request<{ Studio: StudioDetail }>(QUERY_STUDIO_BY_ID, { id });
+    return data.Studio;
+  }
+
+  /**
+   * Search for studios by name.
+   *
+   * @param options - Search / pagination parameters
+   * @returns Paginated list of studios
+   *
+   * @example
+   * ```ts
+   * const studios = await client.searchStudios({ query: "MAPPA" });
+   * ```
+   */
+  async searchStudios(options: SearchStudioOptions = {}): Promise<PagedResult<StudioDetail>> {
+    const variables: Record<string, unknown> = {
+      search: options.query,
+      page: options.page ?? 1,
+      perPage: options.perPage ?? 20,
+    };
+
+    const data = await this.request<{
+      Page: { pageInfo: PagedResult<StudioDetail>["pageInfo"]; studios: StudioDetail[] };
+    }>(QUERY_STUDIO_SEARCH, variables);
+
+    return { pageInfo: data.Page.pageInfo, results: data.Page.studios };
+  }
+
+  /**
+   * Get all available genres on AniList.
+   *
+   * @returns Array of genre strings (e.g. "Action", "Adventure", ...)
+   */
+  async getGenres(): Promise<string[]> {
+    const data = await this.request<{ GenreCollection: string[] }>(QUERY_GENRES);
+    return data.GenreCollection;
+  }
+
+  /**
+   * Get all available media tags on AniList.
+   *
+   * @returns Array of tag objects with id, name, description, category, isAdult
+   */
+  async getTags(): Promise<MediaTag[]> {
+    const data = await this.request<{ MediaTagCollection: MediaTag[] }>(QUERY_TAGS);
+    return data.MediaTagCollection;
+  }
+
+  /**
+   * Auto-paginating async iterator.
+   *
+   * Wraps any paginated method and yields individual items across all pages.
+   * Stops when `hasNextPage` is `false` or `maxPages` is reached.
+   *
+   * @param fetchPage - A function that takes a page number and returns a `PagedResult<T>`
+   * @param maxPages - Maximum number of pages to fetch (default: Infinity)
+   * @returns An async iterable iterator of individual items
+   *
+   * @example
+   * ```ts
+   * // Iterate over all search results
+   * for await (const anime of client.paginate((page) =>
+   *   client.searchMedia({ query: "Naruto", page, perPage: 10 })
+   * )) {
+   *   console.log(anime.title.romaji);
+   * }
+   *
+   * // Limit to 3 pages
+   * for await (const anime of client.paginate(
+   *   (page) => client.getTrending(MediaType.ANIME, page, 20),
+   *   3,
+   * )) {
+   *   console.log(anime.title.romaji);
+   * }
+   * ```
+   */
+  async *paginate<T>(
+    fetchPage: (page: number) => Promise<PagedResult<T>>,
+    maxPages = Infinity,
+  ): AsyncGenerator<T, void, undefined> {
+    let page = 1;
+    let hasNext = true;
+
+    while (hasNext && page <= maxPages) {
+      const result = await fetchPage(page);
+      for (const item of result.results) {
+        yield item;
+      }
+      hasNext = result.pageInfo.hasNextPage === true;
+      page++;
+    }
   }
 
   /**

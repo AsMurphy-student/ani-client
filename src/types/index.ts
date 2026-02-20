@@ -115,6 +115,31 @@ export interface StudioConnection {
   nodes: Studio[];
 }
 
+export enum MediaRelationType {
+  ADAPTATION = "ADAPTATION",
+  PREQUEL = "PREQUEL",
+  SEQUEL = "SEQUEL",
+  PARENT = "PARENT",
+  SIDE_STORY = "SIDE_STORY",
+  CHARACTER = "CHARACTER",
+  SUMMARY = "SUMMARY",
+  ALTERNATIVE = "ALTERNATIVE",
+  SPIN_OFF = "SPIN_OFF",
+  OTHER = "OTHER",
+  SOURCE = "SOURCE",
+  COMPILATION = "COMPILATION",
+  CONTAINS = "CONTAINS",
+}
+
+export interface MediaEdge {
+  relationType: MediaRelationType;
+  node: Pick<Media, "id" | "title" | "type" | "format" | "status" | "coverImage" | "siteUrl">;
+}
+
+export interface MediaConnection {
+  edges: MediaEdge[];
+}
+
 export interface CharacterName {
   first: string | null;
   middle: string | null;
@@ -161,6 +186,7 @@ export interface Media {
   trending: number | null;
   tags: MediaTag[];
   studios: StudioConnection;
+  relations: MediaConnection | null;
   isAdult: boolean | null;
   siteUrl: string | null;
 }
@@ -285,6 +311,11 @@ export interface SearchCharacterOptions {
 
 export interface SearchStaffOptions {
   query?: string;
+  page?: number;
+  perPage?: number;
+}
+
+export interface PaginatedOptions {
   page?: number;
   perPage?: number;
 }
@@ -433,6 +464,24 @@ export interface GetUserMediaListOptions {
   status?: MediaListStatus;
   /** Sort order */
   sort?: MediaListSort[];
+  page?: number;
+  perPage?: number;
+}
+
+export interface StudioDetail {
+  id: number;
+  name: string;
+  isAnimationStudio: boolean;
+  siteUrl: string | null;
+  favourites: number | null;
+  media: {
+    pageInfo: PageInfo;
+    nodes: Pick<Media, "id" | "title" | "type" | "format" | "coverImage" | "siteUrl">[];
+  } | null;
+}
+
+export interface SearchStudioOptions {
+  query?: string;
   page?: number;
   perPage?: number;
 }

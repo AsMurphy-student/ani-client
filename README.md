@@ -102,11 +102,31 @@ client.getMedia(1).then((anime) => console.log(anime.title.romaji));
 | `getAiredChapters(options?)`        | Recently updated releasing manga     |
 | `getPlanning(options?)`             | Upcoming not-yet-released anime / manga |
 
+### Studios
+
+| Method                              | Description                          |
+| ----------------------------------- | ------------------------------------ |
+| `getStudio(id: number)`             | Fetch a studio by ID                 |
+| `searchStudios(options?)`           | Search studios by name               |
+
+### Genres & Tags
+
+| Method                              | Description                          |
+| ----------------------------------- | ------------------------------------ |
+| `getGenres()`                       | List all available genres            |
+| `getTags()`                         | List all available media tags        |
+
 ### Raw queries
 
 | Method                              | Description                          |
 | ----------------------------------- | ------------------------------------ |
 | `raw<T>(query, variables?)`         | Execute any GraphQL query            |
+
+### Pagination helper
+
+| Method                              | Description                          |
+| ----------------------------------- | ------------------------------------ |
+| `paginate<T>(fetchPage, maxPages?)` | Auto-paginating async iterator       |
 
 ### Cache management
 
@@ -329,6 +349,81 @@ recs.results.forEach((r) =>
 const page2 = await client.getRecommendations(20, { page: 2, perPage: 10 });
 ```
 
+## Relations
+
+All media objects now include a `relations` field with sequels, prequels, spin-offs, etc.
+
+```ts
+const anime = await client.getMedia(1); // Cowboy Bebop
+anime.relations?.edges.forEach((edge) =>
+  console.log(`${edge.relationType}: ${edge.node.title.romaji}`)
+);
+// SIDE_STORY: Cowboy Bebop: Tengoku no Tobira
+```
+
+Available relation types: `ADAPTATION`, `PREQUEL`, `SEQUEL`, `PARENT`, `SIDE_STORY`, `CHARACTER`, `SUMMARY`, `ALTERNATIVE`, `SPIN_OFF`, `OTHER`, `SOURCE`, `COMPILATION`, `CONTAINS`.
+
+## Studios
+
+Fetch or search for animation studios.
+
+### `getStudio(id)`
+
+Returns the studio with its most popular productions.
+
+```ts
+const studio = await client.getStudio(44); // Bones
+console.log(studio.name); // "Bones"
+console.log(studio.isAnimationStudio); // true
+studio.media?.nodes.forEach((m) => console.log(m.title.romaji));
+```
+
+### `searchStudios(options?)`
+
+| Option    | Type     | Default | Description             |
+| --------- | -------- | ------- | ----------------------- |
+| `query`   | `string` | —       | Search term             |
+| `page`    | `number` | `1`     | Page number             |
+| `perPage` | `number` | `20`    | Results per page        |
+
+```ts
+const result = await client.searchStudios({ query: "MAPPA" });
+result.results.forEach((s) => console.log(s.name));
+```
+
+## Genres & Tags
+
+List all genres and tags available on AniList.
+
+```ts
+const genres = await client.getGenres();
+console.log(genres); // ["Action", "Adventure", "Comedy", ...]
+
+const tags = await client.getTags();
+tags.forEach((t) => console.log(`${t.name} (${t.category})`));
+```
+
+## Auto-pagination
+
+Use `paginate()` to iterate across all pages automatically with an async iterator.
+
+```ts
+// Iterate over all search results
+for await (const anime of client.paginate((page) =>
+  client.searchMedia({ query: "Gundam", page, perPage: 10 })
+)) {
+  console.log(anime.title.romaji);
+}
+
+// Limit to 3 pages max
+for await (const anime of client.paginate(
+  (page) => client.getTrending(MediaType.ANIME, page, 20),
+  3,
+)) {
+  console.log(anime.title.romaji);
+}
+```
+
 ## Error handling
 
 All API errors throw an `AniListError` with:
@@ -362,8 +457,12 @@ import type {
   AiringSchedule,
   MediaListEntry,
   Recommendation,
+  StudioDetail,
+  MediaEdge,
+  MediaConnection,
   PagedResult,
   SearchMediaOptions,
+  SearchStudioOptions,
   GetAiringOptions,
   GetRecentChaptersOptions,
   GetPlanningOptions,

@@ -254,6 +254,73 @@ async function run() {
     assert(result.results.length <= 3, "should respect perPage limit");
   });
 
+  // ── Relations ──
+  console.log("\nRelations:");
+
+  await test("getMedia(1) includes relations", async () => {
+    client.clearCache();
+    const media = await client.getMedia(1);
+    assert(media.relations !== null && media.relations !== undefined, "relations should exist");
+    assert(Array.isArray(media.relations.edges), "relations.edges should be an array");
+    if (media.relations.edges.length > 0) {
+      const edge = media.relations.edges[0];
+      assert(typeof edge.relationType === "string", "relationType should be a string");
+      assert(typeof edge.node.id === "number", "related media should have an id");
+    }
+  });
+
+  // ── Studios ──
+  console.log("\nStudios:");
+
+  await test("getStudio(1) returns a studio", async () => {
+    const studio = await client.getStudio(1);
+    assert(studio.id === 1, "id should be 1");
+    assert(typeof studio.name === "string", "should have a name");
+    assert(typeof studio.isAnimationStudio === "boolean", "should have isAnimationStudio");
+  });
+
+  await test("searchStudios({ query: 'MAPPA' })", async () => {
+    const result = await client.searchStudios({ query: "MAPPA", perPage: 3 });
+    assert(result.results.length > 0, "should return at least 1 studio");
+    assert(
+      result.results.some((s) => s.name.toUpperCase().includes("MAPPA")),
+      "should contain MAPPA",
+    );
+  });
+
+  // ── Genres & Tags ──
+  console.log("\nGenres & Tags:");
+
+  await test("getGenres() returns genre list", async () => {
+    const genres = await client.getGenres();
+    assert(Array.isArray(genres), "should be an array");
+    assert(genres.length > 0, "should have at least 1 genre");
+    assert(genres.includes("Action"), "should include Action");
+  });
+
+  await test("getTags() returns tag list", async () => {
+    const tags = await client.getTags();
+    assert(Array.isArray(tags), "should be an array");
+    assert(tags.length > 0, "should have at least 1 tag");
+    assert(typeof tags[0].id === "number", "tag should have an id");
+    assert(typeof tags[0].name === "string", "tag should have a name");
+  });
+
+  // ── Paginate (async iterator) ──
+  console.log("\nPaginate:");
+
+  await test("paginate() iterates across pages", async () => {
+    const items: string[] = [];
+    for await (const anime of client.paginate(
+      (page) => client.getTrending("ANIME" as any, page, 3),
+      2,
+    )) {
+      items.push(anime.title.romaji ?? "?");
+    }
+    assert(items.length > 3, "should yield items across multiple pages");
+    assert(items.length <= 6, "should stop after maxPages (2 × 3)");
+  });
+
   // ── Error handling ──
   console.log("\nError handling:");
 
