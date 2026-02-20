@@ -3,7 +3,7 @@
  * Hits the real AniList API (no mock).
  */
 
-import { AniListClient, MediaType, AniListError } from "../src";
+import { AniListClient, MediaType, MediaSeason, MediaListStatus, AniListError } from "../src";
 
 const client = new AniListClient();
 
@@ -154,6 +154,79 @@ async function run() {
     const result = await client.getPlanning({ type: MediaType.ANIME, perPage: 5 });
     assert(result.results.length > 0, "should return at least 1 planned anime");
     assert(result.results.every((m) => m.type === "ANIME"), "all should be ANIME");
+  });
+
+  // ── Season ──
+  console.log("\nSeason:");
+
+  await test("getMediaBySeason({ season: WINTER, seasonYear: 2025 })", async () => {
+    const result = await client.getMediaBySeason({
+      season: MediaSeason.WINTER,
+      seasonYear: 2025,
+      perPage: 5,
+    });
+    assert(result.results.length > 0, "should return at least 1 anime");
+    assert(result.pageInfo.currentPage === 1, "should be page 1");
+    assert(
+      result.results.every((m) => m.season === "WINTER" && m.seasonYear === 2025),
+      "all should be WINTER 2025",
+    );
+  });
+
+  await test("getMediaBySeason({ season: SPRING, seasonYear: 2025, type: MANGA })", async () => {
+    const result = await client.getMediaBySeason({
+      season: MediaSeason.SPRING,
+      seasonYear: 2025,
+      type: MediaType.MANGA,
+      perPage: 3,
+    });
+    assert(Array.isArray(result.results), "results should be an array");
+    assert(result.pageInfo !== undefined, "pageInfo should exist");
+  });
+
+  // ── User Media List ──
+  console.log("\nUser Media List:");
+
+  await test("getUserMediaList({ userName: 'AniList', type: ANIME })", async () => {
+    const result = await client.getUserMediaList({
+      userName: "AniList",
+      type: MediaType.ANIME,
+      perPage: 5,
+    });
+    assert(Array.isArray(result.results), "results should be an array");
+    assert(result.pageInfo !== undefined, "pageInfo should exist");
+    if (result.results.length > 0) {
+      assert(result.results[0].media !== undefined, "each entry should have media");
+      assert(typeof result.results[0].mediaId === "number", "mediaId should be a number");
+    }
+  });
+
+  await test("getUserMediaList with status filter", async () => {
+    const result = await client.getUserMediaList({
+      userName: "AniList",
+      type: MediaType.ANIME,
+      status: MediaListStatus.COMPLETED,
+      perPage: 3,
+    });
+    assert(Array.isArray(result.results), "results should be an array");
+    if (result.results.length > 0) {
+      assert(
+        result.results.every((e) => e.status === "COMPLETED"),
+        "all entries should be COMPLETED",
+      );
+    }
+  });
+
+  await test("getUserMediaList throws without userId or userName", async () => {
+    try {
+      await client.getUserMediaList({ type: MediaType.ANIME } as any);
+      throw new Error("Should have thrown");
+    } catch (err: any) {
+      assert(
+        err.message.includes("userId") || err.message.includes("userName"),
+        "should mention userId or userName",
+      );
+    }
   });
 
   // ── Error handling ──

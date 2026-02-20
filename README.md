@@ -69,6 +69,7 @@ client.getMedia(1).then((anime) => console.log(anime.title.romaji));
 | `getMedia(id: number)`              | Fetch a single anime / manga by ID   |
 | `searchMedia(options?)`             | Search & filter anime / manga        |
 | `getTrending(type?, page?, perPage?)` | Get currently trending entries      |
+| `getMediaBySeason(options)`         | Get all anime/manga for a given season & year |
 
 ### Characters
 
@@ -90,6 +91,7 @@ client.getMedia(1).then((anime) => console.log(anime.title.romaji));
 | ----------------------------------- | ------------------------------------ |
 | `getUser(id: number)`               | Fetch a user by ID                   |
 | `getUserByName(name: string)`       | Fetch a user by username             |
+| `getUserMediaList(options)`         | Get a user's anime or manga list     |
 
 ### Airing, Chapters & Planning
 
@@ -218,6 +220,87 @@ upcoming.results.forEach((m) => console.log(m.title.romaji));
 const all = await client.getPlanning();
 ```
 
+## Season charts
+
+Fetch all anime (or manga) for a specific season and year.
+
+### `getMediaBySeason(options)`
+
+| Option       | Type           | Default              | Description                              |
+| ------------ | -------------- | -------------------- | ---------------------------------------- |
+| `season`     | `MediaSeason`  | **(required)**       | WINTER, SPRING, SUMMER, or FALL          |
+| `seasonYear` | `number`       | **(required)**       | The year (e.g. 2026)                     |
+| `type`       | `MediaType`    | `ANIME`              | Filter by ANIME or MANGA                 |
+| `sort`       | `MediaSort[]`  | `["POPULARITY_DESC"]`| Sort order                               |
+| `page`       | `number`       | `1`                  | Page number                              |
+| `perPage`    | `number`       | `20`                 | Results per page (max 50)                |
+
+```ts
+import { AniListClient, MediaSeason } from "ani-client";
+
+const client = new AniListClient();
+
+// All anime from Winter 2026
+const winter2026 = await client.getMediaBySeason({
+  season: MediaSeason.WINTER,
+  seasonYear: 2026,
+  perPage: 25,
+});
+winter2026.results.forEach((m) => console.log(m.title.romaji));
+
+// Spring 2025 manga
+const spring = await client.getMediaBySeason({
+  season: MediaSeason.SPRING,
+  seasonYear: 2025,
+  type: MediaType.MANGA,
+});
+```
+
+## User media lists
+
+Fetch a user's anime or manga list, optionally filtered by status.
+
+### `getUserMediaList(options)`
+
+| Option     | Type              | Default              | Description                                |
+| ---------- | ----------------- | -------------------- | ------------------------------------------ |
+| `userId`   | `number`          | —                    | User ID (provide userId **or** userName)   |
+| `userName` | `string`          | —                    | Username (provide userId **or** userName)  |
+| `type`     | `MediaType`       | **(required)**       | ANIME or MANGA                             |
+| `status`   | `MediaListStatus` | —                    | Filter: CURRENT, COMPLETED, PLANNING, etc. |
+| `sort`     | `MediaListSort[]` | —                    | Sort order                                 |
+| `page`     | `number`          | `1`                  | Page number                                |
+| `perPage`  | `number`          | `20`                 | Results per page (max 50)                  |
+
+```ts
+import { AniListClient, MediaType, MediaListStatus } from "ani-client";
+
+const client = new AniListClient();
+
+// All anime on a user's list
+const list = await client.getUserMediaList({
+  userName: "AniList",
+  type: MediaType.ANIME,
+  perPage: 10,
+});
+list.results.forEach((entry) =>
+  console.log(`${entry.media.title.romaji} — ${entry.score}/100`)
+);
+
+// Only completed anime
+const completed = await client.getUserMediaList({
+  userName: "AniList",
+  type: MediaType.ANIME,
+  status: MediaListStatus.COMPLETED,
+});
+
+// By user ID
+const byId = await client.getUserMediaList({
+  userId: 1,
+  type: MediaType.MANGA,
+});
+```
+
 ## Error handling
 
 All API errors throw an `AniListError` with:
@@ -249,11 +332,14 @@ import type {
   Staff,
   User,
   AiringSchedule,
+  MediaListEntry,
   PagedResult,
   SearchMediaOptions,
   GetAiringOptions,
   GetRecentChaptersOptions,
   GetPlanningOptions,
+  GetSeasonOptions,
+  GetUserMediaListOptions,
 } from "ani-client";
 ```
 

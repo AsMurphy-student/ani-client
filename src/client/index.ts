@@ -11,6 +11,8 @@ import {
   QUERY_AIRING_SCHEDULE,
   QUERY_RECENT_CHAPTERS,
   QUERY_PLANNING,
+  QUERY_MEDIA_BY_SEASON,
+  QUERY_USER_MEDIA_LIST,
 } from "../queries";
 
 import { AniListError } from "../errors";
@@ -24,6 +26,7 @@ import type {
   Staff,
   User,
   AiringSchedule,
+  MediaListEntry,
   PagedResult,
   SearchMediaOptions,
   SearchCharacterOptions,
@@ -31,6 +34,8 @@ import type {
   GetAiringOptions,
   GetRecentChaptersOptions,
   GetPlanningOptions,
+  GetSeasonOptions,
+  GetUserMediaListOptions,
   MediaType,
 } from "../types";
 
@@ -334,6 +339,86 @@ export class AniListClient {
     }>(QUERY_PLANNING, variables);
 
     return { pageInfo: data.Page.pageInfo, results: data.Page.media };
+  }
+
+  /**
+   * Get anime (or manga) for a specific season and year.
+   *
+   * @param options - Season, year and optional filter / pagination parameters
+   * @returns Paginated list of media for the given season
+   *
+   * @example
+   * ```ts
+   * import { MediaSeason } from "ani-client";
+   *
+   * const winter2026 = await client.getMediaBySeason({
+   *   season: MediaSeason.WINTER,
+   *   seasonYear: 2026,
+   *   perPage: 10,
+   * });
+   * ```
+   */
+  async getMediaBySeason(options: GetSeasonOptions): Promise<PagedResult<Media>> {
+    const variables: Record<string, unknown> = {
+      season: options.season,
+      seasonYear: options.seasonYear,
+      type: options.type ?? "ANIME",
+      sort: options.sort ?? ["POPULARITY_DESC"],
+      page: options.page ?? 1,
+      perPage: options.perPage ?? 20,
+    };
+
+    const data = await this.request<{
+      Page: { pageInfo: PagedResult<Media>["pageInfo"]; media: Media[] };
+    }>(QUERY_MEDIA_BY_SEASON, variables);
+
+    return { pageInfo: data.Page.pageInfo, results: data.Page.media };
+  }
+
+  /**
+   * Get a user's anime or manga list.
+   *
+   * Provide either `userId` or `userName` to identify the user.
+   * Requires `type` (ANIME or MANGA). Optionally filter by list status.
+   *
+   * @param options - User identifier, media type, and optional filters
+   * @returns Paginated list of media list entries
+   *
+   * @example
+   * ```ts
+   * import { MediaType, MediaListStatus } from "ani-client";
+   *
+   * // Get a user's completed anime list
+   * const list = await client.getUserMediaList({
+   *   userName: "AniList",
+   *   type: MediaType.ANIME,
+   *   status: MediaListStatus.COMPLETED,
+   * });
+   * list.results.forEach((entry) =>
+   *   console.log(`${entry.media.title.romaji} — ${entry.score}/100`)
+   * );
+   * ```
+   */
+  async getUserMediaList(options: GetUserMediaListOptions): Promise<PagedResult<MediaListEntry>> {
+    if (!options.userId && !options.userName) {
+      throw new Error("Either userId or userName must be provided");
+    }
+
+    const variables: Record<string, unknown> = {
+      userId: options.userId,
+      userName: options.userName,
+      type: options.type,
+      status: options.status,
+      sort: options.sort,
+      page: options.page ?? 1,
+      perPage: options.perPage ?? 20,
+    };
+
+    const data = await this.request<{
+      Page: { pageInfo: PagedResult<MediaListEntry>["pageInfo"]; mediaList: MediaListEntry[] };
+    }>(QUERY_USER_MEDIA_LIST, variables);
+
+    return { pageInfo: data.Page.pageInfo, results: data.Page.mediaList };
   }
 
   /**

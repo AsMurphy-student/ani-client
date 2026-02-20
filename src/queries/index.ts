@@ -227,3 +227,43 @@ query ($type: MediaType, $sort: [MediaSort], $page: Int, $perPage: Int) {
     }
   }
 }`;
+
+export const QUERY_MEDIA_BY_SEASON = `
+query ($season: MediaSeason!, $seasonYear: Int!, $type: MediaType, $sort: [MediaSort], $page: Int, $perPage: Int) {
+  Page(page: $page, perPage: $perPage) {
+    pageInfo { total perPage currentPage lastPage hasNextPage }
+    media(season: $season, seasonYear: $seasonYear, type: $type, sort: $sort) {
+      ${MEDIA_FIELDS}
+    }
+  }
+}`;
+
+const MEDIA_LIST_FIELDS = `
+  id
+  mediaId
+  status
+  score(format: POINT_100)
+  progress
+  progressVolumes
+  repeat
+  priority
+  private
+  notes
+  startedAt { year month day }
+  completedAt { year month day }
+  updatedAt
+  createdAt
+  media {
+    ${MEDIA_FIELDS}
+  }
+`;
+
+export const QUERY_USER_MEDIA_LIST = `
+query ($userId: Int, $userName: String, $type: MediaType!, $status: MediaListStatus, $sort: [MediaListSort], $page: Int, $perPage: Int) {
+  Page(page: $page, perPage: $perPage) {
+    pageInfo { total perPage currentPage lastPage hasNextPage }
+    mediaList(userId: $userId, userName: $userName, type: $type, status: $status, sort: $sort) {
+      ${MEDIA_LIST_FIELDS}
+    }
+  }
+}`;
