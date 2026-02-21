@@ -1,52 +1,58 @@
 import {
-  QUERY_MEDIA_BY_ID,
-  QUERY_MEDIA_SEARCH,
-  QUERY_TRENDING,
+  QUERY_AIRING_SCHEDULE,
   QUERY_CHARACTER_BY_ID,
   QUERY_CHARACTER_SEARCH,
+  QUERY_GENRES,
+  QUERY_MEDIA_BY_ID,
+  QUERY_MEDIA_BY_SEASON,
+  QUERY_MEDIA_SEARCH,
+  QUERY_PLANNING,
+  QUERY_RECENT_CHAPTERS,
+  QUERY_RECOMMENDATIONS,
   QUERY_STAFF_BY_ID,
   QUERY_STAFF_SEARCH,
-  QUERY_USER_BY_ID,
-  QUERY_USER_BY_NAME,
-  QUERY_AIRING_SCHEDULE,
-  QUERY_RECENT_CHAPTERS,
-  QUERY_PLANNING,
-  QUERY_MEDIA_BY_SEASON,
-  QUERY_USER_MEDIA_LIST,
-  QUERY_RECOMMENDATIONS,
   QUERY_STUDIO_BY_ID,
   QUERY_STUDIO_SEARCH,
-  QUERY_GENRES,
   QUERY_TAGS,
+  QUERY_TRENDING,
+  QUERY_USER_BY_ID,
+  QUERY_USER_BY_NAME,
+  QUERY_USER_MEDIA_LIST,
+  buildBatchCharacterQuery,
+  buildBatchMediaQuery,
+  buildBatchStaffQuery,
 } from "../queries";
 
-import { AniListError } from "../errors";
 import { MemoryCache } from "../cache";
+import { AniListError } from "../errors";
 import { RateLimiter } from "../rate-limiter";
 
 import type {
-  AniListClientOptions,
-  Media,
-  Character,
-  Staff,
-  User,
   AiringSchedule,
-  MediaListEntry,
-  Recommendation,
-  StudioDetail,
-  MediaTag,
-  PagedResult,
-  SearchMediaOptions,
-  SearchCharacterOptions,
-  SearchStaffOptions,
-  SearchStudioOptions,
+  AniListClientOptions,
+  AniListHooks,
+  CacheAdapter,
+  Character,
   GetAiringOptions,
-  GetRecentChaptersOptions,
   GetPlanningOptions,
+  GetRecentChaptersOptions,
+  GetRecommendationsOptions,
   GetSeasonOptions,
   GetUserMediaListOptions,
-  GetRecommendationsOptions,
+  Media,
+  MediaListEntry,
+  MediaTag,
   MediaType,
+  PageInfo,
+  PagedResult,
+  Recommendation,
+  SearchCharacterOptions,
+  SearchMediaOptions,
+  SearchStaffOptions,
+  SearchStudioOptions,
+  Staff,
+  StudioDetail,
+  User,
 } from "../types";
 
 const DEFAULT_API_URL = "https://graphql.anilist.co";
@@ -72,8 +78,10 @@ const DEFAULT_API_URL = "https://graphql.anilist.co";
 export class AniListClient {
   private readonly apiUrl: string;
   private readonly headers: Record<string, string>;
-  private readonly cache: MemoryCache;
+  private readonly cacheAdapter: CacheAdapter;
   private readonly rateLimiter: RateLimiter;
+  private readonly hooks: AniListHooks;
+  private readonly inFlight = new Map<string, Promise<unknown>>();
 
   constructor(options: AniListClientOptions = {}) {
     this.apiUrl = options.apiUrl ?? DEFAULT_API_URL;
@@ -82,10 +90,11 @@ export class AniListClient {
       Accept: "application/json",
     };
     if (options.token) {
-      this.headers["Authorization"] = `Bearer ${options.token}`;
+      this.headers.Authorization = `Bearer ${options.token}`;
     }
-    this.cache = new MemoryCache(options.cache);
+    this.cacheAdapter = options.cacheAdapter ?? new MemoryCache(options.cache);
     this.rateLimiter = new RateLimiter(options.rateLimit);
+    this.hooks = options.hooks ?? {};
   }
 
   /**
@@ -93,27 +102,69 @@ export class AniListClient {
    */
   private async request<T>(query: string, variables: Record<string, unknown> = {}): Promise<T> {
     const cacheKey = MemoryCache.key(query, variables);
-    const cached = this.cache.get<T>(cacheKey);
-    if (cached !== undefined) return cached;
 
-    const res = await this.rateLimiter.fetchWithRetry(this.apiUrl, {
-      method: "POST",
-      headers: this.headers,
-      body: JSON.stringify({ query, variables }),
-    });
+    // Check cache (await handles both sync and async adapters)
+    const cached = await this.cacheAdapter.get<T>(cacheKey);
+    if (cached !== undefined) {
+      this.hooks.onCacheHit?.(cacheKey);
+      this.hooks.onResponse?.(query, 0, true);
+      return cached;
+    }
+
+    // Request deduplication — reuse in-flight request for the same key
+    const existing = this.inFlight.get(cacheKey);
+    if (existing) return existing as Promise<T>;
+
+    const promise = this.executeRequest<T>(query, variables, cacheKey);
+    this.inFlight.set(cacheKey, promise);
+
+    try {
+      return await promise;
+    } finally {
+      this.inFlight.delete(cacheKey);
+    }
+  }
+
+  /** @internal */
+  private async executeRequest<T>(query: string, variables: Record<string, unknown>, cacheKey: string): Promise<T> {
+    const start = Date.now();
+    this.hooks.onRequest?.(query, variables);
+
+    const res = await this.rateLimiter.fetchWithRetry(
+      this.apiUrl,
+      {
+        method: "POST",
+        headers: this.headers,
+        body: JSON.stringify({ query, variables }),
+      },
+      { onRetry: this.hooks.onRetry, onRateLimit: this.hooks.onRateLimit },
+    );
 
     const json = (await res.json()) as { data?: T; errors?: unknown[] };
 
     if (!res.ok || json.errors) {
       const message =
-        (json.errors as Array<{ message?: string }>)?.[0]?.message ??
-        `AniList API error (HTTP ${res.status})`;
+        (json.errors as Array<{ message?: string }>)?.[0]?.message ?? `AniList API error (HTTP ${res.status})`;
       throw new AniListError(message, res.status, json.errors ?? []);
     }
 
     const data = json.data as T;
-    this.cache.set(cacheKey, data);
+    await this.cacheAdapter.set(cacheKey, data);
+    this.hooks.onResponse?.(query, Date.now() - start, false);
     return data;
+  }
+
+  /**
+   * @internal
+   * Shorthand for paginated queries that follow the `Page { pageInfo, <field>[] }` pattern.
+   */
+  private async pagedRequest<T>(
+    query: string,
+    variables: Record<string, unknown>,
+    field: string,
+  ): Promise<PagedResult<T>> {
+    const data = await this.request<{ Page: Record<string, unknown> & { pageInfo: PageInfo } }>(query, variables);
+    return { pageInfo: data.Page.pageInfo, results: data.Page[field] as T[] };
   }
 
   /**
@@ -143,26 +194,8 @@ export class AniListClient {
    * ```
    */
   async searchMedia(options: SearchMediaOptions = {}): Promise<PagedResult<Media>> {
-    const variables: Record<string, unknown> = {
-      search: options.query,
-      type: options.type,
-      format: options.format,
-      status: options.status,
-      season: options.season,
-      seasonYear: options.seasonYear,
-      genre: options.genre,
-      tag: options.tag,
-      isAdult: options.isAdult,
-      sort: options.sort,
-      page: options.page ?? 1,
-      perPage: options.perPage ?? 20,
-    };
-
-    const data = await this.request<{
-      Page: { pageInfo: PagedResult<Media>["pageInfo"]; media: Media[] };
-    }>(QUERY_MEDIA_SEARCH, variables);
-
-    return { pageInfo: data.Page.pageInfo, results: data.Page.media };
+    const { query: search, page = 1, perPage = 20, ...filters } = options;
+    return this.pagedRequest<Media>(QUERY_MEDIA_SEARCH, { search, ...filters, page, perPage }, "media");
   }
 
   /**
@@ -172,16 +205,8 @@ export class AniListClient {
    * @param page - Page number (default 1)
    * @param perPage - Results per page (default 20, max 50)
    */
-  async getTrending(
-    type: MediaType = "ANIME" as MediaType,
-    page = 1,
-    perPage = 20,
-  ): Promise<PagedResult<Media>> {
-    const data = await this.request<{
-      Page: { pageInfo: PagedResult<Media>["pageInfo"]; media: Media[] };
-    }>(QUERY_TRENDING, { type, page, perPage });
-
-    return { pageInfo: data.Page.pageInfo, results: data.Page.media };
+  async getTrending(type: MediaType = "ANIME" as MediaType, page = 1, perPage = 20): Promise<PagedResult<Media>> {
+    return this.pagedRequest<Media>(QUERY_TRENDING, { type, page, perPage }, "media");
   }
 
   /**
@@ -196,18 +221,8 @@ export class AniListClient {
    * Search for characters by name.
    */
   async searchCharacters(options: SearchCharacterOptions = {}): Promise<PagedResult<Character>> {
-    const variables: Record<string, unknown> = {
-      search: options.query,
-      sort: options.sort,
-      page: options.page ?? 1,
-      perPage: options.perPage ?? 20,
-    };
-
-    const data = await this.request<{
-      Page: { pageInfo: PagedResult<Character>["pageInfo"]; characters: Character[] };
-    }>(QUERY_CHARACTER_SEARCH, variables);
-
-    return { pageInfo: data.Page.pageInfo, results: data.Page.characters };
+    const { query: search, page = 1, perPage = 20, ...rest } = options;
+    return this.pagedRequest<Character>(QUERY_CHARACTER_SEARCH, { search, ...rest, page, perPage }, "characters");
   }
 
   /**
@@ -222,17 +237,8 @@ export class AniListClient {
    * Search for staff (voice actors, directors, etc.).
    */
   async searchStaff(options: SearchStaffOptions = {}): Promise<PagedResult<Staff>> {
-    const variables: Record<string, unknown> = {
-      search: options.query,
-      page: options.page ?? 1,
-      perPage: options.perPage ?? 20,
-    };
-
-    const data = await this.request<{
-      Page: { pageInfo: PagedResult<Staff>["pageInfo"]; staff: Staff[] };
-    }>(QUERY_STAFF_SEARCH, variables);
-
-    return { pageInfo: data.Page.pageInfo, results: data.Page.staff };
+    const { query: search, page = 1, perPage = 20 } = options;
+    return this.pagedRequest<Staff>(QUERY_STAFF_SEARCH, { search, page, perPage }, "staff");
   }
 
   /**
@@ -288,11 +294,7 @@ export class AniListClient {
       perPage: options.perPage ?? 20,
     };
 
-    const data = await this.request<{
-      Page: { pageInfo: PagedResult<AiringSchedule>["pageInfo"]; airingSchedules: AiringSchedule[] };
-    }>(QUERY_AIRING_SCHEDULE, variables);
-
-    return { pageInfo: data.Page.pageInfo, results: data.Page.airingSchedules };
+    return this.pagedRequest<AiringSchedule>(QUERY_AIRING_SCHEDULE, variables, "airingSchedules");
   }
 
   /**
@@ -310,16 +312,14 @@ export class AniListClient {
    * ```
    */
   async getAiredChapters(options: GetRecentChaptersOptions = {}): Promise<PagedResult<Media>> {
-    const variables: Record<string, unknown> = {
-      page: options.page ?? 1,
-      perPage: options.perPage ?? 20,
-    };
-
-    const data = await this.request<{
-      Page: { pageInfo: PagedResult<Media>["pageInfo"]; media: Media[] };
-    }>(QUERY_RECENT_CHAPTERS, variables);
-
-    return { pageInfo: data.Page.pageInfo, results: data.Page.media };
+    return this.pagedRequest<Media>(
+      QUERY_RECENT_CHAPTERS,
+      {
+        page: options.page ?? 1,
+        perPage: options.perPage ?? 20,
+      },
+      "media",
+    );
   }
 
   /**
@@ -337,18 +337,16 @@ export class AniListClient {
    * ```
    */
   async getPlanning(options: GetPlanningOptions = {}): Promise<PagedResult<Media>> {
-    const variables: Record<string, unknown> = {
-      type: options.type,
-      sort: options.sort ?? ["POPULARITY_DESC"],
-      page: options.page ?? 1,
-      perPage: options.perPage ?? 20,
-    };
-
-    const data = await this.request<{
-      Page: { pageInfo: PagedResult<Media>["pageInfo"]; media: Media[] };
-    }>(QUERY_PLANNING, variables);
-
-    return { pageInfo: data.Page.pageInfo, results: data.Page.media };
+    return this.pagedRequest<Media>(
+      QUERY_PLANNING,
+      {
+        type: options.type,
+        sort: options.sort ?? ["POPULARITY_DESC"],
+        page: options.page ?? 1,
+        perPage: options.perPage ?? 20,
+      },
+      "media",
+    );
   }
 
   /**
@@ -413,20 +411,18 @@ export class AniListClient {
    * ```
    */
   async getMediaBySeason(options: GetSeasonOptions): Promise<PagedResult<Media>> {
-    const variables: Record<string, unknown> = {
-      season: options.season,
-      seasonYear: options.seasonYear,
-      type: options.type ?? "ANIME",
-      sort: options.sort ?? ["POPULARITY_DESC"],
-      page: options.page ?? 1,
-      perPage: options.perPage ?? 20,
-    };
-
-    const data = await this.request<{
-      Page: { pageInfo: PagedResult<Media>["pageInfo"]; media: Media[] };
-    }>(QUERY_MEDIA_BY_SEASON, variables);
-
-    return { pageInfo: data.Page.pageInfo, results: data.Page.media };
+    return this.pagedRequest<Media>(
+      QUERY_MEDIA_BY_SEASON,
+      {
+        season: options.season,
+        seasonYear: options.seasonYear,
+        type: options.type ?? "ANIME",
+        sort: options.sort ?? ["POPULARITY_DESC"],
+        page: options.page ?? 1,
+        perPage: options.perPage ?? 20,
+      },
+      "media",
+    );
   }
 
   /**
@@ -458,21 +454,19 @@ export class AniListClient {
       throw new Error("Either userId or userName must be provided");
     }
 
-    const variables: Record<string, unknown> = {
-      userId: options.userId,
-      userName: options.userName,
-      type: options.type,
-      status: options.status,
-      sort: options.sort,
-      page: options.page ?? 1,
-      perPage: options.perPage ?? 20,
-    };
-
-    const data = await this.request<{
-      Page: { pageInfo: PagedResult<MediaListEntry>["pageInfo"]; mediaList: MediaListEntry[] };
-    }>(QUERY_USER_MEDIA_LIST, variables);
-
-    return { pageInfo: data.Page.pageInfo, results: data.Page.mediaList };
+    return this.pagedRequest<MediaListEntry>(
+      QUERY_USER_MEDIA_LIST,
+      {
+        userId: options.userId,
+        userName: options.userName,
+        type: options.type,
+        status: options.status,
+        sort: options.sort,
+        page: options.page ?? 1,
+        perPage: options.perPage ?? 20,
+      },
+      "mediaList",
+    );
   }
 
   /**
@@ -499,17 +493,15 @@ export class AniListClient {
    * ```
    */
   async searchStudios(options: SearchStudioOptions = {}): Promise<PagedResult<StudioDetail>> {
-    const variables: Record<string, unknown> = {
-      search: options.query,
-      page: options.page ?? 1,
-      perPage: options.perPage ?? 20,
-    };
-
-    const data = await this.request<{
-      Page: { pageInfo: PagedResult<StudioDetail>["pageInfo"]; studios: StudioDetail[] };
-    }>(QUERY_STUDIO_SEARCH, variables);
-
-    return { pageInfo: data.Page.pageInfo, results: data.Page.studios };
+    return this.pagedRequest<StudioDetail>(
+      QUERY_STUDIO_SEARCH,
+      {
+        search: options.query,
+        page: options.page ?? 1,
+        perPage: options.perPage ?? 20,
+      },
+      "studios",
+    );
   }
 
   /**
@@ -562,7 +554,7 @@ export class AniListClient {
    */
   async *paginate<T>(
     fetchPage: (page: number) => Promise<PagedResult<T>>,
-    maxPages = Infinity,
+    maxPages = Number.POSITIVE_INFINITY,
   ): AsyncGenerator<T, void, undefined> {
     let page = 1;
     let hasNext = true;
@@ -577,17 +569,105 @@ export class AniListClient {
     }
   }
 
+  // ── Batch queries ──
+
   /**
-   * Clear the entire response cache.
+   * Fetch multiple media entries in a single API request.
+   * Uses GraphQL aliases to batch up to 50 IDs per call.
+   *
+   * @param ids - Array of AniList media IDs
+   * @returns Array of media objects (same order as input IDs)
    */
-  clearCache(): void {
-    this.cache.clear();
+  async getMediaBatch(ids: number[]): Promise<Media[]> {
+    if (ids.length === 0) return [];
+    if (ids.length === 1) return [await this.getMedia(ids[0])];
+    return this.executeBatch<Media>(ids, buildBatchMediaQuery, "m");
   }
 
   /**
-   * Number of entries currently in the cache.
+   * Fetch multiple characters in a single API request.
+   *
+   * @param ids - Array of AniList character IDs
+   * @returns Array of character objects (same order as input IDs)
+   */
+  async getCharacterBatch(ids: number[]): Promise<Character[]> {
+    if (ids.length === 0) return [];
+    if (ids.length === 1) return [await this.getCharacter(ids[0])];
+    return this.executeBatch<Character>(ids, buildBatchCharacterQuery, "c");
+  }
+
+  /**
+   * Fetch multiple staff members in a single API request.
+   *
+   * @param ids - Array of AniList staff IDs
+   * @returns Array of staff objects (same order as input IDs)
+   */
+  async getStaffBatch(ids: number[]): Promise<Staff[]> {
+    if (ids.length === 0) return [];
+    if (ids.length === 1) return [await this.getStaff(ids[0])];
+    return this.executeBatch<Staff>(ids, buildBatchStaffQuery, "s");
+  }
+
+  /** @internal */
+  private async executeBatch<T>(ids: number[], buildQuery: (ids: number[]) => string, prefix: string): Promise<T[]> {
+    const chunks = this.chunk(ids, 50);
+    const results: T[] = [];
+
+    for (const chunk of chunks) {
+      const query = buildQuery(chunk);
+      const data = await this.request<Record<string, T>>(query);
+      results.push(...chunk.map((_, i) => data[`${prefix}${i}`]));
+    }
+
+    return results;
+  }
+
+  /** @internal */
+  private chunk<T>(arr: T[], size: number): T[][] {
+    const chunks: T[][] = [];
+    for (let i = 0; i < arr.length; i += size) {
+      chunks.push(arr.slice(i, i + size));
+    }
+    return chunks;
+  }
+
+  // ── Cache management ──
+
+  /**
+   * Clear the entire response cache.
+   */
+  async clearCache(): Promise<void> {
+    await this.cacheAdapter.clear();
+  }
+
+  /**
+   * Number of entries currently in the cache (sync).
+   * For async adapters like Redis, this may be approximate.
    */
   get cacheSize(): number {
-    return this.cache.size;
+    return this.cacheAdapter.size;
+  }
+
+  /**
+   * Remove cache entries whose key matches the given pattern.
+   *
+   * @param pattern — A string (converted to RegExp) or RegExp
+   * @returns Number of entries removed
+   */
+  async invalidateCache(pattern: string | RegExp): Promise<number> {
+    if (this.cacheAdapter.invalidate) {
+      return this.cacheAdapter.invalidate(pattern);
+    }
+
+    const allKeys = await this.cacheAdapter.keys();
+    const regex = typeof pattern === "string" ? new RegExp(pattern) : pattern;
+    let count = 0;
+    for (const key of allKeys) {
+      if (regex.test(key)) {
+        await this.cacheAdapter.delete(key);
+        count++;
+      }
+    }
+    return count;
   }
 }

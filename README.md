@@ -1,9 +1,52 @@
 # ani-client
 
+[![CI](https://github.com/gonzyui/ani-client/actions/workflows/ci.yml/badge.svg)](https://github.com/gonzyui/ani-client/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/ani-client)](https://www.npmjs.com/package/ani-client)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 > A simple, typed client to fetch anime, manga, character, staff and user data from [AniList](https://anilist.co).
 
-Works in **Node.js ≥ 18**, **Bun**, **Deno** and modern **browsers** — anywhere the `fetch` API is available.  
-Ships ESM + CJS bundles with full **TypeScript** declarations.
+- **Zero dependencies** — uses the native `fetch` API
+- **Universal** — Node.js ≥ 18, Bun, Deno and modern browsers
+- **Dual format** — ships ESM + CJS with full TypeScript declarations
+- **Built-in caching** — in-memory LRU with optional Redis adapter
+- **Rate-limit aware** — auto-retry on 429, configurable timeout & network error retry
+- **Request deduplication** — identical in-flight requests are coalesced
+- **Event hooks** — observe every request, cache hit, retry and response
+- **Batch queries** — fetch multiple IDs in a single GraphQL call
+
+## Table of contents
+
+- [Install](#install)
+- [Quick start](#quick-start)
+- [Client options](#client-options)
+- [API reference](#api-reference)
+  - [Media](#media)
+  - [Characters](#characters)
+  - [Staff](#staff)
+  - [Users](#users)
+  - [Airing, Chapters & Planning](#airing-chapters--planning)
+  - [Season charts](#season-charts)
+  - [User media lists](#user-media-lists)
+  - [Recommendations](#recommendations)
+  - [Relations](#relations)
+  - [Studios](#studios)
+  - [Genres & Tags](#genres--tags)
+  - [Batch queries](#batch-queries)
+  - [Raw queries](#raw-queries)
+  - [Auto-pagination](#auto-pagination)
+- [Caching](#caching)
+  - [Memory cache](#memory-cache)
+  - [Redis cache](#redis-cache)
+  - [Custom adapter](#custom-adapter)
+  - [Cache invalidation](#cache-invalidation)
+- [Rate limiting](#rate-limiting)
+- [Request deduplication](#request-deduplication)
+- [Event hooks](#event-hooks)
+- [Error handling](#error-handling)
+- [Types](#types)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Install
 
@@ -42,7 +85,8 @@ const trending = await client.getTrending(MediaType.ANIME);
 console.log(trending.results[0].title.romaji);
 ```
 
-### CommonJS
+<details>
+<summary>CommonJS</summary>
 
 ```js
 const { AniListClient } = require("ani-client");
@@ -51,426 +95,403 @@ const client = new AniListClient();
 client.getMedia(1).then((anime) => console.log(anime.title.romaji));
 ```
 
-## API
+</details>
 
-### `new AniListClient(options?)`
+## Client options
 
-| Option      | Type     | Default                          | Description                        |
-| ----------- | -------- | -------------------------------- | ---------------------------------- |
-| `token`     | `string` | —                                | AniList OAuth bearer token         |
-| `apiUrl`    | `string` | `https://graphql.anilist.co`     | Custom API endpoint                |
-| `cache`     | `object` | `{ ttl: 86400000, maxSize: 500, enabled: true }` | Cache configuration |
-| `rateLimit` | `object` | `{ maxRequests: 85, windowMs: 60000, maxRetries: 3, enabled: true }` | Rate limiter configuration |
+```ts
+const client = new AniListClient({
+  // AniList OAuth bearer token (optional)
+  token: "your-token",
+
+  // Custom API endpoint
+  apiUrl: "https://graphql.anilist.co",
+
+  // In-memory cache settings
+  cache: {
+    ttl: 86_400_000,   // 24 hours (ms)
+    maxSize: 500,       // max entries (LRU eviction)
+    enabled: true,
+  },
+
+  // Or bring your own adapter (takes precedence over `cache`)
+  cacheAdapter: new RedisCache({ client: redisClient }),
+
+  // Rate limiter
+  rateLimit: {
+    maxRequests: 85,          // per window (AniList allows 90)
+    windowMs: 60_000,         // 1 minute
+    maxRetries: 3,            // retries on 429
+    retryDelayMs: 2_000,      // delay between retries
+    timeoutMs: 30_000,        // per-request timeout (0 = none)
+    retryOnNetworkError: true, // retry ECONNRESET, ETIMEDOUT, etc.
+    enabled: true,
+  },
+
+  // Event hooks
+  hooks: {
+    onRequest:   (query, variables) => {},
+    onResponse:  (query, durationMs, fromCache) => {},
+    onCacheHit:  (key) => {},
+    onRateLimit: (retryAfterMs) => {},
+    onRetry:     (attempt, reason, delayMs) => {},
+  },
+});
+```
+
+## API reference
 
 ### Media
 
-| Method                              | Description                          |
-| ----------------------------------- | ------------------------------------ |
-| `getMedia(id: number)`              | Fetch a single anime / manga by ID   |
-| `searchMedia(options?)`             | Search & filter anime / manga        |
-| `getTrending(type?, page?, perPage?)` | Get currently trending entries      |
-| `getMediaBySeason(options)`         | Get all anime/manga for a given season & year |
-| `getRecommendations(mediaId, options?)` | Get user recommendations for a media |
+| Method | Description |
+| --- | --- |
+| `getMedia(id)` | Fetch a single anime / manga by ID |
+| `searchMedia(options?)` | Search & filter anime / manga |
+| `getTrending(type?, page?, perPage?)` | Currently trending entries |
+| `getMediaBySeason(options)` | Anime/manga for a given season & year |
+| `getRecommendations(mediaId, options?)` | User recommendations for a media |
+
+```ts
+const anime = await client.getMedia(1);
+
+const results = await client.searchMedia({
+  query: "Naruto",
+  type: MediaType.ANIME,
+  format: MediaFormat.TV,
+  genre: "Action",
+  perPage: 10,
+});
+```
 
 ### Characters
 
-| Method                              | Description                          |
-| ----------------------------------- | ------------------------------------ |
-| `getCharacter(id: number)`          | Fetch a character by ID              |
-| `searchCharacters(options?)`        | Search characters by name            |
+| Method | Description |
+| --- | --- |
+| `getCharacter(id)` | Fetch a character by ID |
+| `searchCharacters(options?)` | Search characters by name |
+
+```ts
+const spike = await client.getCharacter(1);
+const results = await client.searchCharacters({ query: "Luffy", perPage: 5 });
+```
 
 ### Staff
 
-| Method                              | Description                          |
-| ----------------------------------- | ------------------------------------ |
-| `getStaff(id: number)`              | Fetch a staff member by ID           |
-| `searchStaff(options?)`             | Search for staff members             |
+| Method | Description |
+| --- | --- |
+| `getStaff(id)` | Fetch a staff member by ID |
+| `searchStaff(options?)` | Search for staff members |
+
+```ts
+const staff = await client.getStaff(95001);
+const results = await client.searchStaff({ query: "Miyazaki" });
+```
 
 ### Users
 
-| Method                              | Description                          |
-| ----------------------------------- | ------------------------------------ |
-| `getUser(id: number)`               | Fetch a user by ID                   |
-| `getUserByName(name: string)`       | Fetch a user by username             |
-| `getUserMediaList(options)`         | Get a user's anime or manga list     |
+| Method | Description |
+| --- | --- |
+| `getUser(id)` | Fetch a user by ID |
+| `getUserByName(name)` | Fetch a user by username |
+| `getUserMediaList(options)` | Get a user's anime or manga list |
 
 ### Airing, Chapters & Planning
 
-| Method                              | Description                          |
-| ----------------------------------- | ------------------------------------ |
-| `getAiredEpisodes(options?)`        | Recently aired anime episodes (last 24 h by default) |
-| `getAiredChapters(options?)`        | Recently updated releasing manga     |
-| `getPlanning(options?)`             | Upcoming not-yet-released anime / manga |
-
-### Studios
-
-| Method                              | Description                          |
-| ----------------------------------- | ------------------------------------ |
-| `getStudio(id: number)`             | Fetch a studio by ID                 |
-| `searchStudios(options?)`           | Search studios by name               |
-
-### Genres & Tags
-
-| Method                              | Description                          |
-| ----------------------------------- | ------------------------------------ |
-| `getGenres()`                       | List all available genres            |
-| `getTags()`                         | List all available media tags        |
-
-### Raw queries
-
-| Method                              | Description                          |
-| ----------------------------------- | ------------------------------------ |
-| `raw<T>(query, variables?)`         | Execute any GraphQL query            |
-
-### Pagination helper
-
-| Method                              | Description                          |
-| ----------------------------------- | ------------------------------------ |
-| `paginate<T>(fetchPage, maxPages?)` | Auto-paginating async iterator       |
-
-### Cache management
-
-| Method / Property                   | Description                          |
-| ----------------------------------- | ------------------------------------ |
-| `clearCache()`                      | Clear the entire response cache      |
-| `cacheSize`                         | Number of entries currently cached   |
-
-## Caching
-
-All responses are cached in-memory by default (**24 hours TTL**, max 500 entries). Configure it per-client:
+| Method | Description |
+| --- | --- |
+| `getAiredEpisodes(options?)` | Recently aired anime episodes (last 24 h by default) |
+| `getAiredChapters(options?)` | Recently updated releasing manga |
+| `getPlanning(options?)` | Upcoming not-yet-released anime / manga |
 
 ```ts
-const client = new AniListClient({
-  cache: {
-    ttl: 1000 * 60 * 60,  // 1 hour
-    maxSize: 200,          // keep at most 200 entries
-    enabled: true,         // set to false to disable
-  },
-});
-
-// Manual cache control
-client.clearCache();
-console.log(client.cacheSize); // 0
-```
-
-## Rate limiting
-
-The client automatically respects AniList's rate limit (90 req/min) with a conservative default of **85 req/min**. If you hit a `429 Too Many Requests`, it retries automatically (up to 3 times with backoff).
-
-```ts
-const client = new AniListClient({
-  rateLimit: {
-    maxRequests: 60,       // be extra conservative
-    windowMs: 60_000,      // 1 minute window
-    maxRetries: 5,         // retry up to 5 times on 429
-    retryDelayMs: 3000,    // wait 3s between retries
-    enabled: true,         // set to false to disable
-  },
-});
-```
-
-## Airing, Chapters & Planning
-
-Fetch recently released content or see what's coming up next.
-
-### `getAiredEpisodes(options?)`
-
-Returns anime episodes that recently aired (defaults to the **last 24 hours**).
-
-| Option            | Type           | Default              | Description                                  |
-| ----------------- | -------------- | -------------------- | -------------------------------------------- |
-| `airingAtGreater` | `number`       | `now - 24h` (UNIX)  | Only episodes aired after this timestamp     |
-| `airingAtLesser`  | `number`       | `now` (UNIX)         | Only episodes aired before this timestamp    |
-| `sort`            | `AiringSort[]` | `["TIME_DESC"]`      | Sort order                                   |
-| `page`            | `number`       | `1`                  | Page number                                  |
-| `perPage`         | `number`       | `20`                 | Results per page (max 50)                    |
-
-```ts
-import { AniListClient } from "ani-client";
-
-const client = new AniListClient();
-
-// Episodes aired in the last 24 hours
-const recent = await client.getAiredEpisodes();
-recent.results.forEach((ep) =>
-  console.log(`${ep.media.title.romaji} — Episode ${ep.episode}`)
-);
-
 // Episodes aired in the last 7 days
 const week = await client.getAiredEpisodes({
   airingAtGreater: Math.floor(Date.now() / 1000) - 7 * 24 * 3600,
   perPage: 50,
 });
-```
-
-### `getAiredChapters(options?)`
-
-Returns currently releasing manga, sorted by most recently updated — the closest proxy to "recently released chapters" (AniList does not expose individual chapter schedules).
-
-| Option    | Type     | Default | Description             |
-| --------- | -------- | ------- | ----------------------- |
-| `page`    | `number` | `1`     | Page number             |
-| `perPage` | `number` | `20`    | Results per page (max 50) |
-
-```ts
-const chapters = await client.getAiredChapters({ perPage: 10 });
-chapters.results.forEach((m) =>
-  console.log(`${m.title.romaji} — ${m.chapters ?? "?"} chapters`)
-);
-```
-
-### `getPlanning(options?)`
-
-Returns anime and/or manga that are **not yet released**, sorted by popularity.
-
-| Option    | Type          | Default              | Description                        |
-| --------- | ------------- | -------------------- | ---------------------------------- |
-| `type`    | `MediaType`   | —                    | Filter by ANIME or MANGA (both if omitted) |
-| `sort`    | `MediaSort[]` | `["POPULARITY_DESC"]` | Sort order                        |
-| `page`    | `number`      | `1`                  | Page number                        |
-| `perPage` | `number`      | `20`                 | Results per page (max 50)          |
-
-```ts
-import { MediaType } from "ani-client";
 
 // Most anticipated upcoming anime
-const upcoming = await client.getPlanning({ type: MediaType.ANIME, perPage: 10 });
-upcoming.results.forEach((m) => console.log(m.title.romaji));
-
-// All upcoming media (anime + manga)
-const all = await client.getPlanning();
+const upcoming = await client.getPlanning({
+  type: MediaType.ANIME,
+  perPage: 10,
+});
 ```
 
-## Season charts
-
-Fetch all anime (or manga) for a specific season and year.
-
-### `getMediaBySeason(options)`
-
-| Option       | Type           | Default              | Description                              |
-| ------------ | -------------- | -------------------- | ---------------------------------------- |
-| `season`     | `MediaSeason`  | **(required)**       | WINTER, SPRING, SUMMER, or FALL          |
-| `seasonYear` | `number`       | **(required)**       | The year (e.g. 2026)                     |
-| `type`       | `MediaType`    | `ANIME`              | Filter by ANIME or MANGA                 |
-| `sort`       | `MediaSort[]`  | `["POPULARITY_DESC"]`| Sort order                               |
-| `page`       | `number`       | `1`                  | Page number                              |
-| `perPage`    | `number`       | `20`                 | Results per page (max 50)                |
+### Season charts
 
 ```ts
-import { AniListClient, MediaSeason } from "ani-client";
+import { MediaSeason } from "ani-client";
 
-const client = new AniListClient();
-
-// All anime from Winter 2026
 const winter2026 = await client.getMediaBySeason({
   season: MediaSeason.WINTER,
   seasonYear: 2026,
   perPage: 25,
 });
-winter2026.results.forEach((m) => console.log(m.title.romaji));
-
-// Spring 2025 manga
-const spring = await client.getMediaBySeason({
-  season: MediaSeason.SPRING,
-  seasonYear: 2025,
-  type: MediaType.MANGA,
-});
 ```
 
-## User media lists
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `season` | `MediaSeason` | **(required)** | WINTER, SPRING, SUMMER, or FALL |
+| `seasonYear` | `number` | **(required)** | The year |
+| `type` | `MediaType` | `ANIME` | Filter by ANIME or MANGA |
+| `sort` | `MediaSort[]` | `["POPULARITY_DESC"]` | Sort order |
+| `page` | `number` | `1` | Page number |
+| `perPage` | `number` | `20` | Results per page (max 50) |
 
-Fetch a user's anime or manga list, optionally filtered by status.
-
-### `getUserMediaList(options)`
-
-| Option     | Type              | Default              | Description                                |
-| ---------- | ----------------- | -------------------- | ------------------------------------------ |
-| `userId`   | `number`          | —                    | User ID (provide userId **or** userName)   |
-| `userName` | `string`          | —                    | Username (provide userId **or** userName)  |
-| `type`     | `MediaType`       | **(required)**       | ANIME or MANGA                             |
-| `status`   | `MediaListStatus` | —                    | Filter: CURRENT, COMPLETED, PLANNING, etc. |
-| `sort`     | `MediaListSort[]` | —                    | Sort order                                 |
-| `page`     | `number`          | `1`                  | Page number                                |
-| `perPage`  | `number`          | `20`                 | Results per page (max 50)                  |
+### User media lists
 
 ```ts
-import { AniListClient, MediaType, MediaListStatus } from "ani-client";
+import { MediaType, MediaListStatus } from "ani-client";
 
-const client = new AniListClient();
-
-// All anime on a user's list
 const list = await client.getUserMediaList({
-  userName: "AniList",
-  type: MediaType.ANIME,
-  perPage: 10,
-});
-list.results.forEach((entry) =>
-  console.log(`${entry.media.title.romaji} — ${entry.score}/100`)
-);
-
-// Only completed anime
-const completed = await client.getUserMediaList({
   userName: "AniList",
   type: MediaType.ANIME,
   status: MediaListStatus.COMPLETED,
 });
-
-// By user ID
-const byId = await client.getUserMediaList({
-  userId: 1,
-  type: MediaType.MANGA,
-});
+list.results.forEach((entry) =>
+  console.log(`${entry.media.title.romaji} — ${entry.score}/100`)
+);
 ```
 
-## Recommendations
+Provide either `userId` or `userName`. The `type` field is required.
 
-Get user-submitted recommendations for a specific anime or manga.
-
-### `getRecommendations(mediaId, options?)`
-
-| Option    | Type                   | Default            | Description             |
-| --------- | ---------------------- | ------------------ | ----------------------- |
-| `sort`    | `RecommendationSort[]` | `["RATING_DESC"]`  | Sort order              |
-| `page`    | `number`               | `1`                | Page number             |
-| `perPage` | `number`               | `20`               | Results per page        |
+### Recommendations
 
 ```ts
-import { AniListClient } from "ani-client";
-
-const client = new AniListClient();
-
-// Recommendations for Cowboy Bebop
-const recs = await client.getRecommendations(1);
+const recs = await client.getRecommendations(1); // Cowboy Bebop
 recs.results.forEach((r) =>
   console.log(`${r.mediaRecommendation.title.romaji} (rating: ${r.rating})`)
 );
-
-// With pagination
-const page2 = await client.getRecommendations(20, { page: 2, perPage: 10 });
 ```
 
-## Relations
+### Relations
 
-All media objects now include a `relations` field with sequels, prequels, spin-offs, etc.
+Every media object includes a `relations` field with sequels, prequels, spin-offs, etc.
 
 ```ts
-const anime = await client.getMedia(1); // Cowboy Bebop
+const anime = await client.getMedia(1);
 anime.relations?.edges.forEach((edge) =>
   console.log(`${edge.relationType}: ${edge.node.title.romaji}`)
 );
-// SIDE_STORY: Cowboy Bebop: Tengoku no Tobira
 ```
 
-Available relation types: `ADAPTATION`, `PREQUEL`, `SEQUEL`, `PARENT`, `SIDE_STORY`, `CHARACTER`, `SUMMARY`, `ALTERNATIVE`, `SPIN_OFF`, `OTHER`, `SOURCE`, `COMPILATION`, `CONTAINS`.
+Available types: `ADAPTATION`, `PREQUEL`, `SEQUEL`, `PARENT`, `SIDE_STORY`, `CHARACTER`, `SUMMARY`, `ALTERNATIVE`, `SPIN_OFF`, `OTHER`, `SOURCE`, `COMPILATION`, `CONTAINS`.
 
-## Studios
+### Studios
 
-Fetch or search for animation studios.
-
-### `getStudio(id)`
-
-Returns the studio with its most popular productions.
+| Method | Description |
+| --- | --- |
+| `getStudio(id)` | Fetch a studio with its productions |
+| `searchStudios(options?)` | Search studios by name |
 
 ```ts
 const studio = await client.getStudio(44); // Bones
-console.log(studio.name); // "Bones"
-console.log(studio.isAnimationStudio); // true
-studio.media?.nodes.forEach((m) => console.log(m.title.romaji));
+const results = await client.searchStudios({ query: "MAPPA" });
 ```
 
-### `searchStudios(options?)`
-
-| Option    | Type     | Default | Description             |
-| --------- | -------- | ------- | ----------------------- |
-| `query`   | `string` | —       | Search term             |
-| `page`    | `number` | `1`     | Page number             |
-| `perPage` | `number` | `20`    | Results per page        |
-
-```ts
-const result = await client.searchStudios({ query: "MAPPA" });
-result.results.forEach((s) => console.log(s.name));
-```
-
-## Genres & Tags
-
-List all genres and tags available on AniList.
+### Genres & Tags
 
 ```ts
 const genres = await client.getGenres();
-console.log(genres); // ["Action", "Adventure", "Comedy", ...]
+// ["Action", "Adventure", "Comedy", ...]
 
 const tags = await client.getTags();
-tags.forEach((t) => console.log(`${t.name} (${t.category})`));
+// [{ id, name, description, category, isAdult }, ...]
 ```
 
-## Auto-pagination
+### Batch queries
 
-Use `paginate()` to iterate across all pages automatically with an async iterator.
+Fetch multiple IDs in a single GraphQL request (up to 50 per call, auto-chunked).
+
+| Method | Description |
+| --- | --- |
+| `getMediaBatch(ids)` | Fetch multiple anime / manga |
+| `getCharacterBatch(ids)` | Fetch multiple characters |
+| `getStaffBatch(ids)` | Fetch multiple staff members |
 
 ```ts
-// Iterate over all search results
-for await (const anime of client.paginate((page) =>
-  client.searchMedia({ query: "Gundam", page, perPage: 10 })
-)) {
-  console.log(anime.title.romaji);
-}
+const [bebop, naruto, aot] = await client.getMediaBatch([1, 20, 16498]);
+```
 
-// Limit to 3 pages max
+### Raw queries
+
+Execute any GraphQL query against the AniList API.
+
+```ts
+const data = await client.raw<{ Media: { id: number; title: { romaji: string } } }>(
+  "query { Media(id: 1) { id title { romaji } } }",
+);
+```
+
+### Auto-pagination
+
+`paginate()` returns an async iterator that fetches pages on demand.
+
+```ts
 for await (const anime of client.paginate(
-  (page) => client.getTrending(MediaType.ANIME, page, 20),
-  3,
+  (page) => client.searchMedia({ query: "Gundam", page, perPage: 10 }),
+  3, // max 3 pages
 )) {
   console.log(anime.title.romaji);
 }
+```
+
+## Caching
+
+### Memory cache
+
+The default in-memory cache uses **LRU eviction** (24 h TTL, 500 entries max).
+
+```ts
+const client = new AniListClient({
+  cache: {
+    ttl: 1000 * 60 * 60, // 1 hour
+    maxSize: 200,
+    enabled: true,        // false to disable
+  },
+});
+```
+
+### Redis cache
+
+For distributed or persistent caching, use the built-in Redis adapter. Compatible with [ioredis](https://github.com/redis/ioredis) and [node-redis](https://github.com/redis/node-redis) v4+.
+
+```ts
+import Redis from "ioredis";
+import { AniListClient, RedisCache } from "ani-client";
+
+const client = new AniListClient({
+  cacheAdapter: new RedisCache({
+    client: new Redis(),
+    prefix: "ani:",    // key prefix (default)
+    ttl: 86_400,       // seconds (default: 24 h)
+  }),
+});
+```
+
+### Custom adapter
+
+Implement the `CacheAdapter` interface to bring your own storage:
+
+```ts
+import type { CacheAdapter } from "ani-client";
+
+class MyCache implements CacheAdapter {
+  get<T>(key: string): T | undefined | Promise<T | undefined> { /* ... */ }
+  set<T>(key: string, data: T): void | Promise<void> { /* ... */ }
+  delete(key: string): boolean | Promise<boolean> { /* ... */ }
+  clear(): void | Promise<void> { /* ... */ }
+  get size(): number { return -1; } // return -1 if unknown
+  keys(): string[] | Promise<string[]> { /* ... */ }
+  // Optional — the client provides a fallback if omitted
+  invalidate?(pattern: string | RegExp): number | Promise<number> { /* ... */ }
+}
+```
+
+### Cache invalidation
+
+```ts
+// Clear everything
+await client.clearCache();
+
+// Remove entries matching a pattern
+const removed = await client.invalidateCache(/Media/);
+console.log(`Removed ${removed} entries`);
+
+// Current cache size
+console.log(client.cacheSize);
+```
+
+## Rate limiting
+
+The client respects AniList's rate limit (90 req/min) with a conservative default of **85 req/min**. On HTTP 429, it retries automatically with progressive backoff.
+
+```ts
+const client = new AniListClient({
+  rateLimit: {
+    maxRequests: 60,
+    windowMs: 60_000,
+    maxRetries: 5,
+    retryDelayMs: 3_000,
+    timeoutMs: 30_000,        // abort after 30 s
+    retryOnNetworkError: true, // retry ECONNRESET, ETIMEDOUT, etc.
+    enabled: true,
+  },
+});
+```
+
+## Request deduplication
+
+When multiple callers request the same data at the same time, only one API call is made. All callers receive the same response.
+
+```ts
+// Only 1 HTTP request is sent
+const [a, b] = await Promise.all([
+  client.getMedia(1),
+  client.getMedia(1),
+]);
+```
+
+## Event hooks
+
+Monitor every request lifecycle event for logging, metrics, or debugging.
+
+```ts
+const client = new AniListClient({
+  hooks: {
+    onRequest:   (query, variables) => console.log("→", query.slice(0, 40)),
+    onResponse:  (query, durationMs, fromCache) => console.log(`← ${durationMs}ms (cache: ${fromCache})`),
+    onCacheHit:  (key) => console.log("Cache hit:", key.slice(0, 30)),
+    onRateLimit: (retryAfterMs) => console.warn(`Rate limited, waiting ${retryAfterMs}ms`),
+    onRetry:     (attempt, reason, delayMs) => console.warn(`Retry #${attempt}: ${reason}`),
+  },
+});
 ```
 
 ## Error handling
 
-All API errors throw an `AniListError` with:
-
-- `message` — Human-readable error message
-- `status` — HTTP status code
-- `errors` — Raw error array from the API
+All API errors throw an `AniListError` with `message`, `status` and `errors`:
 
 ```ts
-import { AniListClient, AniListError } from "ani-client";
+import { AniListError } from "ani-client";
 
 try {
   await client.getMedia(999999999);
 } catch (err) {
   if (err instanceof AniListError) {
-    console.error(err.message, err.status);
+    console.error(err.message); // "Not Found."
+    console.error(err.status);  // 404
+    console.error(err.errors);  // raw API error array
   }
 }
 ```
 
 ## Types
 
-All types are exported and documented:
+All types and enums are exported:
 
 ```ts
 import type {
-  Media,
-  Character,
-  Staff,
-  User,
-  AiringSchedule,
-  MediaListEntry,
-  Recommendation,
-  StudioDetail,
-  MediaEdge,
-  MediaConnection,
-  PagedResult,
-  SearchMediaOptions,
-  SearchStudioOptions,
-  GetAiringOptions,
-  GetRecentChaptersOptions,
-  GetPlanningOptions,
-  GetSeasonOptions,
-  GetUserMediaListOptions,
+  Media, Character, Staff, User,
+  AiringSchedule, MediaListEntry, Recommendation, StudioDetail,
+  MediaEdge, MediaConnection, PageInfo, PagedResult,
+  CacheAdapter, AniListHooks, AniListClientOptions,
+  SearchMediaOptions, SearchCharacterOptions, SearchStaffOptions,
+  SearchStudioOptions, GetAiringOptions, GetRecentChaptersOptions,
+  GetPlanningOptions, GetSeasonOptions, GetUserMediaListOptions,
   GetRecommendationsOptions,
 } from "ani-client";
+
+import {
+  MediaType, MediaFormat, MediaStatus, MediaSeason, MediaSort,
+  CharacterSort, AiringSort, RecommendationSort,
+  MediaRelationType, MediaListStatus, MediaListSort,
+} from "ani-client";
 ```
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, coding standards, and how to submit changes.
 
 ## License
 

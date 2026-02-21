@@ -315,11 +315,6 @@ export interface SearchStaffOptions {
   perPage?: number;
 }
 
-export interface PaginatedOptions {
-  page?: number;
-  perPage?: number;
-}
-
 export interface PagedResult<T> {
   pageInfo: PageInfo;
   results: T[];
@@ -486,6 +481,41 @@ export interface SearchStudioOptions {
   perPage?: number;
 }
 
+/**
+ * Interface that all cache adapters must implement.
+ * Methods may return sync values or Promises — the client awaits all calls.
+ */
+export interface CacheAdapter {
+  /** Retrieve a cached value, or `undefined` if missing / expired. */
+  get<T>(key: string): T | undefined | Promise<T | undefined>;
+  /** Store a value in the cache. */
+  set<T>(key: string, data: T): void | Promise<void>;
+  /** Remove a specific entry. Returns `true` if the key existed. */
+  delete(key: string): boolean | Promise<boolean>;
+  /** Clear the entire cache. */
+  clear(): void | Promise<void>;
+  /** Number of entries currently stored (sync). Returns -1 if unknown. */
+  readonly size: number;
+  /** Return all cache keys. */
+  keys(): IterableIterator<string> | string[] | Promise<string[]>;
+  /** Bulk-remove entries matching a pattern. Optional — the client provides a fallback. */
+  invalidate?(pattern: string | RegExp): number | Promise<number>;
+}
+
+/** Event hooks for logging, debugging, and monitoring. */
+export interface AniListHooks {
+  /** Called before every API request. */
+  onRequest?: (query: string, variables: Record<string, unknown>) => void;
+  /** Called when a response is served from cache. */
+  onCacheHit?: (key: string) => void;
+  /** Called when the rate limiter enforces a wait (429 received). */
+  onRateLimit?: (retryAfterMs: number) => void;
+  /** Called when a request is retried (429 or network error). */
+  onRetry?: (attempt: number, reason: string, delayMs: number) => void;
+  /** Called when a request completes. */
+  onResponse?: (query: string, durationMs: number, fromCache: boolean) => void;
+}
+
 export interface AniListClientOptions {
   /** Optional AniList OAuth token for authenticated requests */
   token?: string;
@@ -500,6 +530,8 @@ export interface AniListClientOptions {
     /** Set to false to disable caching entirely */
     enabled?: boolean;
   };
+  /** Custom cache adapter (e.g. RedisCache). Takes precedence over `cache`. */
+  cacheAdapter?: CacheAdapter;
   /** Rate limiter configuration (enabled by default, 85 req/min) */
   rateLimit?: {
     /** Max requests per window (default: 85) */
@@ -512,5 +544,11 @@ export interface AniListClientOptions {
     retryDelayMs?: number;
     /** Set to false to disable rate limiting entirely */
     enabled?: boolean;
+    /** Timeout per request in ms (default: 30 000). 0 = no timeout. */
+    timeoutMs?: number;
+    /** Retry on network errors like ECONNRESET / ETIMEDOUT (default: true) */
+    retryOnNetworkError?: boolean;
   };
+  /** Event hooks for logging, debugging, and monitoring */
+  hooks?: AniListHooks;
 }

@@ -3,7 +3,7 @@
  * Hits the real AniList API (no mock).
  */
 
-import { AniListClient, MediaType, MediaSeason, MediaListStatus, RecommendationSort, AniListError } from "../src";
+import { AniListClient, AniListError, MediaListStatus, MediaSeason, MediaType, RecommendationSort } from "../src";
 
 const client = new AniListClient();
 
@@ -49,7 +49,7 @@ async function run() {
         (m) =>
           m.title.romaji?.toLowerCase().includes("naruto") ||
           m.title.english?.toLowerCase().includes("naruto") ||
-          m.title.native?.includes("ナルト")
+          m.title.native?.includes("ナルト"),
       ),
       "should contain Naruto in at least one title field",
     );
@@ -58,7 +58,10 @@ async function run() {
   await test("searchMedia({ type: MANGA, perPage: 2 })", async () => {
     const result = await client.searchMedia({ type: MediaType.MANGA, perPage: 2 });
     assert(result.results.length > 0, "should return manga results");
-    assert(result.results.every((m) => m.type === MediaType.MANGA), "all should be MANGA");
+    assert(
+      result.results.every((m) => m.type === MediaType.MANGA),
+      "all should be MANGA",
+    );
   });
 
   await test("getTrending(ANIME)", async () => {
@@ -79,7 +82,10 @@ async function run() {
   await test("searchCharacters({ query: 'Luffy' })", async () => {
     const result = await client.searchCharacters({ query: "Luffy", perPage: 3 });
     assert(result.results.length > 0, "should return at least 1 character");
-    assert(result.results.some((c) => c.name.full?.includes("Luffy")), "should contain Luffy");
+    assert(
+      result.results.some((c) => c.name.full?.includes("Luffy")),
+      "should contain Luffy",
+    );
   });
 
   // ── Staff ──
@@ -138,7 +144,10 @@ async function run() {
   await test("getAiredChapters() returns recently updated manga", async () => {
     const result = await client.getAiredChapters({ perPage: 5 });
     assert(result.results.length > 0, "should return at least 1 manga");
-    assert(result.results.every((m) => m.type === "MANGA"), "all should be MANGA");
+    assert(
+      result.results.every((m) => m.type === "MANGA"),
+      "all should be MANGA",
+    );
   });
 
   await test("getPlanning() returns upcoming media", async () => {
@@ -153,7 +162,10 @@ async function run() {
   await test("getPlanning({ type: ANIME })", async () => {
     const result = await client.getPlanning({ type: MediaType.ANIME, perPage: 5 });
     assert(result.results.length > 0, "should return at least 1 planned anime");
-    assert(result.results.every((m) => m.type === "ANIME"), "all should be ANIME");
+    assert(
+      result.results.every((m) => m.type === "ANIME"),
+      "all should be ANIME",
+    );
   });
 
   // ── Season ──
@@ -219,11 +231,12 @@ async function run() {
 
   await test("getUserMediaList throws without userId or userName", async () => {
     try {
+      // biome-ignore lint/suspicious/noExplicitAny: intentionally testing invalid input
       await client.getUserMediaList({ type: MediaType.ANIME } as any);
       throw new Error("Should have thrown");
-    } catch (err: any) {
+    } catch (err: unknown) {
       assert(
-        err.message.includes("userId") || err.message.includes("userName"),
+        (err as Error).message.includes("userId") || (err as Error).message.includes("userName"),
         "should mention userId or userName",
       );
     }
@@ -237,14 +250,8 @@ async function run() {
     assert(Array.isArray(result.results), "results should be an array");
     assert(result.pageInfo !== undefined, "pageInfo should exist");
     if (result.results.length > 0) {
-      assert(
-        result.results[0].mediaRecommendation !== undefined,
-        "should have mediaRecommendation",
-      );
-      assert(
-        typeof result.results[0].mediaRecommendation.id === "number",
-        "recommended media should have an id",
-      );
+      assert(result.results[0].mediaRecommendation !== undefined, "should have mediaRecommendation");
+      assert(typeof result.results[0].mediaRecommendation.id === "number", "recommended media should have an id");
     }
   });
 
@@ -261,9 +268,9 @@ async function run() {
     client.clearCache();
     const media = await client.getMedia(1);
     assert(media.relations !== null && media.relations !== undefined, "relations should exist");
-    assert(Array.isArray(media.relations.edges), "relations.edges should be an array");
-    if (media.relations.edges.length > 0) {
-      const edge = media.relations.edges[0];
+    assert(Array.isArray(media.relations!.edges), "relations.edges should be an array");
+    if (media.relations!.edges.length > 0) {
+      const edge = media.relations!.edges[0];
       assert(typeof edge.relationType === "string", "relationType should be a string");
       assert(typeof edge.node.id === "number", "related media should have an id");
     }
@@ -311,10 +318,7 @@ async function run() {
 
   await test("paginate() iterates across pages", async () => {
     const items: string[] = [];
-    for await (const anime of client.paginate(
-      (page) => client.getTrending("ANIME" as any, page, 3),
-      2,
-    )) {
+    for await (const anime of client.paginate((page) => client.getTrending(MediaType.ANIME, page, 3), 2)) {
       items.push(anime.title.romaji ?? "?");
     }
     assert(items.length > 3, "should yield items across multiple pages");
@@ -328,9 +332,9 @@ async function run() {
     try {
       await client.getMedia(999999999);
       throw new Error("Should have thrown");
-    } catch (err: any) {
+    } catch (err: unknown) {
       assert(err instanceof AniListError, "should be AniListError");
-      assert(typeof err.status === "number", "should have status");
+      assert(typeof (err as AniListError).status === "number", "should have status");
     }
   });
 
@@ -339,7 +343,7 @@ async function run() {
 
   await test("raw() custom query", async () => {
     const data = await client.raw<{ Media: { id: number; title: { romaji: string } } }>(
-      `query { Media(id: 1) { id title { romaji } } }`
+      "query { Media(id: 1) { id title { romaji } } }",
     );
     assert(data.Media.id === 1, "should return media with id 1");
   });

@@ -1,6 +1,7 @@
 export { AniListClient } from "./client";
 export { AniListError } from "./errors";
 export { MemoryCache, type CacheOptions } from "./cache";
+export { RedisCache, type RedisCacheOptions, type RedisLikeClient } from "./cache/redis";
 export { RateLimiter, type RateLimitOptions } from "./rate-limiter";
 export {
   MediaType,
@@ -14,6 +15,8 @@ export {
   MediaRelationType,
   MediaListStatus,
   MediaListSort,
+  type CacheAdapter,
+  type AniListHooks,
   type Media,
   type MediaTitle,
   type MediaCoverImage,
@@ -39,7 +42,6 @@ export {
   type Recommendation,
   type PageInfo,
   type PagedResult,
-  type PaginatedOptions,
   type SearchMediaOptions,
   type SearchCharacterOptions,
   type SearchStaffOptions,

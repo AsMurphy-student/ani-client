@@ -368,3 +368,18 @@ query {
     isAdult
   }
 }`;
+
+// ── Batch query builders ──
+
+/** @internal Build a batched GraphQL query using aliases. */
+function buildBatchQuery(ids: number[], typeName: string, fields: string, prefix: string): string {
+  const aliases = ids.map((id, i) => `${prefix}${i}: ${typeName}(id: ${id}) { ${fields} }`).join("\n  ");
+  return `query {\n  ${aliases}\n}`;
+}
+
+export const buildBatchMediaQuery = (ids: number[]): string => buildBatchQuery(ids, "Media", MEDIA_FIELDS, "m");
+
+export const buildBatchCharacterQuery = (ids: number[]): string =>
+  buildBatchQuery(ids, "Character", CHARACTER_FIELDS, "c");
+
+export const buildBatchStaffQuery = (ids: number[]): string => buildBatchQuery(ids, "Staff", STAFF_FIELDS, "s");

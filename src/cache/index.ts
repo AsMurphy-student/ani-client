@@ -1,3 +1,5 @@
+import type { CacheAdapter } from "../types";
+
 /**
  * Simple in-memory cache with configurable TTL.
  * Used internally by AniListClient to avoid redundant API calls.
@@ -18,7 +20,7 @@ interface CacheEntry<T> {
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
-export class MemoryCache {
+export class MemoryCache implements CacheAdapter {
   private readonly ttl: number;
   private readonly maxSize: number;
   private readonly enabled: boolean;
@@ -32,7 +34,7 @@ export class MemoryCache {
 
   /** Build a deterministic cache key from a query + variables pair. */
   static key(query: string, variables: Record<string, unknown>): string {
-    return query.trim() + "|" + JSON.stringify(variables, Object.keys(variables).sort());
+    return `${query.trim()}|${JSON.stringify(variables, Object.keys(variables).sort())}`;
   }
 
   /** Retrieve a cached value, or `undefined` if missing / expired. */
@@ -44,6 +46,9 @@ export class MemoryCache {
       this.store.delete(key);
       return undefined;
     }
+    // LRU: promote to most-recently-used by re-inserting at the end
+    this.store.delete(key);
+    this.store.set(key, entry);
     return entry.data as T;
   }
 
@@ -51,6 +56,10 @@ export class MemoryCache {
   set<T>(key: string, data: T): void {
     if (!this.enabled) return;
 
+    // Remove first so re-insert places it at the end (MRU position)
+    this.store.delete(key);
+
+    // Evict least-recently-used entry if at capacity
     if (this.maxSize > 0 && this.store.size >= this.maxSize) {
       const firstKey = this.store.keys().next().value;
       if (firstKey !== undefined) this.store.delete(firstKey);
@@ -72,5 +81,28 @@ export class MemoryCache {
   /** Number of entries currently stored. */
   get size(): number {
     return this.store.size;
+  }
+
+  /** Return an iterator over all cache keys. */
+  keys(): IterableIterator<string> {
+    return this.store.keys();
+  }
+
+  /**
+   * Remove all entries whose key matches the given pattern.
+   *
+   * @param pattern — A string (converted to RegExp) or RegExp.
+   * @returns Number of entries removed.
+   */
+  invalidate(pattern: string | RegExp): number {
+    const regex = typeof pattern === "string" ? new RegExp(pattern) : pattern;
+    let count = 0;
+    for (const key of [...this.store.keys()]) {
+      if (regex.test(key)) {
+        this.store.delete(key);
+        count++;
+      }
+    }
+    return count;
   }
 }
