@@ -7,7 +7,7 @@
 > A simple, typed client to fetch anime, manga, character, staff and user data from [AniList](https://anilist.co).
 
 - **Zero dependencies** — uses the native `fetch` API
-- **Universal** — Node.js ≥ 18, Bun, Deno and modern browsers
+- **Universal** — Node.js ≥ 20, Bun, Deno and modern browsers
 - **Dual format** — ships ESM + CJS with full TypeScript declarations
 - **Built-in caching** — in-memory LRU with optional Redis adapter
 - **Rate-limit aware** — auto-retry on 429, configurable timeout & network error retry
