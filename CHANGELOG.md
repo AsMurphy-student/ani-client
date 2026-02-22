@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.4.1] — 2026-02-22
+
+### Added
+
+- **Voice actors on media character edges** — `getMedia(id, { characters: { voiceActors: true } })` now returns voice actor data (id, name, language, image, gender, primary occupations, site URL) alongside each character.
+- **Voice actors on `getCharacter` / `searchCharacters`** — `getCharacter(id, { voiceActors: true })` and `searchCharacters({ query, voiceActors: true })` return voice actors for each media the character appears in.
+- **New types** — `VoiceActor`, `CharacterMediaEdge`, `CharacterIncludeOptions`.
+- **Integration tests** — Smoke tests for voice actors on media, characters, and character search.
+
+### Fixed
+
+- **`searchStaff` query used wrong sort type** — The GraphQL variable was declared as `[CharacterSort]` instead of `[StaffSort]`, causing the API to reject requests with a sort parameter.
+
 ## [1.4.0] — 2026-02-22
 
 ### Added

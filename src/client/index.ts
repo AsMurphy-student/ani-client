@@ -1,7 +1,9 @@
 import {
   QUERY_AIRING_SCHEDULE,
   QUERY_CHARACTER_BY_ID,
+  QUERY_CHARACTER_BY_ID_WITH_VA,
   QUERY_CHARACTER_SEARCH,
+  QUERY_CHARACTER_SEARCH_WITH_VA,
   QUERY_GENRES,
   QUERY_MEDIA_BY_ID,
   QUERY_MEDIA_BY_SEASON,
@@ -35,6 +37,7 @@ import type {
   AniListHooks,
   CacheAdapter,
   Character,
+  CharacterIncludeOptions,
   GetAiringOptions,
   GetPlanningOptions,
   GetRecentChaptersOptions,
@@ -198,6 +201,9 @@ export class AniListClient {
    * // Include characters sorted by role, 25 results
    * const anime = await client.getMedia(1, { characters: true });
    *
+   * // Include characters with voice actors
+   * const anime = await client.getMedia(1, { characters: { voiceActors: true } });
+   *
    * // Full control
    * const anime = await client.getMedia(1, {
    *   characters: { perPage: 50, sort: true },
@@ -258,34 +264,47 @@ export class AniListClient {
    * Fetch a character by AniList ID.
    *
    * @param id - The AniList character ID
+   * @param include - Optional include options (e.g. voice actors)
    * @returns The character object
    *
    * @example
    * ```ts
    * const spike = await client.getCharacter(1);
    * console.log(spike.name.full); // "Spike Spiegel"
+   *
+   * // With voice actors
+   * const spike = await client.getCharacter(1, { voiceActors: true });
+   * spike.media?.edges?.forEach((e) => {
+   *   console.log(e.node.title.romaji);
+   *   e.voiceActors?.forEach((va) => console.log(`  VA: ${va.name.full}`));
+   * });
    * ```
    */
-  async getCharacter(id: number): Promise<Character> {
-    const data = await this.request<{ Character: Character }>(QUERY_CHARACTER_BY_ID, { id });
+  async getCharacter(id: number, include?: CharacterIncludeOptions): Promise<Character> {
+    const query = include?.voiceActors ? QUERY_CHARACTER_BY_ID_WITH_VA : QUERY_CHARACTER_BY_ID;
+    const data = await this.request<{ Character: Character }>(query, { id });
     return data.Character;
   }
 
   /**
    * Search for characters by name.
    *
-   * @param options - Search / pagination parameters
+   * @param options - Search / pagination parameters (includes optional `voiceActors`)
    * @returns Paginated results with matching characters
    *
    * @example
    * ```ts
    * const result = await client.searchCharacters({ query: "Luffy", perPage: 5 });
+   *
+   * // With voice actors
+   * const result = await client.searchCharacters({ query: "Luffy", voiceActors: true });
    * ```
    */
   async searchCharacters(options: SearchCharacterOptions = {}): Promise<PagedResult<Character>> {
-    const { query: search, page = 1, perPage = 20, ...rest } = options;
+    const { query: search, page = 1, perPage = 20, voiceActors, ...rest } = options;
+    const gqlQuery = voiceActors ? QUERY_CHARACTER_SEARCH_WITH_VA : QUERY_CHARACTER_SEARCH;
     return this.pagedRequest<Character>(
-      QUERY_CHARACTER_SEARCH,
+      gqlQuery,
       { search, ...rest, page, perPage: this.clampPerPage(perPage) },
       "characters",
     );

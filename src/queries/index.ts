@@ -72,8 +72,7 @@ const CHARACTER_FIELDS_COMPACT = `
   siteUrl
 `;
 
-const CHARACTER_FIELDS = `
-  ${CHARACTER_FIELDS_COMPACT}
+const CHARACTER_MEDIA_NODES = `
   media(perPage: 10) {
     nodes {
       id
@@ -83,6 +82,44 @@ const CHARACTER_FIELDS = `
       siteUrl
     }
   }
+`;
+
+/** Compact voice actor fields — lightweight subset for embedding inside character edges. */
+const VOICE_ACTOR_FIELDS_COMPACT = `
+  id
+  name { first middle last full native userPreferred }
+  languageV2
+  image { large medium }
+  gender
+  primaryOccupations
+  siteUrl
+`;
+
+const CHARACTER_MEDIA_EDGES_WITH_VA = `
+  media(perPage: 10) {
+    edges {
+      voiceActors {
+        ${VOICE_ACTOR_FIELDS_COMPACT}
+      }
+      node {
+        id
+        title { romaji english native userPreferred }
+        type
+        coverImage { large medium }
+        siteUrl
+      }
+    }
+  }
+`;
+
+const CHARACTER_FIELDS = `
+  ${CHARACTER_FIELDS_COMPACT}
+  ${CHARACTER_MEDIA_NODES}
+`;
+
+const CHARACTER_FIELDS_WITH_VA = `
+  ${CHARACTER_FIELDS_COMPACT}
+  ${CHARACTER_MEDIA_EDGES_WITH_VA}
 `;
 
 const STAFF_FIELDS = `
@@ -179,12 +216,29 @@ query ($id: Int!) {
   }
 }`;
 
+export const QUERY_CHARACTER_BY_ID_WITH_VA = `
+query ($id: Int!) {
+  Character(id: $id) {
+    ${CHARACTER_FIELDS_WITH_VA}
+  }
+}`;
+
 export const QUERY_CHARACTER_SEARCH = `
 query ($search: String, $sort: [CharacterSort], $page: Int, $perPage: Int) {
   Page(page: $page, perPage: $perPage) {
     pageInfo { total perPage currentPage lastPage hasNextPage }
     characters(search: $search, sort: $sort) {
       ${CHARACTER_FIELDS}
+    }
+  }
+}`;
+
+export const QUERY_CHARACTER_SEARCH_WITH_VA = `
+query ($search: String, $sort: [CharacterSort], $page: Int, $perPage: Int) {
+  Page(page: $page, perPage: $perPage) {
+    pageInfo { total perPage currentPage lastPage hasNextPage }
+    characters(search: $search, sort: $sort) {
+      ${CHARACTER_FIELDS_WITH_VA}
     }
   }
 }`;
@@ -197,7 +251,7 @@ query ($id: Int!) {
 }`;
 
 export const QUERY_STAFF_SEARCH = `
-query ($search: String, $sort: [CharacterSort], $page: Int, $perPage: Int) {
+query ($search: String, $sort: [StaffSort], $page: Int, $perPage: Int) {
   Page(page: $page, perPage: $perPage) {
     pageInfo { total perPage currentPage lastPage hasNextPage }
     staff(search: $search, sort: $sort) {
@@ -411,13 +465,18 @@ export function buildMediaByIdQuery(include?: MediaIncludeOptions): string {
     const opts = typeof include.characters === "object" ? include.characters : {};
     const perPage = opts.perPage ?? 25;
     const sortClause = opts.sort !== false ? ", sort: [ROLE, RELEVANCE, ID]" : "";
+    const voiceActorBlock = opts.voiceActors
+      ? `\n            voiceActors {
+              ${VOICE_ACTOR_FIELDS_COMPACT}
+            }`
+      : "";
     extra.push(`
     characters(perPage: ${perPage}${sortClause}) {
       edges {
         role
         node {
           ${CHARACTER_FIELDS_COMPACT}
-        }
+        }${voiceActorBlock}
       }
     }`);
   }

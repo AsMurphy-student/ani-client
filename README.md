@@ -182,7 +182,7 @@ The second parameter of `getMedia()` lets you opt-in to additional data. By defa
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
-| `characters` | `boolean \| { perPage?, sort? }` | — | Characters with their roles (MAIN, SUPPORTING, BACKGROUND) |
+| `characters` | `boolean \| { perPage?, sort?, voiceActors? }` | — | Characters with their roles (MAIN, SUPPORTING, BACKGROUND). Set `voiceActors: true` to include VA data. |
 | `staff` | `boolean \| { perPage?, sort? }` | — | Staff members with their roles |
 | `relations` | `boolean` | `true` | Sequels, prequels, adaptations, etc. Set `false` to exclude |
 | `streamingEpisodes` | `boolean` | — | Streaming links (Crunchyroll, Funimation, etc.) |
@@ -200,6 +200,17 @@ anime.characters?.edges.forEach((e) =>
 // 50 characters, no sorting
 const anime = await client.getMedia(1, {
   characters: { perPage: 50, sort: false },
+});
+
+// Include voice actors alongside characters
+const anime = await client.getMedia(1, {
+  characters: { voiceActors: true },
+});
+anime.characters?.edges.forEach((e) => {
+  console.log(e.node.name.full);
+  e.voiceActors?.forEach((va) =>
+    console.log(`  VA: ${va.name.full} (${va.languageV2})`)
+  );
 });
 
 // Staff members
@@ -230,12 +241,24 @@ const anime = await client.getMedia(1, {
 
 | Method | Description |
 | --- | --- |
-| `getCharacter(id)` | Fetch a character by ID |
-| `searchCharacters(options?)` | Search characters by name |
+| `getCharacter(id, include?)` | Fetch a character by ID, optionally with voice actors |
+| `searchCharacters(options?)` | Search characters by name, optionally with voice actors |
 
 ```ts
 const spike = await client.getCharacter(1);
 const results = await client.searchCharacters({ query: "Luffy", perPage: 5 });
+
+// With voice actors
+const spike = await client.getCharacter(1, { voiceActors: true });
+spike.media?.edges?.forEach((e) => {
+  console.log(e.node.title.romaji);
+  e.voiceActors?.forEach((va) =>
+    console.log(`  VA: ${va.name.full} (${va.languageV2})`)
+  );
+});
+
+// Search with voice actors
+const result = await client.searchCharacters({ query: "Luffy", voiceActors: true });
 ```
 
 ### Staff
@@ -538,9 +561,10 @@ All types and enums are exported:
 
 ```ts
 import type {
-  Media, Character, Staff, User,
+  Media, Character, Staff, User, VoiceActor,
   AiringSchedule, MediaListEntry, Recommendation, StudioDetail,
   MediaEdge, MediaConnection, MediaCharacterEdge, MediaCharacterConnection,
+  CharacterMediaEdge, CharacterIncludeOptions,
   MediaStaffEdge, MediaStaffConnection, MediaIncludeOptions,
   StreamingEpisode, ExternalLink, MediaStats, MediaRecommendationNode,
   PageInfo, PagedResult,

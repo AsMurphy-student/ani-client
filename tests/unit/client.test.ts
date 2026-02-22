@@ -205,7 +205,7 @@ describe("AniListClient", () => {
       get size() {
         return store.size;
       },
-      keys: vi.fn(() => store.keys()),
+      keys: vi.fn(() => [...store.keys()]),
     };
 
     const client = new AniListClient({ cacheAdapter: customAdapter as CacheAdapter });

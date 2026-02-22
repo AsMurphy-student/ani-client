@@ -179,9 +179,28 @@ export interface CharacterImage {
   medium: string | null;
 }
 
+/** Compact voice actor data returned inside character edges. */
+export interface VoiceActor {
+  id: number;
+  name: {
+    first: string | null;
+    middle: string | null;
+    last: string | null;
+    full: string | null;
+    native: string | null;
+    userPreferred: string | null;
+  };
+  languageV2: string | null;
+  image: StaffImage;
+  gender: string | null;
+  primaryOccupations: string[];
+  siteUrl: string | null;
+}
+
 export interface MediaCharacterEdge {
   role: CharacterRole;
   node: Omit<Character, "media">;
+  voiceActors?: VoiceActor[];
 }
 
 export interface MediaCharacterConnection {
@@ -277,6 +296,13 @@ export interface Media {
   siteUrl: string | null;
 }
 
+type CharacterMediaNode = Pick<Media, "id" | "title" | "type" | "coverImage" | "siteUrl">;
+
+export interface CharacterMediaEdge {
+  node: CharacterMediaNode;
+  voiceActors?: VoiceActor[];
+}
+
 export interface Character {
   id: number;
   name: CharacterName;
@@ -289,8 +315,15 @@ export interface Character {
   favourites: number | null;
   siteUrl: string | null;
   media: {
-    nodes: Pick<Media, "id" | "title" | "type" | "coverImage" | "siteUrl">[];
+    nodes?: CharacterMediaNode[];
+    edges?: CharacterMediaEdge[];
   } | null;
+}
+
+/** Options for including extra data when fetching a character. */
+export interface CharacterIncludeOptions {
+  /** Include voice actors for each media the character appears in. */
+  voiceActors?: boolean;
 }
 
 export interface StaffName {
@@ -393,6 +426,8 @@ export interface SearchCharacterOptions {
   sort?: CharacterSort[];
   page?: number;
   perPage?: number;
+  /** Include voice actors for each media the character appears in. */
+  voiceActors?: boolean;
 }
 
 export interface SearchStaffOptions {
@@ -575,7 +610,7 @@ export interface SearchStudioOptions {
 export interface MediaIncludeOptions {
   /** Include characters with their roles (MAIN, SUPPORTING, BACKGROUND).
    *  `true` = 25 results sorted by role. Object form to customize. */
-  characters?: boolean | { perPage?: number; sort?: boolean };
+  characters?: boolean | { perPage?: number; sort?: boolean; voiceActors?: boolean };
   /** Include staff members with their roles.
    *  `true` = 25 results sorted by relevance. Object form to customize. */
   staff?: boolean | { perPage?: number; sort?: boolean };

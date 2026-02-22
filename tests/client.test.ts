@@ -88,6 +88,32 @@ async function run() {
     );
   });
 
+  await test("getCharacter(1, { voiceActors: true }) returns voice actors", async () => {
+    await client.clearCache();
+    const char = await client.getCharacter(1, { voiceActors: true });
+    assert(char.id === 1, "id should be 1");
+    assert(char.media !== null, "media should exist");
+    assert(Array.isArray(char.media?.edges), "media.edges should be an array");
+    if (char.media?.edges && char.media.edges.length > 0) {
+      const edge = char.media.edges[0];
+      assert(typeof edge.node.id === "number", "media node should have an id");
+      assert(Array.isArray(edge.voiceActors), "voiceActors should be an array");
+      if (edge.voiceActors && edge.voiceActors.length > 0) {
+        const va = edge.voiceActors[0];
+        assert(typeof va.id === "number", "voice actor should have an id");
+        assert(typeof va.name.full === "string", "voice actor should have a full name");
+      }
+    }
+  });
+
+  await test("searchCharacters({ query: 'Luffy', voiceActors: true })", async () => {
+    await client.clearCache();
+    const result = await client.searchCharacters({ query: "Luffy", perPage: 1, voiceActors: true });
+    assert(result.results.length > 0, "should return at least 1 character");
+    const char = result.results[0];
+    assert(Array.isArray(char.media?.edges), "media.edges should be an array");
+  });
+
   // ── Staff ──
   console.log("\nStaff:");
 
@@ -259,6 +285,28 @@ async function run() {
     const result = await client.getRecommendations(20, { perPage: 3 });
     assert(Array.isArray(result.results), "results should be an array");
     assert(result.results.length <= 3, "should respect perPage limit");
+  });
+
+  // ── Voice Actors ──
+  console.log("\nVoice Actors:");
+
+  await test("getMedia(1, { characters: { voiceActors: true } }) returns voice actors", async () => {
+    await client.clearCache();
+    const media = await client.getMedia(1, { characters: { voiceActors: true } });
+    assert(media.characters !== undefined, "characters should exist");
+    assert(Array.isArray(media.characters?.edges), "characters.edges should be an array");
+    if (media.characters && media.characters.edges.length > 0) {
+      const edge = media.characters.edges[0];
+      assert(typeof edge.role === "string", "role should be a string");
+      assert(typeof edge.node.id === "number", "character should have an id");
+      assert(Array.isArray(edge.voiceActors), "voiceActors should be an array");
+      if (edge.voiceActors && edge.voiceActors.length > 0) {
+        const va = edge.voiceActors[0];
+        assert(typeof va.id === "number", "voice actor should have an id");
+        assert(typeof va.name.full === "string", "voice actor should have a full name");
+        assert(typeof va.languageV2 === "string", "voice actor should have a language");
+      }
+    }
   });
 
   // ── Relations ──
