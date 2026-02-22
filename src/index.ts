@@ -1,8 +1,8 @@
 export { AniListClient } from "./client";
 export { AniListError } from "./errors";
-export { MemoryCache, type CacheOptions } from "./cache";
+export { MemoryCache } from "./cache";
 export { RedisCache, type RedisCacheOptions, type RedisLikeClient } from "./cache/redis";
-export { RateLimiter, type RateLimitOptions } from "./rate-limiter";
+export { RateLimiter } from "./rate-limiter";
 export {
   MediaType,
   MediaFormat,
@@ -10,12 +10,15 @@ export {
   MediaSeason,
   MediaSort,
   CharacterSort,
+  CharacterRole,
   AiringSort,
   RecommendationSort,
   MediaRelationType,
   MediaListStatus,
   MediaListSort,
   type CacheAdapter,
+  type CacheOptions,
+  type RateLimitOptions,
   type AniListHooks,
   type Media,
   type MediaTitle,
@@ -28,6 +31,17 @@ export {
   type StudioDetail,
   type MediaEdge,
   type MediaConnection,
+  type MediaCharacterEdge,
+  type MediaCharacterConnection,
+  type MediaStaffEdge,
+  type MediaStaffConnection,
+  type StreamingEpisode,
+  type ExternalLink,
+  type ScoreDistribution,
+  type StatusDistribution,
+  type MediaStats,
+  type MediaRecommendationNode,
+  type MediaIncludeOptions,
   type Character,
   type CharacterName,
   type CharacterImage,

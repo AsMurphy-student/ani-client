@@ -216,4 +216,186 @@ describe("AniListClient", () => {
     await client.getMedia(1);
     expect(customAdapter.get).toHaveBeenCalled();
   });
+
+  // ── getMedia with include options ──
+
+  it("getMedia with { characters: true } sends a query containing 'characters'", async () => {
+    const mediaWithCharacters = {
+      ...mockMedia,
+      characters: {
+        edges: [
+          {
+            role: "MAIN",
+            node: {
+              id: 1,
+              name: { first: "Spike", middle: null, last: "Spiegel", full: "Spike Spiegel", native: null, alternative: [] },
+              image: { large: null, medium: null },
+              description: null,
+              gender: "Male",
+              dateOfBirth: null,
+              age: "27",
+              bloodType: null,
+              favourites: 100,
+              siteUrl: null,
+            },
+          },
+        ],
+      },
+    };
+    mockFetch({ Media: mediaWithCharacters });
+
+    const client = new AniListClient({ cache: { enabled: false } });
+    const result = await client.getMedia(1, { characters: true });
+
+    expect(result.characters).toBeDefined();
+    expect(result.characters!.edges).toHaveLength(1);
+    expect(result.characters!.edges[0].role).toBe("MAIN");
+    expect(result.characters!.edges[0].node.name.full).toBe("Spike Spiegel");
+
+    // Verify the query sent to fetch contains "characters"
+    const fetchCall = vi.mocked(fetch).mock.calls[0];
+    const body = JSON.parse(fetchCall[1]!.body as string);
+    expect(body.query).toContain("characters");
+  });
+
+  it("getMedia with { staff: true } sends a query containing 'staff'", async () => {
+    const mediaWithStaff = {
+      ...mockMedia,
+      staff: {
+        edges: [
+          {
+            role: "Director",
+            node: {
+              id: 10,
+              name: { first: "Shinichiro", middle: null, last: "Watanabe", full: "Shinichiro Watanabe", native: null },
+              language: "Japanese",
+              image: { large: null, medium: null },
+              description: null,
+              primaryOccupations: ["Director"],
+              gender: "Male",
+              dateOfBirth: null,
+              dateOfDeath: null,
+              age: null,
+              yearsActive: [],
+              homeTown: null,
+              bloodType: null,
+              favourites: 50,
+              siteUrl: null,
+            },
+          },
+        ],
+      },
+    };
+    mockFetch({ Media: mediaWithStaff });
+
+    const client = new AniListClient({ cache: { enabled: false } });
+    const result = await client.getMedia(1, { staff: true });
+
+    expect(result.staff).toBeDefined();
+    expect(result.staff!.edges).toHaveLength(1);
+    expect(result.staff!.edges[0].role).toBe("Director");
+
+    const fetchCall = vi.mocked(fetch).mock.calls[0];
+    const body = JSON.parse(fetchCall[1]!.body as string);
+    expect(body.query).toContain("staff");
+  });
+
+  it("getMedia without include does NOT send characters/staff in query", async () => {
+    mockFetch({ Media: mockMedia });
+
+    const client = new AniListClient({ cache: { enabled: false } });
+    await client.getMedia(1);
+
+    const fetchCall = vi.mocked(fetch).mock.calls[0];
+    const body = JSON.parse(fetchCall[1]!.body as string);
+    expect(body.query).not.toContain("characters");
+    expect(body.query).not.toMatch(/\bstaff\s*\(/);
+  });
+
+  it("getMedia with { characters: { perPage: 50 } } customises pagination", async () => {
+    mockFetch({ Media: { ...mockMedia, characters: { edges: [] } } });
+
+    const client = new AniListClient({ cache: { enabled: false } });
+    await client.getMedia(1, { characters: { perPage: 50 } });
+
+    const fetchCall = vi.mocked(fetch).mock.calls[0];
+    const body = JSON.parse(fetchCall[1]!.body as string);
+    expect(body.query).toContain("characters(perPage: 50");
+  });
+
+  it("getMedia with { characters: { sort: false } } omits sort clause", async () => {
+    mockFetch({ Media: { ...mockMedia, characters: { edges: [] } } });
+
+    const client = new AniListClient({ cache: { enabled: false } });
+    await client.getMedia(1, { characters: { sort: false } });
+
+    const fetchCall = vi.mocked(fetch).mock.calls[0];
+    const body = JSON.parse(fetchCall[1]!.body as string);
+    expect(body.query).toContain("characters(perPage: 25)");
+    expect(body.query).not.toMatch(/characters\([^)]*sort:/);
+  });
+
+  it("getMedia with { relations: false } excludes relations from query", async () => {
+    mockFetch({ Media: { ...mockMedia, relations: null } });
+
+    const client = new AniListClient({ cache: { enabled: false } });
+    await client.getMedia(1, { relations: false });
+
+    const fetchCall = vi.mocked(fetch).mock.calls[0];
+    const body = JSON.parse(fetchCall[1]!.body as string);
+    expect(body.query).not.toContain("relations");
+  });
+
+  it("getMedia with { streamingEpisodes: true } includes streaming fields", async () => {
+    mockFetch({ Media: { ...mockMedia, streamingEpisodes: [{ title: "Ep 1", thumbnail: null, url: "https://example.com", site: "Crunchyroll" }] } });
+
+    const client = new AniListClient({ cache: { enabled: false } });
+    const result = await client.getMedia(1, { streamingEpisodes: true });
+
+    const fetchCall = vi.mocked(fetch).mock.calls[0];
+    const body = JSON.parse(fetchCall[1]!.body as string);
+    expect(body.query).toContain("streamingEpisodes");
+    expect(result.streamingEpisodes).toHaveLength(1);
+    expect(result.streamingEpisodes![0].site).toBe("Crunchyroll");
+  });
+
+  it("getMedia with { externalLinks: true } includes external link fields", async () => {
+    mockFetch({ Media: { ...mockMedia, externalLinks: [{ id: 1, url: "https://mal.net", site: "MyAnimeList", type: "INFO", icon: null, color: null }] } });
+
+    const client = new AniListClient({ cache: { enabled: false } });
+    const result = await client.getMedia(1, { externalLinks: true });
+
+    const fetchCall = vi.mocked(fetch).mock.calls[0];
+    const body = JSON.parse(fetchCall[1]!.body as string);
+    expect(body.query).toContain("externalLinks");
+    expect(result.externalLinks).toHaveLength(1);
+    expect(result.externalLinks![0].site).toBe("MyAnimeList");
+  });
+
+  it("getMedia with { stats: true } includes score/status distribution", async () => {
+    mockFetch({ Media: { ...mockMedia, stats: { scoreDistribution: [{ score: 80, amount: 500 }], statusDistribution: [{ status: "COMPLETED", amount: 1000 }] } } });
+
+    const client = new AniListClient({ cache: { enabled: false } });
+    const result = await client.getMedia(1, { stats: true });
+
+    const fetchCall = vi.mocked(fetch).mock.calls[0];
+    const body = JSON.parse(fetchCall[1]!.body as string);
+    expect(body.query).toContain("scoreDistribution");
+    expect(body.query).toContain("statusDistribution");
+    expect(result.stats!.scoreDistribution[0].score).toBe(80);
+    expect(result.stats!.statusDistribution[0].status).toBe("COMPLETED");
+  });
+
+  it("getMedia with { recommendations: { perPage: 5 } } includes recommendations", async () => {
+    mockFetch({ Media: { ...mockMedia, recommendations: { nodes: [{ id: 1, rating: 50, mediaRecommendation: { id: 5, title: { romaji: "Samurai Champloo", english: null, native: null, userPreferred: null }, type: "ANIME", format: "TV", coverImage: { large: null, medium: null }, averageScore: 85, siteUrl: null } }] } } });
+
+    const client = new AniListClient({ cache: { enabled: false } });
+    const result = await client.getMedia(1, { recommendations: { perPage: 5 } });
+
+    const fetchCall = vi.mocked(fetch).mock.calls[0];
+    const body = JSON.parse(fetchCall[1]!.body as string);
+    expect(body.query).toContain("recommendations(perPage: 5");
+    expect(result.recommendations!.nodes).toHaveLength(1);
+    expect(result.recommendations!.nodes[0].mediaRecommendation.title.romaji).toBe("Samurai Champloo");
+  });
 });

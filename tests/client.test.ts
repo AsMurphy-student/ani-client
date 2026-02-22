@@ -265,7 +265,7 @@ async function run() {
   console.log("\nRelations:");
 
   await test("getMedia(1) includes relations", async () => {
-    client.clearCache();
+    await client.clearCache();
     const media = await client.getMedia(1);
     assert(media.relations !== null && media.relations !== undefined, "relations should exist");
     assert(Array.isArray(media.relations!.edges), "relations.edges should be an array");
@@ -362,7 +362,7 @@ async function run() {
 
   await test("clearCache() empties the cache", async () => {
     assert(client.cacheSize > 0, "cache should have entries before clear");
-    client.clearCache();
+    await client.clearCache();
     assert(client.cacheSize === 0, "cache should be empty after clear");
   });
 

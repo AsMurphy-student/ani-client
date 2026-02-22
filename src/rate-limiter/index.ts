@@ -6,22 +6,8 @@
  * waits for the Retry-After header and retries automatically.
  */
 
-export interface RateLimitOptions {
-  /** Max requests per window (default: 85, conservative under AniList's 90/min) */
-  maxRequests?: number;
-  /** Window size in milliseconds (default: 60 000 = 1 minute) */
-  windowMs?: number;
-  /** Max number of retries on 429 responses (default: 3) */
-  maxRetries?: number;
-  /** Default retry delay in ms when Retry-After header is missing (default: 2000) */
-  retryDelayMs?: number;
-  /** Disable rate limiting entirely (default: false) */
-  enabled?: boolean;
-  /** Timeout per request in milliseconds (default: 30 000). 0 = no timeout. */
-  timeoutMs?: number;
-  /** Retry on network errors like ECONNRESET / ETIMEDOUT (default: true) */
-  retryOnNetworkError?: boolean;
-}
+import type { RateLimitOptions } from "../types";
+export type { RateLimitOptions };
 
 export class RateLimiter {
   private readonly maxRequests: number;

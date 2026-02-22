@@ -1,17 +1,10 @@
-import type { CacheAdapter } from "../types";
+import type { CacheAdapter, CacheOptions } from "../types";
 
 /**
  * Simple in-memory cache with configurable TTL.
  * Used internally by AniListClient to avoid redundant API calls.
  */
-export interface CacheOptions {
-  /** Time-to-live in milliseconds (default: 24 hours) */
-  ttl?: number;
-  /** Maximum number of entries to keep (default: 500, 0 = unlimited) */
-  maxSize?: number;
-  /** Disable caching entirely (default: false) */
-  enabled?: boolean;
-}
+export type { CacheOptions };
 
 interface CacheEntry<T> {
   data: T;
@@ -34,7 +27,8 @@ export class MemoryCache implements CacheAdapter {
 
   /** Build a deterministic cache key from a query + variables pair. */
   static key(query: string, variables: Record<string, unknown>): string {
-    return `${query.trim()}|${JSON.stringify(variables, Object.keys(variables).sort())}`;
+    const normalized = query.replace(/\s+/g, " ").trim();
+    return `${normalized}|${JSON.stringify(variables, Object.keys(variables).sort())}`;
   }
 
   /** Retrieve a cached value, or `undefined` if missing / expired. */
@@ -83,9 +77,9 @@ export class MemoryCache implements CacheAdapter {
     return this.store.size;
   }
 
-  /** Return an iterator over all cache keys. */
-  keys(): IterableIterator<string> {
-    return this.store.keys();
+  /** Return all cache keys. */
+  keys(): string[] {
+    return [...this.store.keys()];
   }
 
   /**
@@ -95,14 +89,13 @@ export class MemoryCache implements CacheAdapter {
    * @returns Number of entries removed.
    */
   invalidate(pattern: string | RegExp): number {
-    const regex = typeof pattern === "string" ? new RegExp(pattern) : pattern;
-    let count = 0;
-    for (const key of [...this.store.keys()]) {
-      if (regex.test(key)) {
-        this.store.delete(key);
-        count++;
-      }
+    const regex =
+      typeof pattern === "string" ? new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")) : pattern;
+    const toDelete: string[] = [];
+    for (const key of this.store.keys()) {
+      if (regex.test(key)) toDelete.push(key);
     }
-    return count;
+    for (const key of toDelete) this.store.delete(key);
+    return toDelete.length;
   }
 }

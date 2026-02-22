@@ -33,21 +33,37 @@ export enum MediaSeason {
 
 export enum MediaSort {
   ID = "ID",
+  ID_DESC = "ID_DESC",
   TITLE_ROMAJI = "TITLE_ROMAJI",
+  TITLE_ROMAJI_DESC = "TITLE_ROMAJI_DESC",
   TITLE_ENGLISH = "TITLE_ENGLISH",
+  TITLE_ENGLISH_DESC = "TITLE_ENGLISH_DESC",
   TITLE_NATIVE = "TITLE_NATIVE",
+  TITLE_NATIVE_DESC = "TITLE_NATIVE_DESC",
   TYPE = "TYPE",
+  TYPE_DESC = "TYPE_DESC",
   FORMAT = "FORMAT",
+  FORMAT_DESC = "FORMAT_DESC",
   START_DATE = "START_DATE",
+  START_DATE_DESC = "START_DATE_DESC",
   END_DATE = "END_DATE",
+  END_DATE_DESC = "END_DATE_DESC",
   SCORE = "SCORE",
+  SCORE_DESC = "SCORE_DESC",
   POPULARITY = "POPULARITY",
+  POPULARITY_DESC = "POPULARITY_DESC",
   TRENDING = "TRENDING",
+  TRENDING_DESC = "TRENDING_DESC",
   EPISODES = "EPISODES",
+  EPISODES_DESC = "EPISODES_DESC",
   DURATION = "DURATION",
+  DURATION_DESC = "DURATION_DESC",
   STATUS = "STATUS",
+  STATUS_DESC = "STATUS_DESC",
   FAVOURITES = "FAVOURITES",
+  FAVOURITES_DESC = "FAVOURITES_DESC",
   UPDATED_AT = "UPDATED_AT",
+  UPDATED_AT_DESC = "UPDATED_AT_DESC",
   SEARCH_MATCH = "SEARCH_MATCH",
 }
 
@@ -64,9 +80,18 @@ export enum AiringSort {
 
 export enum CharacterSort {
   ID = "ID",
+  ID_DESC = "ID_DESC",
   ROLE = "ROLE",
+  ROLE_DESC = "ROLE_DESC",
   SEARCH_MATCH = "SEARCH_MATCH",
   FAVOURITES = "FAVOURITES",
+  FAVOURITES_DESC = "FAVOURITES_DESC",
+}
+
+export enum CharacterRole {
+  MAIN = "MAIN",
+  SUPPORTING = "SUPPORTING",
+  BACKGROUND = "BACKGROUND",
 }
 
 export interface MediaTitle {
@@ -154,6 +179,61 @@ export interface CharacterImage {
   medium: string | null;
 }
 
+export interface MediaCharacterEdge {
+  role: CharacterRole;
+  node: Omit<Character, "media">;
+}
+
+export interface MediaCharacterConnection {
+  edges: MediaCharacterEdge[];
+}
+
+export interface MediaStaffEdge {
+  role: string;
+  node: Staff;
+}
+
+export interface MediaStaffConnection {
+  edges: MediaStaffEdge[];
+}
+
+export interface StreamingEpisode {
+  title: string | null;
+  thumbnail: string | null;
+  url: string | null;
+  site: string | null;
+}
+
+export interface ExternalLink {
+  id: number;
+  url: string | null;
+  site: string;
+  type: string | null;
+  icon: string | null;
+  color: string | null;
+}
+
+export interface ScoreDistribution {
+  score: number;
+  amount: number;
+}
+
+export interface StatusDistribution {
+  status: MediaListStatus | string;
+  amount: number;
+}
+
+export interface MediaStats {
+  scoreDistribution: ScoreDistribution[];
+  statusDistribution: StatusDistribution[];
+}
+
+export interface MediaRecommendationNode {
+  id: number;
+  rating: number | null;
+  mediaRecommendation: Pick<Media, "id" | "title" | "type" | "format" | "coverImage" | "averageScore" | "siteUrl">;
+}
+
 export interface Media {
   id: number;
   idMal: number | null;
@@ -187,6 +267,12 @@ export interface Media {
   tags: MediaTag[];
   studios: StudioConnection;
   relations: MediaConnection | null;
+  characters?: MediaCharacterConnection;
+  staff?: MediaStaffConnection;
+  streamingEpisodes?: StreamingEpisode[];
+  externalLinks?: ExternalLink[];
+  stats?: MediaStats;
+  recommendations?: { nodes: MediaRecommendationNode[] };
   isAdult: boolean | null;
   siteUrl: string | null;
 }
@@ -230,7 +316,7 @@ export interface Staff {
   gender: string | null;
   dateOfBirth: FuzzyDate | null;
   dateOfDeath: FuzzyDate | null;
-  age: number | null;
+  age: string | null;
   yearsActive: number[];
   homeTown: string | null;
   bloodType: string | null;
@@ -311,6 +397,7 @@ export interface SearchCharacterOptions {
 
 export interface SearchStaffOptions {
   query?: string;
+  sort?: CharacterSort[];
   page?: number;
   perPage?: number;
 }
@@ -482,6 +569,29 @@ export interface SearchStudioOptions {
 }
 
 /**
+ * Options to include additional related data when fetching a media entry.
+ * Pass `true` to include with defaults, or an object to customize.
+ */
+export interface MediaIncludeOptions {
+  /** Include characters with their roles (MAIN, SUPPORTING, BACKGROUND).
+   *  `true` = 25 results sorted by role. Object form to customize. */
+  characters?: boolean | { perPage?: number; sort?: boolean };
+  /** Include staff members with their roles.
+   *  `true` = 25 results sorted by relevance. Object form to customize. */
+  staff?: boolean | { perPage?: number; sort?: boolean };
+  /** Include relations (default: `true` for backward compat). Set to `false` to exclude. */
+  relations?: boolean;
+  /** Include streaming episode links (Crunchyroll, Funimation, etc.) */
+  streamingEpisodes?: boolean;
+  /** Include external links (MAL, official site, etc.) */
+  externalLinks?: boolean;
+  /** Include score & status distribution stats */
+  stats?: boolean;
+  /** Include user recommendations. `true` = 10 results, or customize with `{ perPage }`. */
+  recommendations?: boolean | { perPage?: number };
+}
+
+/**
  * Interface that all cache adapters must implement.
  * Methods may return sync values or Promises — the client awaits all calls.
  */
@@ -497,9 +607,37 @@ export interface CacheAdapter {
   /** Number of entries currently stored (sync). Returns -1 if unknown. */
   readonly size: number;
   /** Return all cache keys. */
-  keys(): IterableIterator<string> | string[] | Promise<string[]>;
+  keys(): string[] | Promise<string[]>;
   /** Bulk-remove entries matching a pattern. Optional — the client provides a fallback. */
   invalidate?(pattern: string | RegExp): number | Promise<number>;
+}
+
+/** Cache configuration options. */
+export interface CacheOptions {
+  /** Time-to-live in milliseconds (default: 86 400 000 = 24h) */
+  ttl?: number;
+  /** Maximum number of cached entries (default: 500, 0 = unlimited) */
+  maxSize?: number;
+  /** Set to false to disable caching entirely */
+  enabled?: boolean;
+}
+
+/** Rate limiter configuration options. */
+export interface RateLimitOptions {
+  /** Max requests per window (default: 85) */
+  maxRequests?: number;
+  /** Window size in ms (default: 60 000) */
+  windowMs?: number;
+  /** Max retries on 429 (default: 3) */
+  maxRetries?: number;
+  /** Retry delay in ms when Retry-After header is absent (default: 2000) */
+  retryDelayMs?: number;
+  /** Set to false to disable rate limiting entirely */
+  enabled?: boolean;
+  /** Timeout per request in ms (default: 30 000). 0 = no timeout. */
+  timeoutMs?: number;
+  /** Retry on network errors like ECONNRESET / ETIMEDOUT (default: true) */
+  retryOnNetworkError?: boolean;
 }
 
 /** Event hooks for logging, debugging, and monitoring. */
@@ -522,33 +660,11 @@ export interface AniListClientOptions {
   /** Custom API endpoint (defaults to https://graphql.anilist.co) */
   apiUrl?: string;
   /** Cache configuration (enabled by default, 24h TTL) */
-  cache?: {
-    /** Time-to-live in milliseconds (default: 86 400 000 = 24h) */
-    ttl?: number;
-    /** Maximum number of cached entries (default: 500, 0 = unlimited) */
-    maxSize?: number;
-    /** Set to false to disable caching entirely */
-    enabled?: boolean;
-  };
+  cache?: CacheOptions;
   /** Custom cache adapter (e.g. RedisCache). Takes precedence over `cache`. */
   cacheAdapter?: CacheAdapter;
   /** Rate limiter configuration (enabled by default, 85 req/min) */
-  rateLimit?: {
-    /** Max requests per window (default: 85) */
-    maxRequests?: number;
-    /** Window size in ms (default: 60 000) */
-    windowMs?: number;
-    /** Max retries on 429 (default: 3) */
-    maxRetries?: number;
-    /** Retry delay in ms when Retry-After header is absent (default: 2000) */
-    retryDelayMs?: number;
-    /** Set to false to disable rate limiting entirely */
-    enabled?: boolean;
-    /** Timeout per request in ms (default: 30 000). 0 = no timeout. */
-    timeoutMs?: number;
-    /** Retry on network errors like ECONNRESET / ETIMEDOUT (default: true) */
-    retryOnNetworkError?: boolean;
-  };
+  rateLimit?: RateLimitOptions;
   /** Event hooks for logging, debugging, and monitoring */
   hooks?: AniListHooks;
 }

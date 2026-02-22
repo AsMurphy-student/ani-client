@@ -22,6 +22,7 @@
 - [Client options](#client-options)
 - [API reference](#api-reference)
   - [Media](#media)
+  - [Include options](#include-options)
   - [Characters](#characters)
   - [Staff](#staff)
   - [Users](#users)
@@ -145,14 +146,26 @@ const client = new AniListClient({
 
 | Method | Description |
 | --- | --- |
-| `getMedia(id)` | Fetch a single anime / manga by ID |
+| `getMedia(id, include?)` | Fetch a single anime / manga by ID with optional extra data |
 | `searchMedia(options?)` | Search & filter anime / manga |
 | `getTrending(type?, page?, perPage?)` | Currently trending entries |
 | `getMediaBySeason(options)` | Anime/manga for a given season & year |
 | `getRecommendations(mediaId, options?)` | User recommendations for a media |
 
 ```ts
+// Simple — same as before
 const anime = await client.getMedia(1);
+
+// With extra data
+const anime = await client.getMedia(1, {
+  characters: { perPage: 25, sort: true },
+  staff: true,
+  relations: true,
+  streamingEpisodes: true,
+  externalLinks: true,
+  stats: true,
+  recommendations: { perPage: 5 },
+});
 
 const results = await client.searchMedia({
   query: "Naruto",
@@ -160,6 +173,56 @@ const results = await client.searchMedia({
   format: MediaFormat.TV,
   genre: "Action",
   perPage: 10,
+});
+```
+
+### Include options
+
+The second parameter of `getMedia()` lets you opt-in to additional data. By default, only `relations` are included for backward compatibility.
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `characters` | `boolean \| { perPage?, sort? }` | — | Characters with their roles (MAIN, SUPPORTING, BACKGROUND) |
+| `staff` | `boolean \| { perPage?, sort? }` | — | Staff members with their roles |
+| `relations` | `boolean` | `true` | Sequels, prequels, adaptations, etc. Set `false` to exclude |
+| `streamingEpisodes` | `boolean` | — | Streaming links (Crunchyroll, Funimation, etc.) |
+| `externalLinks` | `boolean` | — | External links (MAL, official site, etc.) |
+| `stats` | `boolean` | — | Score & status distribution |
+| `recommendations` | `boolean \| { perPage? }` | — | User recommendations |
+
+```ts
+// Include characters sorted by role (25 per page by default)
+const anime = await client.getMedia(1, { characters: true });
+anime.characters?.edges.forEach((e) =>
+  console.log(`${e.node.name.full} (${e.role})`)
+);
+
+// 50 characters, no sorting
+const anime = await client.getMedia(1, {
+  characters: { perPage: 50, sort: false },
+});
+
+// Staff members
+const anime = await client.getMedia(1, { staff: true });
+anime.staff?.edges.forEach((e) =>
+  console.log(`${e.node.name.full} — ${e.role}`)
+);
+
+// Everything at once
+const anime = await client.getMedia(1, {
+  characters: { perPage: 50 },
+  staff: { perPage: 25 },
+  relations: true,
+  streamingEpisodes: true,
+  externalLinks: true,
+  stats: true,
+  recommendations: { perPage: 10 },
+});
+
+// Lightweight — exclude relations
+const anime = await client.getMedia(1, {
+  characters: true,
+  relations: false,
 });
 ```
 
@@ -266,13 +329,16 @@ recs.results.forEach((r) =>
 
 ### Relations
 
-Every media object includes a `relations` field with sequels, prequels, spin-offs, etc.
+Relations (sequels, prequels, spin-offs, etc.) are included by default when using `getMedia()`. You can also explicitly request them via the `include` parameter, or exclude them with `relations: false`.
 
 ```ts
 const anime = await client.getMedia(1);
 anime.relations?.edges.forEach((edge) =>
   console.log(`${edge.relationType}: ${edge.node.title.romaji}`)
 );
+
+// Exclude relations for a lighter response
+const anime = await client.getMedia(1, { relations: false });
 ```
 
 Available types: `ADAPTATION`, `PREQUEL`, `SEQUEL`, `PARENT`, `SIDE_STORY`, `CHARACTER`, `SUMMARY`, `ALTERNATIVE`, `SPIN_OFF`, `OTHER`, `SOURCE`, `COMPILATION`, `CONTAINS`.
@@ -474,7 +540,10 @@ All types and enums are exported:
 import type {
   Media, Character, Staff, User,
   AiringSchedule, MediaListEntry, Recommendation, StudioDetail,
-  MediaEdge, MediaConnection, PageInfo, PagedResult,
+  MediaEdge, MediaConnection, MediaCharacterEdge, MediaCharacterConnection,
+  MediaStaffEdge, MediaStaffConnection, MediaIncludeOptions,
+  StreamingEpisode, ExternalLink, MediaStats, MediaRecommendationNode,
+  PageInfo, PagedResult,
   CacheAdapter, AniListHooks, AniListClientOptions,
   SearchMediaOptions, SearchCharacterOptions, SearchStaffOptions,
   SearchStudioOptions, GetAiringOptions, GetRecentChaptersOptions,
@@ -484,7 +553,7 @@ import type {
 
 import {
   MediaType, MediaFormat, MediaStatus, MediaSeason, MediaSort,
-  CharacterSort, AiringSort, RecommendationSort,
+  CharacterSort, CharacterRole, AiringSort, RecommendationSort,
   MediaRelationType, MediaListStatus, MediaListSort,
 } from "ani-client";
 ```

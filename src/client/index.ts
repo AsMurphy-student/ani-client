@@ -21,12 +21,14 @@ import {
   buildBatchCharacterQuery,
   buildBatchMediaQuery,
   buildBatchStaffQuery,
+  buildMediaByIdQuery,
 } from "../queries";
 
 import { MemoryCache } from "../cache";
 import { AniListError } from "../errors";
 import { RateLimiter } from "../rate-limiter";
 
+import { MediaType } from "../types";
 import type {
   AiringSchedule,
   AniListClientOptions,
@@ -40,9 +42,9 @@ import type {
   GetSeasonOptions,
   GetUserMediaListOptions,
   Media,
+  MediaIncludeOptions,
   MediaListEntry,
   MediaTag,
-  MediaType,
   PageInfo,
   PagedResult,
   Recommendation,
@@ -164,17 +166,56 @@ export class AniListClient {
     field: string,
   ): Promise<PagedResult<T>> {
     const data = await this.request<{ Page: Record<string, unknown> & { pageInfo: PageInfo } }>(query, variables);
-    return { pageInfo: data.Page.pageInfo, results: data.Page[field] as T[] };
+    const results = data.Page[field];
+    if (!Array.isArray(results)) {
+      throw new AniListError(`Unexpected response: missing field "${field}" in Page`, 0, []);
+    }
+    return { pageInfo: data.Page.pageInfo, results: results as T[] };
+  }
+
+  /**
+   * @internal
+   * Clamp perPage to AniList's maximum of 50.
+   */
+  private clampPerPage(value: number): number {
+    return Math.min(Math.max(value, 1), 50);
   }
 
   /**
    * Fetch a single media entry by its AniList ID.
    *
+   * Optionally include related data (characters, staff, relations, etc.) via the `include` parameter.
+   *
    * @param id - The AniList media ID
+   * @param include - Optional related data to include
    * @returns The media object
+   *
+   * @example
+   * ```ts
+   * // Basic usage — same as before (includes relations by default)
+   * const anime = await client.getMedia(1);
+   *
+   * // Include characters sorted by role, 25 results
+   * const anime = await client.getMedia(1, { characters: true });
+   *
+   * // Full control
+   * const anime = await client.getMedia(1, {
+   *   characters: { perPage: 50, sort: true },
+   *   staff: true,
+   *   relations: true,
+   *   streamingEpisodes: true,
+   *   externalLinks: true,
+   *   stats: true,
+   *   recommendations: { perPage: 5 },
+   * });
+   *
+   * // Exclude relations for a lighter response
+   * const anime = await client.getMedia(1, { characters: true, relations: false });
+   * ```
    */
-  async getMedia(id: number): Promise<Media> {
-    const data = await this.request<{ Media: Media }>(QUERY_MEDIA_BY_ID, { id });
+  async getMedia(id: number, include?: MediaIncludeOptions): Promise<Media> {
+    const query = include ? buildMediaByIdQuery(include) : QUERY_MEDIA_BY_ID;
+    const data = await this.request<{ Media: Media }>(query, { id });
     return data.Media;
   }
 
@@ -195,7 +236,7 @@ export class AniListClient {
    */
   async searchMedia(options: SearchMediaOptions = {}): Promise<PagedResult<Media>> {
     const { query: search, page = 1, perPage = 20, ...filters } = options;
-    return this.pagedRequest<Media>(QUERY_MEDIA_SEARCH, { search, ...filters, page, perPage }, "media");
+    return this.pagedRequest<Media>(QUERY_MEDIA_SEARCH, { search, ...filters, page, perPage: this.clampPerPage(perPage) }, "media");
   }
 
   /**
@@ -205,12 +246,21 @@ export class AniListClient {
    * @param page - Page number (default 1)
    * @param perPage - Results per page (default 20, max 50)
    */
-  async getTrending(type: MediaType = "ANIME" as MediaType, page = 1, perPage = 20): Promise<PagedResult<Media>> {
-    return this.pagedRequest<Media>(QUERY_TRENDING, { type, page, perPage }, "media");
+  async getTrending(type: MediaType = MediaType.ANIME, page = 1, perPage = 20): Promise<PagedResult<Media>> {
+    return this.pagedRequest<Media>(QUERY_TRENDING, { type, page, perPage: this.clampPerPage(perPage) }, "media");
   }
 
   /**
    * Fetch a character by AniList ID.
+   *
+   * @param id - The AniList character ID
+   * @returns The character object
+   *
+   * @example
+   * ```ts
+   * const spike = await client.getCharacter(1);
+   * console.log(spike.name.full); // "Spike Spiegel"
+   * ```
    */
   async getCharacter(id: number): Promise<Character> {
     const data = await this.request<{ Character: Character }>(QUERY_CHARACTER_BY_ID, { id });
@@ -219,14 +269,31 @@ export class AniListClient {
 
   /**
    * Search for characters by name.
+   *
+   * @param options - Search / pagination parameters
+   * @returns Paginated results with matching characters
+   *
+   * @example
+   * ```ts
+   * const result = await client.searchCharacters({ query: "Luffy", perPage: 5 });
+   * ```
    */
   async searchCharacters(options: SearchCharacterOptions = {}): Promise<PagedResult<Character>> {
     const { query: search, page = 1, perPage = 20, ...rest } = options;
-    return this.pagedRequest<Character>(QUERY_CHARACTER_SEARCH, { search, ...rest, page, perPage }, "characters");
+    return this.pagedRequest<Character>(QUERY_CHARACTER_SEARCH, { search, ...rest, page, perPage: this.clampPerPage(perPage) }, "characters");
   }
 
   /**
    * Fetch a staff member by AniList ID.
+   *
+   * @param id - The AniList staff ID
+   * @returns The staff object
+   *
+   * @example
+   * ```ts
+   * const staff = await client.getStaff(95001);
+   * console.log(staff.name.full);
+   * ```
    */
   async getStaff(id: number): Promise<Staff> {
     const data = await this.request<{ Staff: Staff }>(QUERY_STAFF_BY_ID, { id });
@@ -235,14 +302,31 @@ export class AniListClient {
 
   /**
    * Search for staff (voice actors, directors, etc.).
+   *
+   * @param options - Search / pagination parameters
+   * @returns Paginated results with matching staff
+   *
+   * @example
+   * ```ts
+   * const result = await client.searchStaff({ query: "Miyazaki", perPage: 5 });
+   * ```
    */
   async searchStaff(options: SearchStaffOptions = {}): Promise<PagedResult<Staff>> {
-    const { query: search, page = 1, perPage = 20 } = options;
-    return this.pagedRequest<Staff>(QUERY_STAFF_SEARCH, { search, page, perPage }, "staff");
+    const { query: search, page = 1, perPage = 20, sort } = options;
+    return this.pagedRequest<Staff>(QUERY_STAFF_SEARCH, { search, sort, page, perPage: this.clampPerPage(perPage) }, "staff");
   }
 
   /**
    * Fetch a user by AniList ID.
+   *
+   * @param id - The AniList user ID
+   * @returns The user object
+   *
+   * @example
+   * ```ts
+   * const user = await client.getUser(1);
+   * console.log(user.name);
+   * ```
    */
   async getUser(id: number): Promise<User> {
     const data = await this.request<{ User: User }>(QUERY_USER_BY_ID, { id });
@@ -251,6 +335,15 @@ export class AniListClient {
 
   /**
    * Fetch a user by username.
+   *
+   * @param name - The AniList username
+   * @returns The user object
+   *
+   * @example
+   * ```ts
+   * const user = await client.getUserByName("AniList");
+   * console.log(user.statistics);
+   * ```
    */
   async getUserByName(name: string): Promise<User> {
     const data = await this.request<{ User: User }>(QUERY_USER_BY_NAME, { name });
@@ -291,7 +384,7 @@ export class AniListClient {
       airingAt_lesser: options.airingAtLesser ?? now,
       sort: options.sort ?? ["TIME_DESC"],
       page: options.page ?? 1,
-      perPage: options.perPage ?? 20,
+      perPage: this.clampPerPage(options.perPage ?? 20),
     };
 
     return this.pagedRequest<AiringSchedule>(QUERY_AIRING_SCHEDULE, variables, "airingSchedules");
@@ -316,7 +409,7 @@ export class AniListClient {
       QUERY_RECENT_CHAPTERS,
       {
         page: options.page ?? 1,
-        perPage: options.perPage ?? 20,
+        perPage: this.clampPerPage(options.perPage ?? 20),
       },
       "media",
     );
@@ -343,7 +436,7 @@ export class AniListClient {
         type: options.type,
         sort: options.sort ?? ["POPULARITY_DESC"],
         page: options.page ?? 1,
-        perPage: options.perPage ?? 20,
+        perPage: this.clampPerPage(options.perPage ?? 20),
       },
       "media",
     );
@@ -419,7 +512,7 @@ export class AniListClient {
         type: options.type ?? "ANIME",
         sort: options.sort ?? ["POPULARITY_DESC"],
         page: options.page ?? 1,
-        perPage: options.perPage ?? 20,
+        perPage: this.clampPerPage(options.perPage ?? 20),
       },
       "media",
     );
@@ -463,7 +556,7 @@ export class AniListClient {
         status: options.status,
         sort: options.sort,
         page: options.page ?? 1,
-        perPage: options.perPage ?? 20,
+        perPage: this.clampPerPage(options.perPage ?? 20),
       },
       "mediaList",
     );
@@ -498,7 +591,7 @@ export class AniListClient {
       {
         search: options.query,
         page: options.page ?? 1,
-        perPage: options.perPage ?? 20,
+        perPage: this.clampPerPage(options.perPage ?? 20),
       },
       "studios",
     );
@@ -611,15 +704,16 @@ export class AniListClient {
   /** @internal */
   private async executeBatch<T>(ids: number[], buildQuery: (ids: number[]) => string, prefix: string): Promise<T[]> {
     const chunks = this.chunk(ids, 50);
-    const results: T[] = [];
 
-    for (const chunk of chunks) {
-      const query = buildQuery(chunk);
-      const data = await this.request<Record<string, T>>(query);
-      results.push(...chunk.map((_, i) => data[`${prefix}${i}`]));
-    }
+    const chunkResults = await Promise.all(
+      chunks.map(async (chunk) => {
+        const query = buildQuery(chunk);
+        const data = await this.request<Record<string, T>>(query);
+        return chunk.map((_, i) => data[`${prefix}${i}`]);
+      }),
+    );
 
-    return results;
+    return chunkResults.flat();
   }
 
   /** @internal */

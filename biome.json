@@ -22,7 +22,7 @@
         "noForEach": "off"
       },
       "style": {
-        "noNonNullAssertion": "off"
+        "noNonNullAssertion": "warn"
       }
     }
   },

@@ -1,4 +1,5 @@
-const MEDIA_FIELDS = `
+/** Core media fields — always returned. Does NOT include relations (opt-in via include). */
+const MEDIA_FIELDS_BASE = `
   id
   idMal
   title { romaji english native userPreferred }
@@ -30,6 +31,11 @@ const MEDIA_FIELDS = `
   trending
   tags { id name description category rank isMediaSpoiler }
   studios { nodes { id name isAnimationStudio siteUrl } }
+  isAdult
+  siteUrl
+`;
+
+const RELATIONS_FIELDS = `
   relations {
     edges {
       relationType(version: 2)
@@ -44,11 +50,16 @@ const MEDIA_FIELDS = `
       }
     }
   }
-  isAdult
-  siteUrl
 `;
 
-const CHARACTER_FIELDS = `
+/** Full media fields with relations — used by existing queries for backward compat. */
+const MEDIA_FIELDS = `
+  ${MEDIA_FIELDS_BASE}
+  ${RELATIONS_FIELDS}
+`;
+
+/** Character fields without back-reference to media (used when embedding characters inside a Media query). */
+const CHARACTER_FIELDS_COMPACT = `
   id
   name { first middle last full native alternative }
   image { large medium }
@@ -59,6 +70,10 @@ const CHARACTER_FIELDS = `
   bloodType
   favourites
   siteUrl
+`;
+
+const CHARACTER_FIELDS = `
+  ${CHARACTER_FIELDS_COMPACT}
   media(perPage: 10) {
     nodes {
       id
@@ -142,7 +157,7 @@ query (
       isAdult: $isAdult,
       sort: $sort
     ) {
-      ${MEDIA_FIELDS}
+      ${MEDIA_FIELDS_BASE}
     }
   }
 }`;
@@ -152,7 +167,7 @@ query ($type: MediaType, $page: Int, $perPage: Int) {
   Page(page: $page, perPage: $perPage) {
     pageInfo { total perPage currentPage lastPage hasNextPage }
     media(type: $type, sort: TRENDING_DESC) {
-      ${MEDIA_FIELDS}
+      ${MEDIA_FIELDS_BASE}
     }
   }
 }`;
@@ -182,10 +197,10 @@ query ($id: Int!) {
 }`;
 
 export const QUERY_STAFF_SEARCH = `
-query ($search: String, $page: Int, $perPage: Int) {
+query ($search: String, $sort: [CharacterSort], $page: Int, $perPage: Int) {
   Page(page: $page, perPage: $perPage) {
     pageInfo { total perPage currentPage lastPage hasNextPage }
-    staff(search: $search) {
+    staff(search: $search, sort: $sort) {
       ${STAFF_FIELDS}
     }
   }
@@ -216,7 +231,7 @@ query ($airingAt_greater: Int, $airingAt_lesser: Int, $sort: [AiringSort], $page
       episode
       mediaId
       media {
-        ${MEDIA_FIELDS}
+        ${MEDIA_FIELDS_BASE}
       }
     }
   }
@@ -227,7 +242,7 @@ query ($page: Int, $perPage: Int) {
   Page(page: $page, perPage: $perPage) {
     pageInfo { total perPage currentPage lastPage hasNextPage }
     media(type: MANGA, status: RELEASING, sort: UPDATED_AT_DESC) {
-      ${MEDIA_FIELDS}
+      ${MEDIA_FIELDS_BASE}
     }
   }
 }`;
@@ -237,7 +252,7 @@ query ($type: MediaType, $sort: [MediaSort], $page: Int, $perPage: Int) {
   Page(page: $page, perPage: $perPage) {
     pageInfo { total perPage currentPage lastPage hasNextPage }
     media(type: $type, status: NOT_YET_RELEASED, sort: $sort) {
-      ${MEDIA_FIELDS}
+      ${MEDIA_FIELDS_BASE}
     }
   }
 }`;
@@ -247,7 +262,7 @@ query ($season: MediaSeason!, $seasonYear: Int!, $type: MediaType, $sort: [Media
   Page(page: $page, perPage: $perPage) {
     pageInfo { total perPage currentPage lastPage hasNextPage }
     media(season: $season, seasonYear: $seasonYear, type: $type, sort: $sort) {
-      ${MEDIA_FIELDS}
+      ${MEDIA_FIELDS_BASE}
     }
   }
 }`;
@@ -268,7 +283,7 @@ const MEDIA_LIST_FIELDS = `
   updatedAt
   createdAt
   media {
-    ${MEDIA_FIELDS}
+    ${MEDIA_FIELDS_BASE}
   }
 `;
 
@@ -369,6 +384,123 @@ query {
   }
 }`;
 
+import type { MediaIncludeOptions } from "../types";
+
+// ── Dynamic media query builder ──
+
+/**
+ * Build a `Media(id: $id)` query that optionally includes characters, staff,
+ * relations, streaming episodes, external links, stats, and recommendations.
+ *
+ * When no include options are given, the query is identical to QUERY_MEDIA_BY_ID.
+ *
+ * @internal
+ */
+export function buildMediaByIdQuery(include?: MediaIncludeOptions): string {
+  if (!include) return QUERY_MEDIA_BY_ID;
+
+  const extra: string[] = [];
+
+  // Relations — included by default (backward compat), opt-out with `relations: false`
+  if (include.relations !== false) {
+    extra.push(RELATIONS_FIELDS);
+  }
+
+  // Characters
+  if (include.characters) {
+    const opts = typeof include.characters === "object" ? include.characters : {};
+    const perPage = opts.perPage ?? 25;
+    const sortClause = opts.sort !== false ? ", sort: [ROLE, RELEVANCE, ID]" : "";
+    extra.push(`
+    characters(perPage: ${perPage}${sortClause}) {
+      edges {
+        role
+        node {
+          ${CHARACTER_FIELDS_COMPACT}
+        }
+      }
+    }`);
+  }
+
+  // Staff
+  if (include.staff) {
+    const opts = typeof include.staff === "object" ? include.staff : {};
+    const perPage = opts.perPage ?? 25;
+    const sortClause = opts.sort !== false ? ", sort: [RELEVANCE, ID]" : "";
+    extra.push(`
+    staff(perPage: ${perPage}${sortClause}) {
+      edges {
+        role
+        node {
+          ${STAFF_FIELDS}
+        }
+      }
+    }`);
+  }
+
+  // Recommendations
+  if (include.recommendations) {
+    const perPage = typeof include.recommendations === "object" ? include.recommendations.perPage ?? 10 : 10;
+    extra.push(`
+    recommendations(perPage: ${perPage}, sort: [RATING_DESC]) {
+      nodes {
+        id
+        rating
+        mediaRecommendation {
+          id
+          title { romaji english native userPreferred }
+          type
+          format
+          coverImage { large medium }
+          averageScore
+          siteUrl
+        }
+      }
+    }`);
+  }
+
+  // Streaming episodes
+  if (include.streamingEpisodes) {
+    extra.push(`
+    streamingEpisodes {
+      title
+      thumbnail
+      url
+      site
+    }`);
+  }
+
+  // External links
+  if (include.externalLinks) {
+    extra.push(`
+    externalLinks {
+      id
+      url
+      site
+      type
+      icon
+      color
+    }`);
+  }
+
+  // Stats (score & status distribution)
+  if (include.stats) {
+    extra.push(`
+    stats {
+      scoreDistribution { score amount }
+      statusDistribution { status amount }
+    }`);
+  }
+
+  return `
+query ($id: Int!) {
+  Media(id: $id) {
+    ${MEDIA_FIELDS_BASE}
+    ${extra.join("\n")}
+  }
+}`;
+}
+
 // ── Batch query builders ──
 
 /** @internal Build a batched GraphQL query using aliases. */
@@ -377,7 +509,7 @@ function buildBatchQuery(ids: number[], typeName: string, fields: string, prefix
   return `query {\n  ${aliases}\n}`;
 }
 
-export const buildBatchMediaQuery = (ids: number[]): string => buildBatchQuery(ids, "Media", MEDIA_FIELDS, "m");
+export const buildBatchMediaQuery = (ids: number[]): string => buildBatchQuery(ids, "Media", MEDIA_FIELDS_BASE, "m");
 
 export const buildBatchCharacterQuery = (ids: number[]): string =>
   buildBatchQuery(ids, "Character", CHARACTER_FIELDS, "c");

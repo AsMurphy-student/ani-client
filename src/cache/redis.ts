@@ -9,6 +9,8 @@ export interface RedisLikeClient {
   set(key: string, value: string, ...args: unknown[]): Promise<unknown>;
   del(...keys: (string | string[])[]): Promise<number>;
   keys(pattern: string): Promise<string[]>;
+  /** Optional SCAN-based iteration — used when available to avoid blocking the server. */
+  scanIterator?(options: { MATCH: string; COUNT?: number }): AsyncIterable<string>;
 }
 
 export interface RedisCacheOptions {
@@ -68,8 +70,26 @@ export class RedisCache implements CacheAdapter {
     return count > 0;
   }
 
+  /**
+   * Collect keys matching a pattern. Uses SCAN when available, falls back to KEYS.
+   *
+   * **Warning:** The `KEYS` fallback is O(N) and blocks the Redis server.
+   * Provide a client with `scanIterator` support for production use.
+   * @internal
+   */
+  private async collectKeys(pattern: string): Promise<string[]> {
+    if (this.client.scanIterator) {
+      const keys: string[] = [];
+      for await (const key of this.client.scanIterator({ MATCH: pattern, COUNT: 100 })) {
+        keys.push(key);
+      }
+      return keys;
+    }
+    return this.client.keys(pattern);
+  }
+
   async clear(): Promise<void> {
-    const keys = await this.client.keys(`${this.prefix}*`);
+    const keys = await this.collectKeys(`${this.prefix}*`);
     if (keys.length > 0) {
       await this.client.del(...keys);
     }
@@ -90,7 +110,7 @@ export class RedisCache implements CacheAdapter {
   }
 
   async keys(): Promise<string[]> {
-    const raw = await this.client.keys(`${this.prefix}*`);
+    const raw = await this.collectKeys(`${this.prefix}*`);
     return raw.map((k) => k.slice(this.prefix.length));
   }
 
@@ -100,9 +120,16 @@ export class RedisCache implements CacheAdapter {
    * @param pattern — A glob pattern (e.g. `"*Media*"`)
    * @returns Number of entries removed.
    */
-  async invalidate(pattern: string): Promise<number> {
-    const keys = await this.client.keys(`${this.prefix}${pattern}`);
-    if (keys.length === 0) return 0;
-    return this.client.del(...keys);
+  async invalidate(pattern: string | RegExp): Promise<number> {
+    if (typeof pattern === "string") {
+      const keys = await this.collectKeys(`${this.prefix}${pattern}`);
+      if (keys.length === 0) return 0;
+      return this.client.del(...keys);
+    }
+    // RegExp: collect all keys and filter
+    const allKeys = await this.collectKeys(`${this.prefix}*`);
+    const matching = allKeys.filter((k) => pattern.test(k.slice(this.prefix.length)));
+    if (matching.length === 0) return 0;
+    return this.client.del(...matching);
   }
 }

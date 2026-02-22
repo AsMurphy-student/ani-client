@@ -35,7 +35,7 @@ jobs:
         run: pnpm run build
 
       - name: Test
-        run: pnpm test
+        run: pnpm test:unit
 
       - name: Publish to npm
         run: npm publish --access public
