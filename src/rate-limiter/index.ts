@@ -41,6 +41,7 @@ export class RateLimiter {
     this.timestamps = this.timestamps.filter((t) => now - t < this.windowMs);
 
     if (this.timestamps.length >= this.maxRequests) {
+      // biome-ignore lint/style/noNonNullAssertion: length check guarantees [0] exists
       const oldest = this.timestamps[0]!;
       const waitMs = this.windowMs - (now - oldest) + 50;
       await this.sleep(waitMs);

@@ -268,9 +268,10 @@ async function run() {
     await client.clearCache();
     const media = await client.getMedia(1);
     assert(media.relations !== null && media.relations !== undefined, "relations should exist");
-    assert(Array.isArray(media.relations!.edges), "relations.edges should be an array");
-    if (media.relations!.edges.length > 0) {
-      const edge = media.relations!.edges[0];
+    assert(Array.isArray(media.relations?.edges), "relations.edges should be an array");
+    if (media.relations && media.relations.edges.length > 0) {
+      const edge = media.relations.edges[0];
+      assert(edge !== undefined, "edge should exist");
       assert(typeof edge.relationType === "string", "relationType should be a string");
       assert(typeof edge.node.id === "number", "related media should have an id");
     }

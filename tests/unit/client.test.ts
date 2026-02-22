@@ -228,7 +228,14 @@ describe("AniListClient", () => {
             role: "MAIN",
             node: {
               id: 1,
-              name: { first: "Spike", middle: null, last: "Spiegel", full: "Spike Spiegel", native: null, alternative: [] },
+              name: {
+                first: "Spike",
+                middle: null,
+                last: "Spiegel",
+                full: "Spike Spiegel",
+                native: null,
+                alternative: [],
+              },
               image: { large: null, medium: null },
               description: null,
               gender: "Male",
@@ -248,13 +255,13 @@ describe("AniListClient", () => {
     const result = await client.getMedia(1, { characters: true });
 
     expect(result.characters).toBeDefined();
-    expect(result.characters!.edges).toHaveLength(1);
-    expect(result.characters!.edges[0].role).toBe("MAIN");
-    expect(result.characters!.edges[0].node.name.full).toBe("Spike Spiegel");
+    expect(result.characters?.edges).toHaveLength(1);
+    expect(result.characters?.edges[0].role).toBe("MAIN");
+    expect(result.characters?.edges[0].node.name.full).toBe("Spike Spiegel");
 
     // Verify the query sent to fetch contains "characters"
     const fetchCall = vi.mocked(fetch).mock.calls[0];
-    const body = JSON.parse(fetchCall[1]!.body as string);
+    const body = JSON.parse(fetchCall[1]?.body as string);
     expect(body.query).toContain("characters");
   });
 
@@ -292,11 +299,11 @@ describe("AniListClient", () => {
     const result = await client.getMedia(1, { staff: true });
 
     expect(result.staff).toBeDefined();
-    expect(result.staff!.edges).toHaveLength(1);
-    expect(result.staff!.edges[0].role).toBe("Director");
+    expect(result.staff?.edges).toHaveLength(1);
+    expect(result.staff?.edges[0].role).toBe("Director");
 
     const fetchCall = vi.mocked(fetch).mock.calls[0];
-    const body = JSON.parse(fetchCall[1]!.body as string);
+    const body = JSON.parse(fetchCall[1]?.body as string);
     expect(body.query).toContain("staff");
   });
 
@@ -307,7 +314,7 @@ describe("AniListClient", () => {
     await client.getMedia(1);
 
     const fetchCall = vi.mocked(fetch).mock.calls[0];
-    const body = JSON.parse(fetchCall[1]!.body as string);
+    const body = JSON.parse(fetchCall[1]?.body as string);
     expect(body.query).not.toContain("characters");
     expect(body.query).not.toMatch(/\bstaff\s*\(/);
   });
@@ -319,7 +326,7 @@ describe("AniListClient", () => {
     await client.getMedia(1, { characters: { perPage: 50 } });
 
     const fetchCall = vi.mocked(fetch).mock.calls[0];
-    const body = JSON.parse(fetchCall[1]!.body as string);
+    const body = JSON.parse(fetchCall[1]?.body as string);
     expect(body.query).toContain("characters(perPage: 50");
   });
 
@@ -330,7 +337,7 @@ describe("AniListClient", () => {
     await client.getMedia(1, { characters: { sort: false } });
 
     const fetchCall = vi.mocked(fetch).mock.calls[0];
-    const body = JSON.parse(fetchCall[1]!.body as string);
+    const body = JSON.parse(fetchCall[1]?.body as string);
     expect(body.query).toContain("characters(perPage: 25)");
     expect(body.query).not.toMatch(/characters\([^)]*sort:/);
   });
@@ -342,60 +349,99 @@ describe("AniListClient", () => {
     await client.getMedia(1, { relations: false });
 
     const fetchCall = vi.mocked(fetch).mock.calls[0];
-    const body = JSON.parse(fetchCall[1]!.body as string);
+    const body = JSON.parse(fetchCall[1]?.body as string);
     expect(body.query).not.toContain("relations");
   });
 
   it("getMedia with { streamingEpisodes: true } includes streaming fields", async () => {
-    mockFetch({ Media: { ...mockMedia, streamingEpisodes: [{ title: "Ep 1", thumbnail: null, url: "https://example.com", site: "Crunchyroll" }] } });
+    mockFetch({
+      Media: {
+        ...mockMedia,
+        streamingEpisodes: [{ title: "Ep 1", thumbnail: null, url: "https://example.com", site: "Crunchyroll" }],
+      },
+    });
 
     const client = new AniListClient({ cache: { enabled: false } });
     const result = await client.getMedia(1, { streamingEpisodes: true });
 
     const fetchCall = vi.mocked(fetch).mock.calls[0];
-    const body = JSON.parse(fetchCall[1]!.body as string);
+    const body = JSON.parse(fetchCall[1]?.body as string);
     expect(body.query).toContain("streamingEpisodes");
     expect(result.streamingEpisodes).toHaveLength(1);
-    expect(result.streamingEpisodes![0].site).toBe("Crunchyroll");
+    expect(result.streamingEpisodes?.[0].site).toBe("Crunchyroll");
   });
 
   it("getMedia with { externalLinks: true } includes external link fields", async () => {
-    mockFetch({ Media: { ...mockMedia, externalLinks: [{ id: 1, url: "https://mal.net", site: "MyAnimeList", type: "INFO", icon: null, color: null }] } });
+    mockFetch({
+      Media: {
+        ...mockMedia,
+        externalLinks: [{ id: 1, url: "https://mal.net", site: "MyAnimeList", type: "INFO", icon: null, color: null }],
+      },
+    });
 
     const client = new AniListClient({ cache: { enabled: false } });
     const result = await client.getMedia(1, { externalLinks: true });
 
     const fetchCall = vi.mocked(fetch).mock.calls[0];
-    const body = JSON.parse(fetchCall[1]!.body as string);
+    const body = JSON.parse(fetchCall[1]?.body as string);
     expect(body.query).toContain("externalLinks");
     expect(result.externalLinks).toHaveLength(1);
-    expect(result.externalLinks![0].site).toBe("MyAnimeList");
+    expect(result.externalLinks?.[0].site).toBe("MyAnimeList");
   });
 
   it("getMedia with { stats: true } includes score/status distribution", async () => {
-    mockFetch({ Media: { ...mockMedia, stats: { scoreDistribution: [{ score: 80, amount: 500 }], statusDistribution: [{ status: "COMPLETED", amount: 1000 }] } } });
+    mockFetch({
+      Media: {
+        ...mockMedia,
+        stats: {
+          scoreDistribution: [{ score: 80, amount: 500 }],
+          statusDistribution: [{ status: "COMPLETED", amount: 1000 }],
+        },
+      },
+    });
 
     const client = new AniListClient({ cache: { enabled: false } });
     const result = await client.getMedia(1, { stats: true });
 
     const fetchCall = vi.mocked(fetch).mock.calls[0];
-    const body = JSON.parse(fetchCall[1]!.body as string);
+    const body = JSON.parse(fetchCall[1]?.body as string);
     expect(body.query).toContain("scoreDistribution");
     expect(body.query).toContain("statusDistribution");
-    expect(result.stats!.scoreDistribution[0].score).toBe(80);
-    expect(result.stats!.statusDistribution[0].status).toBe("COMPLETED");
+    expect(result.stats?.scoreDistribution[0].score).toBe(80);
+    expect(result.stats?.statusDistribution[0].status).toBe("COMPLETED");
   });
 
   it("getMedia with { recommendations: { perPage: 5 } } includes recommendations", async () => {
-    mockFetch({ Media: { ...mockMedia, recommendations: { nodes: [{ id: 1, rating: 50, mediaRecommendation: { id: 5, title: { romaji: "Samurai Champloo", english: null, native: null, userPreferred: null }, type: "ANIME", format: "TV", coverImage: { large: null, medium: null }, averageScore: 85, siteUrl: null } }] } } });
+    mockFetch({
+      Media: {
+        ...mockMedia,
+        recommendations: {
+          nodes: [
+            {
+              id: 1,
+              rating: 50,
+              mediaRecommendation: {
+                id: 5,
+                title: { romaji: "Samurai Champloo", english: null, native: null, userPreferred: null },
+                type: "ANIME",
+                format: "TV",
+                coverImage: { large: null, medium: null },
+                averageScore: 85,
+                siteUrl: null,
+              },
+            },
+          ],
+        },
+      },
+    });
 
     const client = new AniListClient({ cache: { enabled: false } });
     const result = await client.getMedia(1, { recommendations: { perPage: 5 } });
 
     const fetchCall = vi.mocked(fetch).mock.calls[0];
-    const body = JSON.parse(fetchCall[1]!.body as string);
+    const body = JSON.parse(fetchCall[1]?.body as string);
     expect(body.query).toContain("recommendations(perPage: 5");
-    expect(result.recommendations!.nodes).toHaveLength(1);
-    expect(result.recommendations!.nodes[0].mediaRecommendation.title.romaji).toBe("Samurai Champloo");
+    expect(result.recommendations?.nodes).toHaveLength(1);
+    expect(result.recommendations?.nodes[0].mediaRecommendation.title.romaji).toBe("Samurai Champloo");
   });
 });

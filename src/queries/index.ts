@@ -440,7 +440,7 @@ export function buildMediaByIdQuery(include?: MediaIncludeOptions): string {
 
   // Recommendations
   if (include.recommendations) {
-    const perPage = typeof include.recommendations === "object" ? include.recommendations.perPage ?? 10 : 10;
+    const perPage = typeof include.recommendations === "object" ? (include.recommendations.perPage ?? 10) : 10;
     extra.push(`
     recommendations(perPage: ${perPage}, sort: [RATING_DESC]) {
       nodes {

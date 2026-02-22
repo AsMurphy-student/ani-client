@@ -89,8 +89,7 @@ export class MemoryCache implements CacheAdapter {
    * @returns Number of entries removed.
    */
   invalidate(pattern: string | RegExp): number {
-    const regex =
-      typeof pattern === "string" ? new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")) : pattern;
+    const regex = typeof pattern === "string" ? new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")) : pattern;
     const toDelete: string[] = [];
     for (const key of this.store.keys()) {
       if (regex.test(key)) toDelete.push(key);

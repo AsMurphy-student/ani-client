@@ -236,7 +236,11 @@ export class AniListClient {
    */
   async searchMedia(options: SearchMediaOptions = {}): Promise<PagedResult<Media>> {
     const { query: search, page = 1, perPage = 20, ...filters } = options;
-    return this.pagedRequest<Media>(QUERY_MEDIA_SEARCH, { search, ...filters, page, perPage: this.clampPerPage(perPage) }, "media");
+    return this.pagedRequest<Media>(
+      QUERY_MEDIA_SEARCH,
+      { search, ...filters, page, perPage: this.clampPerPage(perPage) },
+      "media",
+    );
   }
 
   /**
@@ -280,7 +284,11 @@ export class AniListClient {
    */
   async searchCharacters(options: SearchCharacterOptions = {}): Promise<PagedResult<Character>> {
     const { query: search, page = 1, perPage = 20, ...rest } = options;
-    return this.pagedRequest<Character>(QUERY_CHARACTER_SEARCH, { search, ...rest, page, perPage: this.clampPerPage(perPage) }, "characters");
+    return this.pagedRequest<Character>(
+      QUERY_CHARACTER_SEARCH,
+      { search, ...rest, page, perPage: this.clampPerPage(perPage) },
+      "characters",
+    );
   }
 
   /**
@@ -313,7 +321,11 @@ export class AniListClient {
    */
   async searchStaff(options: SearchStaffOptions = {}): Promise<PagedResult<Staff>> {
     const { query: search, page = 1, perPage = 20, sort } = options;
-    return this.pagedRequest<Staff>(QUERY_STAFF_SEARCH, { search, sort, page, perPage: this.clampPerPage(perPage) }, "staff");
+    return this.pagedRequest<Staff>(
+      QUERY_STAFF_SEARCH,
+      { search, sort, page, perPage: this.clampPerPage(perPage) },
+      "staff",
+    );
   }
 
   /**
