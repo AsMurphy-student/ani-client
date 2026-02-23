@@ -4,7 +4,7 @@ Thanks for your interest in contributing! This document covers everything you ne
 
 ## Prerequisites
 
-- **Node.js** ≥ 18
+- **Node.js** ≥ 20
 - **pnpm** ≥ 10 (`corepack enable` to activate)
 - **Git**
 
