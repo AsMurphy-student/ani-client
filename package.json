@@ -12,9 +12,7 @@
       "require": "./dist/index.js"
     }
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -26,15 +24,7 @@
     "test:integration": "tsx tests/client.test.ts",
     "prepublishOnly": "pnpm run build"
   },
-  "keywords": [
-    "anilist",
-    "anime",
-    "manga",
-    "graphql",
-    "api",
-    "client",
-    "typescript"
-  ],
+  "keywords": ["anilist", "anime", "manga", "graphql", "api", "client", "typescript"],
   "author": "gonzyui",
   "license": "MIT",
   "engines": {
