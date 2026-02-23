@@ -62,6 +62,8 @@ import type {
   User,
 } from "../types";
 
+import { chunk, clampPerPage } from "../utils";
+
 const DEFAULT_API_URL = "https://graphql.anilist.co";
 
 /**
@@ -137,12 +139,14 @@ export class AniListClient {
     const start = Date.now();
     this.hooks.onRequest?.(query, variables);
 
+    const minifiedQuery = query.replace(/\s+/g, " ").trim();
+
     const res = await this.rateLimiter.fetchWithRetry(
       this.apiUrl,
       {
         method: "POST",
         headers: this.headers,
-        body: JSON.stringify({ query, variables }),
+        body: JSON.stringify({ query: minifiedQuery, variables }),
       },
       { onRetry: this.hooks.onRetry, onRateLimit: this.hooks.onRateLimit },
     );
@@ -176,14 +180,6 @@ export class AniListClient {
       throw new AniListError(`Unexpected response: missing field "${field}" in Page`, 0, []);
     }
     return { pageInfo: data.Page.pageInfo, results: results as T[] };
-  }
-
-  /**
-   * @internal
-   * Clamp perPage to AniList's maximum of 50.
-   */
-  private clampPerPage(value: number): number {
-    return Math.min(Math.max(value, 1), 50);
   }
 
   /**
@@ -246,7 +242,7 @@ export class AniListClient {
     const { query: search, page = 1, perPage = 20, ...filters } = options;
     return this.pagedRequest<Media>(
       QUERY_MEDIA_SEARCH,
-      { search, ...filters, page, perPage: this.clampPerPage(perPage) },
+      { search, ...filters, page, perPage: clampPerPage(perPage) },
       "media",
     );
   }
@@ -259,7 +255,7 @@ export class AniListClient {
    * @param perPage - Results per page (default 20, max 50)
    */
   async getTrending(type: MediaType = MediaType.ANIME, page = 1, perPage = 20): Promise<PagedResult<Media>> {
-    return this.pagedRequest<Media>(QUERY_TRENDING, { type, page, perPage: this.clampPerPage(perPage) }, "media");
+    return this.pagedRequest<Media>(QUERY_TRENDING, { type, page, perPage: clampPerPage(perPage) }, "media");
   }
 
   /**
@@ -307,7 +303,7 @@ export class AniListClient {
     const gqlQuery = voiceActors ? QUERY_CHARACTER_SEARCH_WITH_VA : QUERY_CHARACTER_SEARCH;
     return this.pagedRequest<Character>(
       gqlQuery,
-      { search, ...rest, page, perPage: this.clampPerPage(perPage) },
+      { search, ...rest, page, perPage: clampPerPage(perPage) },
       "characters",
     );
   }
@@ -355,7 +351,7 @@ export class AniListClient {
     const { query: search, page = 1, perPage = 20, sort } = options;
     return this.pagedRequest<Staff>(
       QUERY_STAFF_SEARCH,
-      { search, sort, page, perPage: this.clampPerPage(perPage) },
+      { search, sort, page, perPage: clampPerPage(perPage) },
       "staff",
     );
   }
@@ -428,7 +424,7 @@ export class AniListClient {
       airingAt_lesser: options.airingAtLesser ?? now,
       sort: options.sort ?? ["TIME_DESC"],
       page: options.page ?? 1,
-      perPage: this.clampPerPage(options.perPage ?? 20),
+      perPage: clampPerPage(options.perPage ?? 20),
     };
 
     return this.pagedRequest<AiringSchedule>(QUERY_AIRING_SCHEDULE, variables, "airingSchedules");
@@ -453,7 +449,7 @@ export class AniListClient {
       QUERY_RECENT_CHAPTERS,
       {
         page: options.page ?? 1,
-        perPage: this.clampPerPage(options.perPage ?? 20),
+        perPage: clampPerPage(options.perPage ?? 20),
       },
       "media",
     );
@@ -480,7 +476,7 @@ export class AniListClient {
         type: options.type,
         sort: options.sort ?? ["POPULARITY_DESC"],
         page: options.page ?? 1,
-        perPage: this.clampPerPage(options.perPage ?? 20),
+        perPage: clampPerPage(options.perPage ?? 20),
       },
       "media",
     );
@@ -556,7 +552,7 @@ export class AniListClient {
         type: options.type ?? "ANIME",
         sort: options.sort ?? ["POPULARITY_DESC"],
         page: options.page ?? 1,
-        perPage: this.clampPerPage(options.perPage ?? 20),
+        perPage: clampPerPage(options.perPage ?? 20),
       },
       "media",
     );
@@ -600,7 +596,7 @@ export class AniListClient {
         status: options.status,
         sort: options.sort,
         page: options.page ?? 1,
-        perPage: this.clampPerPage(options.perPage ?? 20),
+        perPage: clampPerPage(options.perPage ?? 20),
       },
       "mediaList",
     );
@@ -635,7 +631,7 @@ export class AniListClient {
       {
         search: options.query,
         page: options.page ?? 1,
-        perPage: this.clampPerPage(options.perPage ?? 20),
+        perPage: clampPerPage(options.perPage ?? 20),
       },
       "studios",
     );
@@ -747,26 +743,17 @@ export class AniListClient {
 
   /** @internal */
   private async executeBatch<T>(ids: number[], buildQuery: (ids: number[]) => string, prefix: string): Promise<T[]> {
-    const chunks = this.chunk(ids, 50);
+    const chunks = chunk(ids, 50);
 
-    const chunkResults = await Promise.all(
-      chunks.map(async (chunk) => {
-        const query = buildQuery(chunk);
-        const data = await this.request<Record<string, T>>(query);
-        return chunk.map((_, i) => data[`${prefix}${i}`]);
-      }),
-    );
+    const chunkResults: T[][] = [];
+    // Process chunks sequentially to prevent overloading the network queue
+    for (const idChunk of chunks) {
+      const query = buildQuery(idChunk);
+      const data = await this.request<Record<string, T>>(query);
+      chunkResults.push(idChunk.map((_, i) => data[`${prefix}${i}`]));
+    }
 
     return chunkResults.flat();
-  }
-
-  /** @internal */
-  private chunk<T>(arr: T[], size: number): T[][] {
-    const chunks: T[][] = [];
-    for (let i = 0; i < arr.length; i += size) {
-      chunks.push(arr.slice(i, i + size));
-    }
-    return chunks;
   }
 
   // ── Cache management ──
@@ -779,10 +766,10 @@ export class AniListClient {
   }
 
   /**
-   * Number of entries currently in the cache (sync).
-   * For async adapters like Redis, this may be approximate.
+   * Number of entries currently in the cache.
+   * For async adapters like Redis, this may return a Promise.
    */
-  get cacheSize(): number {
+  get cacheSize(): number | Promise<number> {
     return this.cacheAdapter.size;
   }
 

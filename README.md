@@ -6,6 +6,8 @@
 
 > A simple, typed client to fetch anime, manga, character, staff and user data from [AniList](https://anilist.co).
 
+✨ **Showcase**: [Check here](SHOWCASE.md) to see which projects use this package!
+
 - **Zero dependencies** — uses the native `fetch` API
 - **Universal** — Node.js ≥ 20, Bun, Deno and modern browsers
 - **Dual format** — ships ESM + CJS with full TypeScript declarations
@@ -479,7 +481,7 @@ class MyCache implements CacheAdapter {
   set<T>(key: string, data: T): void | Promise<void> { /* ... */ }
   delete(key: string): boolean | Promise<boolean> { /* ... */ }
   clear(): void | Promise<void> { /* ... */ }
-  get size(): number { return -1; } // return -1 if unknown
+  get size(): number | Promise<number> { return -1; } // return -1 if unknown
   keys(): string[] | Promise<string[]> { /* ... */ }
   // Optional — the client provides a fallback if omitted
   invalidate?(pattern: string | RegExp): number | Promise<number> { /* ... */ }

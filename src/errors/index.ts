@@ -12,6 +12,7 @@ export class AniListError extends Error {
     this.name = "AniListError";
     this.status = status;
     this.errors = errors;
+    Object.setPrototypeOf(this, AniListError.prototype);
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, AniListError);
     }

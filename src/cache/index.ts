@@ -73,7 +73,7 @@ export class MemoryCache implements CacheAdapter {
   }
 
   /** Number of entries currently stored. */
-  get size(): number {
+  get size(): number | Promise<number> {
     return this.store.size;
   }
 

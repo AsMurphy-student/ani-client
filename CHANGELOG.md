@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.4.3] — 2026-02-24
+
+### Added
+- **Query minification** — GraphQL queries are now minified (whitespace and newlines removed) before being sent, saving bandwidth.
+
+### Changed
+- **Sequential batch chunks** — `executeBatch` (`getMediaBatch`, `getCharacterBatch`, `getStaffBatch`) now executes API chunks of 50 IDs sequentially instead of entirely concurrently to prevent rate limit spikes and memory bloat on huge batches.
+- **Cache adapter \`size\` signature** — `CacheAdapter.size` now returns `number | Promise<number>` instead of purely `number`, better accommodating asynchronous adapters like Redis.
+- **Split Type Declarations** — Core typing in `src/types/index.ts` has been refactored and split into multiple logical domain files (`media.ts`, `staff.ts`, `character.ts`, etc.) to improve project maintainability.
+- **Extracted internal helpers** — `chunk` and `clampPerPage` functions have been extracted from `AniListClient` out into a new `src/utils/index.ts` file.
+
+### Fixed
+- **Redis Cache `getSize` leak** — Fixed an issue in `RedisCache` where `getSize` used `KEYS *` instead of `SCAN`, potentially blocking the Redis server. It now correctly uses `collectKeys()`.
+- **`AniListError` instanceof check** — Added `Object.setPrototypeOf(this, AniListError.prototype);` in the `AniListError` constructor to ensure that `err instanceof AniListError` works correctly across more Node/TypeScript compilation targets.
+
 ## [1.4.2] — 2026-02-23
 
 ### Added

@@ -96,16 +96,15 @@ export class RedisCache implements CacheAdapter {
   }
 
   /**
-   * Returns -1 because Redis keys can expire silently via TTL.
-   * Use `getSize()` for an accurate count.
+   * Get the actual number of keys with this prefix in Redis.
    */
-  get size(): number {
-    return -1;
+  get size(): Promise<number> {
+    return this.getSize();
   }
 
-  /** Get the actual number of keys with this prefix in Redis. */
-  async getSize(): Promise<number> {
-    const keys = await this.client.keys(`${this.prefix}*`);
+  /** @internal */
+  private async getSize(): Promise<number> {
+    const keys = await this.collectKeys(`${this.prefix}*`);
     return keys.length;
   }
 

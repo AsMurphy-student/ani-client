@@ -34,7 +34,8 @@ src/
 ├── errors/index.ts       # AniListError class
 ├── queries/index.ts      # GraphQL query strings & batch builders
 ├── rate-limiter/index.ts # Rate limiter with timeout & retry
-└── types/index.ts        # All TypeScript types, enums & interfaces
+├── types/                # TypeScript types, split by domain
+└── utils/index.ts        # Internal generic utilities
 
 tests/
 ├── unit/                 # Vitest unit tests (mocked, no network)
