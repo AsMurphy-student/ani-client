@@ -12,6 +12,7 @@ import {
   QUERY_RECENT_CHAPTERS,
   QUERY_RECOMMENDATIONS,
   QUERY_STAFF_BY_ID,
+  QUERY_STAFF_BY_ID_WITH_MEDIA,
   QUERY_STAFF_SEARCH,
   QUERY_STUDIO_BY_ID,
   QUERY_STUDIO_SEARCH,
@@ -56,6 +57,7 @@ import type {
   SearchStaffOptions,
   SearchStudioOptions,
   Staff,
+  StaffIncludeOptions,
   StudioDetail,
   User,
 } from "../types";
@@ -314,15 +316,26 @@ export class AniListClient {
    * Fetch a staff member by AniList ID.
    *
    * @param id - The AniList staff ID
+   * @param include - Optional include options to fetch related data (e.g. media)
    * @returns The staff object
    *
    * @example
    * ```ts
    * const staff = await client.getStaff(95001);
    * console.log(staff.name.full);
+   *
+   * // With media the staff worked on
+   * const staff = await client.getStaff(95001, { media: true });
+   * staff.staffMedia?.nodes.forEach((m) => console.log(m.title.romaji));
    * ```
    */
-  async getStaff(id: number): Promise<Staff> {
+  async getStaff(id: number, include?: StaffIncludeOptions): Promise<Staff> {
+    if (include?.media) {
+      const opts = typeof include.media === "object" ? include.media : {};
+      const perPage = opts.perPage ?? 25;
+      const data = await this.request<{ Staff: Staff }>(QUERY_STAFF_BY_ID_WITH_MEDIA, { id, perPage });
+      return data.Staff;
+    }
     const data = await this.request<{ Staff: Staff }>(QUERY_STAFF_BY_ID, { id });
     return data.Staff;
   }

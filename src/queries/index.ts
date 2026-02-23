@@ -140,6 +140,47 @@ const STAFF_FIELDS = `
   siteUrl
 `;
 
+const STAFF_MEDIA_FIELDS = `
+  staffMedia(perPage: $perPage, sort: [POPULARITY_DESC]) {
+    nodes {
+      id
+      title { romaji english native userPreferred }
+      type
+      format
+      status
+      coverImage { extraLarge large medium color }
+      bannerImage
+      genres
+      averageScore
+      meanScore
+      popularity
+      favourites
+      episodes
+      trending
+      hashtag
+      season
+      seasonYear
+      startDate { year month day }
+      endDate { year month day }
+      nextAiringEpisode {
+        id
+        airingAt
+        episode
+        mediaId
+        timeUntilAiring
+      }
+      studios {
+        edges {
+          node {
+            name
+          }
+        }
+      }
+      siteUrl
+    }
+  }
+`;
+
 const USER_FIELDS = `
   id
   name
@@ -247,6 +288,14 @@ export const QUERY_STAFF_BY_ID = `
 query ($id: Int!) {
   Staff(id: $id) {
     ${STAFF_FIELDS}
+  }
+}`;
+
+export const QUERY_STAFF_BY_ID_WITH_MEDIA = `
+query ($id: Int!, $perPage: Int) {
+  Staff(id: $id) {
+    ${STAFF_FIELDS}
+    ${STAFF_MEDIA_FIELDS}
   }
 }`;
 

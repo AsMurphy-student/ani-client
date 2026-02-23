@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.4.2] — 2026-02-23
+
+### Added
+
+- **Staff media entries** — `getStaff(id, { media: true })` now returns the media (anime/manga) a staff member has worked on via `staffMedia.nodes`. Supports `{ media: { perPage } }` to control the number of results (default: 25, sorted by popularity).
+- **New types** — `StaffMediaNode`, `StaffIncludeOptions`.
+- **Unit tests** — Tests for `getStaff` with and without media include option.
+- **Integration test** — Smoke test for `getStaff` with `{ media: true }`.
+
 ## [1.4.1] — 2026-02-22
 
 ### Added

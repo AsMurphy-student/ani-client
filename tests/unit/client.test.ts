@@ -444,4 +444,129 @@ describe("AniListClient", () => {
     expect(result.recommendations?.nodes).toHaveLength(1);
     expect(result.recommendations?.nodes[0].mediaRecommendation.title.romaji).toBe("Samurai Champloo");
   });
+
+  it("getStaff with { media: true } sends a query containing 'staffMedia'", async () => {
+    const staffWithMedia = {
+      id: 95001,
+      name: { first: "Hayao", middle: null, last: "Miyazaki", full: "Hayao Miyazaki", native: "宮崎駿" },
+      language: "Japanese",
+      image: { large: null, medium: null },
+      description: "Famous director",
+      primaryOccupations: ["Director"],
+      gender: "Male",
+      dateOfBirth: { year: 1941, month: 1, day: 5 },
+      dateOfDeath: null,
+      age: null,
+      yearsActive: [1963],
+      homeTown: "Tokyo",
+      bloodType: null,
+      favourites: 5000,
+      siteUrl: null,
+      staffMedia: {
+        nodes: [
+          {
+            id: 164,
+            title: {
+              romaji: "Sen to Chihiro no Kamikakushi",
+              english: "Spirited Away",
+              native: "千と千尋の神隠し",
+              userPreferred: "Sen to Chihiro no Kamikakushi",
+            },
+            type: "ANIME",
+            format: "MOVIE",
+            status: "FINISHED",
+            coverImage: { extraLarge: null, large: null, medium: null, color: null },
+            bannerImage: null,
+            genres: ["Adventure", "Drama"],
+            averageScore: 87,
+            meanScore: 87,
+            popularity: 100000,
+            favourites: 12000,
+            episodes: 1,
+            trending: 10,
+            hashtag: null,
+            season: "SUMMER",
+            seasonYear: 2001,
+            startDate: { year: 2001, month: 7, day: 20 },
+            endDate: { year: 2001, month: 7, day: 20 },
+            nextAiringEpisode: null,
+            studios: { edges: [{ node: { name: "Studio Ghibli" } }] },
+            siteUrl: null,
+          },
+        ],
+      },
+    };
+    mockFetch({ Staff: staffWithMedia });
+
+    const client = new AniListClient({ cache: { enabled: false } });
+    const result = await client.getStaff(95001, { media: true });
+
+    expect(result.staffMedia).toBeDefined();
+    expect(result.staffMedia?.nodes).toHaveLength(1);
+    expect(result.staffMedia?.nodes[0].title.romaji).toBe("Sen to Chihiro no Kamikakushi");
+    expect(result.staffMedia?.nodes[0].genres).toContain("Adventure");
+
+    const fetchCall = vi.mocked(fetch).mock.calls[0];
+    const body = JSON.parse(fetchCall[1]?.body as string);
+    expect(body.query).toContain("staffMedia");
+    expect(body.variables.perPage).toBe(25);
+  });
+
+  it("getStaff with { media: { perPage: 10 } } sends custom perPage", async () => {
+    const mockStaff = {
+      id: 95001,
+      name: { first: "Hayao", middle: null, last: "Miyazaki", full: "Hayao Miyazaki", native: "宮崎駿" },
+      language: "Japanese",
+      image: { large: null, medium: null },
+      description: null,
+      primaryOccupations: [],
+      gender: null,
+      dateOfBirth: null,
+      dateOfDeath: null,
+      age: null,
+      yearsActive: [],
+      homeTown: null,
+      bloodType: null,
+      favourites: null,
+      siteUrl: null,
+      staffMedia: { nodes: [] },
+    };
+    mockFetch({ Staff: mockStaff });
+
+    const client = new AniListClient({ cache: { enabled: false } });
+    await client.getStaff(95001, { media: { perPage: 10 } });
+
+    const fetchCall = vi.mocked(fetch).mock.calls[0];
+    const body = JSON.parse(fetchCall[1]?.body as string);
+    expect(body.query).toContain("staffMedia");
+    expect(body.variables.perPage).toBe(10);
+  });
+
+  it("getStaff without include does NOT send staffMedia in query", async () => {
+    const mockStaff = {
+      id: 95001,
+      name: { first: "Hayao", middle: null, last: "Miyazaki", full: "Hayao Miyazaki", native: "宮崎駿" },
+      language: "Japanese",
+      image: { large: null, medium: null },
+      description: null,
+      primaryOccupations: [],
+      gender: null,
+      dateOfBirth: null,
+      dateOfDeath: null,
+      age: null,
+      yearsActive: [],
+      homeTown: null,
+      bloodType: null,
+      favourites: null,
+      siteUrl: null,
+    };
+    mockFetch({ Staff: mockStaff });
+
+    const client = new AniListClient({ cache: { enabled: false } });
+    await client.getStaff(95001);
+
+    const fetchCall = vi.mocked(fetch).mock.calls[0];
+    const body = JSON.parse(fetchCall[1]?.body as string);
+    expect(body.query).not.toContain("staffMedia");
+  });
 });

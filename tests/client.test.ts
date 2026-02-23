@@ -123,6 +123,19 @@ async function run() {
     assert(staff.name.full !== null, "should have a name");
   });
 
+  await test("getStaff(95001, { media: true })", async () => {
+    await client.clearCache();
+    const staff = await client.getStaff(95001, { media: true });
+    assert(staff.id === 95001, "id should match");
+    assert(staff.staffMedia !== undefined, "staffMedia should be present");
+    assert(Array.isArray(staff.staffMedia?.nodes), "staffMedia.nodes should be an array");
+    if (staff.staffMedia && staff.staffMedia.nodes.length > 0) {
+      const m = staff.staffMedia.nodes[0];
+      assert(typeof m.id === "number", "media node should have an id");
+      assert(m.title !== undefined, "media node should have a title");
+    }
+  });
+
   await test("searchStaff({ query: 'Miyazaki' })", async () => {
     const result = await client.searchStaff({ query: "Miyazaki", perPage: 3 });
     assert(result.results.length > 0, "should return at least 1 staff");

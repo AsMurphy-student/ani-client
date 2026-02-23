@@ -339,6 +339,38 @@ export interface StaffImage {
   medium: string | null;
 }
 
+/** A media node returned inside `Staff.staffMedia`. */
+export interface StaffMediaNode {
+  id: number;
+  title: MediaTitle;
+  type: MediaType;
+  format: MediaFormat | null;
+  status: MediaStatus | null;
+  coverImage: MediaCoverImage;
+  bannerImage: string | null;
+  genres: string[];
+  averageScore: number | null;
+  meanScore: number | null;
+  popularity: number | null;
+  favourites: number | null;
+  episodes: number | null;
+  trending: number | null;
+  hashtag: string | null;
+  season: MediaSeason | null;
+  seasonYear: number | null;
+  startDate: FuzzyDate | null;
+  endDate: FuzzyDate | null;
+  nextAiringEpisode: {
+    id: number;
+    airingAt: number;
+    episode: number;
+    mediaId: number;
+    timeUntilAiring: number;
+  } | null;
+  studios: { edges: { node: { name: string } }[] } | null;
+  siteUrl: string | null;
+}
+
 export interface Staff {
   id: number;
   name: StaffName;
@@ -355,6 +387,17 @@ export interface Staff {
   bloodType: string | null;
   favourites: number | null;
   siteUrl: string | null;
+  /** Media the staff member has worked on — only present when requested via include options. */
+  staffMedia?: {
+    nodes: StaffMediaNode[];
+  } | null;
+}
+
+/** Options to include additional related data when fetching a staff member by ID. */
+export interface StaffIncludeOptions {
+  /** Include media the staff member has worked on.
+   *  `true` = 25 results sorted by popularity. Object form to customize. */
+  media?: boolean | { perPage?: number; sort?: boolean };
 }
 
 export interface UserAvatar {

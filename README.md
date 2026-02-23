@@ -265,12 +265,21 @@ const result = await client.searchCharacters({ query: "Luffy", voiceActors: true
 
 | Method | Description |
 | --- | --- |
-| `getStaff(id)` | Fetch a staff member by ID |
+| `getStaff(id, include?)` | Fetch a staff member by ID (optionally with media) |
 | `searchStaff(options?)` | Search for staff members |
 
 ```ts
 const staff = await client.getStaff(95001);
 const results = await client.searchStaff({ query: "Miyazaki" });
+
+// With media the staff member worked on
+const staffWithMedia = await client.getStaff(95001, { media: true });
+staffWithMedia.staffMedia?.nodes.forEach((m) => {
+  console.log(m.title.romaji, m.format, m.averageScore);
+});
+
+// Customize the number of media returned
+const staffWith5Media = await client.getStaff(95001, { media: { perPage: 5 } });
 ```
 
 ### Users
@@ -566,6 +575,7 @@ import type {
   MediaEdge, MediaConnection, MediaCharacterEdge, MediaCharacterConnection,
   CharacterMediaEdge, CharacterIncludeOptions,
   MediaStaffEdge, MediaStaffConnection, MediaIncludeOptions,
+  StaffMediaNode, StaffIncludeOptions,
   StreamingEpisode, ExternalLink, MediaStats, MediaRecommendationNode,
   PageInfo, PagedResult,
   CacheAdapter, AniListHooks, AniListClientOptions,

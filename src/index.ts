@@ -51,6 +51,8 @@ export {
   type Staff,
   type StaffName,
   type StaffImage,
+  type StaffMediaNode,
+  type StaffIncludeOptions,
   type User,
   type UserAvatar,
   type UserStatistics,
