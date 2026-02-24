@@ -12,7 +12,9 @@
       "require": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -22,9 +24,20 @@
     "test": "vitest run && tsx tests/client.test.ts",
     "test:unit": "vitest run",
     "test:integration": "tsx tests/client.test.ts",
-    "prepublishOnly": "pnpm run build"
+    "prepublishOnly": "pnpm run build",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
-  "keywords": ["anilist", "anime", "manga", "graphql", "api", "client", "typescript"],
+  "keywords": [
+    "anilist",
+    "anime",
+    "manga",
+    "graphql",
+    "api",
+    "client",
+    "typescript"
+  ],
   "author": "gonzyui",
   "license": "MIT",
   "engines": {
@@ -44,7 +57,9 @@
     "tsup": "^8.5.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "vitest": "^3.0.0"
+    "vitepress": "^1.6.4",
+    "vitest": "^3.0.0",
+    "vue": "^3.5.28"
   },
   "packageManager": "pnpm@10.30.0"
 }
