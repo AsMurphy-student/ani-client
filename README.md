@@ -6,7 +6,7 @@
 
 > A simple, typed client to fetch anime, manga, character, staff and user data from [AniList](https://anilist.co).
 
-✨ **Showcase**: [Check here](https://ani-client.vercel.app/showcase) to see which projects use this package!
+✨ **Showcase**: [Check here](https://ani-client-docs.vercel.app/showcase) to see which projects use this package!
 
 - **Zero dependencies** — uses the native `fetch` API
 - **Universal** — Node.js ≥ 20, Bun, Deno and modern browsers
