@@ -17,7 +17,7 @@
 
 The full API reference, usage guide, and configuration examples are available on our official documentation website!
 
-**[👉 View the full documentation here](https://ani-client.vercel.app/)**
+**[👉 View the full documentation here](https://ani-client-docs.vercel.app/)**
 
 ## Install
 
