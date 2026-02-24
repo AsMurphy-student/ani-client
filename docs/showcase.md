@@ -12,7 +12,7 @@ If you are using `ani-client` in your own project, feel free to open a Pull Requ
     <div class="card-header">
       <div class="card-title-row">
         <h3>ani-client-web</h3>
-        <span class="version-badge">v1.2.0</span>
+        <span class="version-badge">v1.4.4</span>
       </div>
     </div>
     <div class="card-body">
