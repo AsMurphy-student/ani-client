@@ -12,9 +12,7 @@
       "require": "./dist/index.js"
     }
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "sideEffects": false,
   "scripts": {
     "build": "tsup",
@@ -30,15 +28,7 @@
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"
   },
-  "keywords": [
-    "anilist",
-    "anime",
-    "manga",
-    "graphql",
-    "api",
-    "client",
-    "typescript"
-  ],
+  "keywords": ["anilist", "anime", "manga", "graphql", "api", "client", "typescript"],
   "author": "gonzyui",
   "license": "MIT",
   "engines": {
