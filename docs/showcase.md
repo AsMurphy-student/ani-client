@@ -8,7 +8,7 @@ If you are using `ani-client` in your own project, feel free to open a Pull Requ
 
 <div class="showcase-grid">
   <!-- ani-client-web -->
-  <a href="https://aniclient.vercel.app/" target="_blank" rel="noopener noreferrer" class="showcase-card">
+  <a href="https://aniclient.gonzyuidev.xyz/" target="_blank" rel="noopener noreferrer" class="showcase-card">
     <div class="card-header">
       <div class="card-title-row">
         <h3>ani-client-web</h3>
