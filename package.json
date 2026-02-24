@@ -1,6 +1,6 @@
 {
   "name": "ani-client",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "description": "A simple and typed client to fetch anime, manga, characters and user data from AniList",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -12,7 +12,10 @@
       "require": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -27,7 +30,15 @@
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"
   },
-  "keywords": ["anilist", "anime", "manga", "graphql", "api", "client", "typescript"],
+  "keywords": [
+    "anilist",
+    "anime",
+    "manga",
+    "graphql",
+    "api",
+    "client",
+    "typescript"
+  ],
   "author": "gonzyui",
   "license": "MIT",
   "engines": {
@@ -37,7 +48,7 @@
     "type": "git",
     "url": "https://github.com/gonzyui/ani-client.git"
   },
-  "homepage": "https://github.com/gonzyui/ani-client#readme",
+  "homepage": "https://ani-client-docs.vercel.app/",
   "bugs": {
     "url": "https://github.com/gonzyui/ani-client/issues"
   },

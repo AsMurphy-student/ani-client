@@ -1,5 +1,6 @@
 import type { Character, CharacterRole } from "./character";
 import type { ExternalLink, FuzzyDate, PageInfo } from "./common";
+import type { MediaListStatus } from "./lists";
 import type { Staff, VoiceActor } from "./staff";
 import type { StudioConnection } from "./studio";
 import type { UserAvatar } from "./user";
@@ -170,7 +171,7 @@ export interface ScoreDistribution {
 }
 
 export interface StatusDistribution {
-  status: string; // Used MediaListStatus | string in original. simplified to string here temporarily, should be tied to MediaListStatus later
+  status: MediaListStatus | string;
   amount: number;
 }
 

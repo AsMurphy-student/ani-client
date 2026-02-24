@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.4.4] — 2026-02-24
+
+### Added
+- **`StaffSort` enum** — New enum matching AniList's `StaffSort` type (`ID`, `ROLE`, `LANGUAGE`, `SEARCH_MATCH`, `FAVOURITES`, `RELEVANCE` + `_DESC` variants). Exported from the package root.
+- **Types & Enums docs page** — New `reference/types.md` documenting all exported enums, core interfaces, and configuration interfaces.
+- **Expanded API Reference** — `reference/api.md` rewritten with all 26 public client methods, signatures, and examples.
+
+### Fixed
+- **`SearchStaffOptions.sort`** — Was incorrectly typed as `CharacterSort[]` instead of `StaffSort[]`, causing the AniList API to reject requests with a sort parameter.
+- **`StatusDistribution.status`** — Now correctly typed as `MediaListStatus | string` (was `string`).
+- **Unused import** — Removed dead `FuzzyDate` import in `user.ts`.
+- **`getRecommendations` missing perPage clamp** — Now uses `clampPerPage()` like all other paginated methods.
+- **Import placement** — `MediaIncludeOptions` import moved to top of `queries/index.ts`.
+- **Docs typo** — Fixed "lease-frequently-used" → "least-recently-used" in caching guide.
+
+### Changed
+- **`package.json` `homepage`** — Now points to the documentation site (`ani-client-docs.vercel.app`) instead of the GitHub README.
+- **`sideEffects: false`** — Added to `package.json` for better bundler tree-shaking.
+
 ## [1.4.3] — 2026-02-24
 
 ### Added

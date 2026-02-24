@@ -4,7 +4,7 @@
 
 ## Memory Cache (Default)
 
-The default in-memory cache uses **LRU eviction**. It is designed to automatically forget the lease-frequently-used entries saving raw memory payload footprints.
+The default in-memory cache uses **LRU eviction**. It automatically evicts the least-recently-used entries to keep memory usage under control.
 
 ```typescript
 const client = new AniListClient({

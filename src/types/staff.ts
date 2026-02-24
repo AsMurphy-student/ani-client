@@ -1,6 +1,18 @@
-import type { CharacterSort } from "./character";
 import type { FuzzyDate } from "./common";
 import type { MediaCoverImage, MediaFormat, MediaSeason, MediaStatus, MediaTitle, MediaType } from "./media";
+
+export enum StaffSort {
+  ID = "ID",
+  ID_DESC = "ID_DESC",
+  ROLE = "ROLE",
+  ROLE_DESC = "ROLE_DESC",
+  LANGUAGE = "LANGUAGE",
+  LANGUAGE_DESC = "LANGUAGE_DESC",
+  SEARCH_MATCH = "SEARCH_MATCH",
+  FAVOURITES = "FAVOURITES",
+  FAVOURITES_DESC = "FAVOURITES_DESC",
+  RELEVANCE = "RELEVANCE",
+}
 
 export interface StaffName {
   first: string | null;
@@ -78,7 +90,7 @@ export interface StaffIncludeOptions {
 
 export interface SearchStaffOptions {
   query?: string;
-  sort?: CharacterSort[]; // Should be StaffSort, but keeping aligned to original logic for now / resolving in another pass.
+  sort?: StaffSort[];
   page?: number;
   perPage?: number;
 }

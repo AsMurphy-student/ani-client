@@ -508,7 +508,7 @@ export class AniListClient {
       mediaId,
       sort: options.sort ?? ["RATING_DESC"],
       page: options.page ?? 1,
-      perPage: options.perPage ?? 20,
+      perPage: clampPerPage(options.perPage ?? 20),
     };
 
     const data = await this.request<{

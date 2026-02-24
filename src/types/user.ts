@@ -1,5 +1,3 @@
-import type { FuzzyDate } from "./common";
-
 export interface UserAvatar {
   large: string | null;
   medium: string | null;

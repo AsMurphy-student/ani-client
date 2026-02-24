@@ -46,7 +46,10 @@ export default defineConfig({
       "/reference/": [
         {
           text: "API Reference",
-          items: [{ text: "Client Methods", link: "/reference/api" }],
+          items: [
+            { text: "Client Methods", link: "/reference/api" },
+            { text: "Types & Enums", link: "/reference/types" },
+          ],
         },
       ],
     },

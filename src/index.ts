@@ -16,6 +16,7 @@ export {
   MediaRelationType,
   MediaListStatus,
   MediaListSort,
+  StaffSort,
   type CacheAdapter,
   type CacheOptions,
   type RateLimitOptions,

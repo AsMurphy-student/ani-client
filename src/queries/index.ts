@@ -1,3 +1,5 @@
+import type { MediaIncludeOptions } from "../types";
+
 /** Core media fields — always returned. Does NOT include relations (opt-in via include). */
 const MEDIA_FIELDS_BASE = `
   id
@@ -486,8 +488,6 @@ query {
     isAdult
   }
 }`;
-
-import type { MediaIncludeOptions } from "../types";
 
 // ── Dynamic media query builder ──
 
