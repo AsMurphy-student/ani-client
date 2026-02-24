@@ -16,7 +16,7 @@
 - **Docs typo** — Fixed "lease-frequently-used" → "least-recently-used" in caching guide.
 
 ### Changed
-- **`package.json` `homepage`** — Now points to the documentation site (`ani-client-docs.vercel.app`) instead of the GitHub README.
+- **`package.json` `homepage`** — Now points to the documentation site (`https://docs-aniclient.gonzyuidev.xyz/`) instead of the GitHub README.
 - **`sideEffects: false`** — Added to `package.json` for better bundler tree-shaking.
 
 ## [1.4.3] — 2026-02-24
