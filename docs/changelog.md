@@ -1,5 +1,31 @@
 # Changelog
 
+## [1.5.0] — 2026-02-26
+
+### Added
+- **`nextAiringEpisode`** — Now included in all media responses by default. Returns `airingAt`, `episode`, `timeUntilAiring`, and `mediaId` for currently airing anime.
+- **`MediaSource` enum** — New enum (`ORIGINAL`, `MANGA`, `LIGHT_NOVEL`, `VISUAL_NOVEL`, `VIDEO_GAME`, `OTHER`, etc.). `Media.source` is now typed as `MediaSource | null` instead of `string | null`.
+- **`UserSort` enum** — New enum (`ID`, `USERNAME`, `WATCHED_TIME`, `CHAPTERS_READ`, `SEARCH_MATCH` + `_DESC` variants).
+- **`NextAiringEpisode` interface** — New type for the `nextAiringEpisode` field on `Media`.
+- **`searchUsers(options?)`** — Search for AniList users by name with pagination and sort support.
+- **`getPopular(type?, page?, perPage?)`** — Convenience method for most popular media (wraps `searchMedia` with `POPULARITY_DESC` sort).
+- **`getTopRated(type?, page?, perPage?)`** — Convenience method for highest-rated media (wraps `searchMedia` with `SCORE_DESC` sort).
+- **`destroy()`** — Cleanup method that clears the cache and in-flight request map.
+- **Multi-criteria search** — `searchMedia` now supports `genres?: string[]`, `tags?: string[]`, `genresExclude?: string[]`, and `tagsExclude?: string[]` for powerful filtering.
+- **`SearchUserOptions`** — New options type for `searchUsers()`.
+
+### Changed
+- **`getUser(idOrName)`** — Now accepts `number | string`. Pass an ID (number) or a username (string). `getUserByName()` is kept as a deprecated alias.
+- **`Studio` / `StudioDetail` merged** — `StudioDetail` is now a deprecated type alias for `Studio`. The `Studio` interface includes optional `favourites` and `media` fields.
+- **`invalidate()` alignment** — `MemoryCache.invalidate(string)` now uses **substring matching** (e.g. `"Media"` matches all keys containing `"Media"`) instead of escaping the string into a RegExp. `RegExp` patterns are used as-is. This aligns the mental model with Redis glob patterns.
+- **Exponential backoff** — Rate limiter retries now use exponential backoff with jitter (capped at 30s) instead of linear delays.
+- **Circular buffer** — Rate limiter timestamps use a fixed-size circular buffer instead of a dynamically growing and filtered array.
+- **Centralized `normalizeQuery()`** — Query normalization is now done via a shared utility, removing duplicate regex in cache and client.
+- **Integration tests migrated to Vitest** — Tests now use `describe`/`it`/`expect` instead of a custom `test()`/`assert()` runner. Organized into `tests/unit/` and `tests/integration/` with separate Vitest workspace projects.
+
+### Removed
+- **`vue` devDependency** — VitePress installs it as a transitive dependency.
+
 ## [1.4.4] — 2026-02-24
 
 ### Added

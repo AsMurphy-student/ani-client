@@ -10,6 +10,24 @@ export enum MediaType {
   MANGA = "MANGA",
 }
 
+export enum MediaSource {
+  ORIGINAL = "ORIGINAL",
+  MANGA = "MANGA",
+  LIGHT_NOVEL = "LIGHT_NOVEL",
+  VISUAL_NOVEL = "VISUAL_NOVEL",
+  VIDEO_GAME = "VIDEO_GAME",
+  OTHER = "OTHER",
+  NOVEL = "NOVEL",
+  DOUJINSHI = "DOUJINSHI",
+  ANIME = "ANIME",
+  WEB_NOVEL = "WEB_NOVEL",
+  LIVE_ACTION = "LIVE_ACTION",
+  GAME = "GAME",
+  COMIC = "COMIC",
+  MULTIMEDIA_PROJECT = "MULTIMEDIA_PROJECT",
+  PICTURE_BOOK = "PICTURE_BOOK",
+}
+
 export enum MediaFormat {
   TV = "TV",
   TV_SHORT = "TV_SHORT",
@@ -186,6 +204,14 @@ export interface MediaRecommendationNode {
   mediaRecommendation: Pick<Media, "id" | "title" | "type" | "format" | "coverImage" | "averageScore" | "siteUrl">;
 }
 
+export interface NextAiringEpisode {
+  id: number;
+  airingAt: number;
+  episode: number;
+  mediaId: number;
+  timeUntilAiring: number;
+}
+
 export interface Media {
   id: number;
   idMal: number | null;
@@ -204,7 +230,7 @@ export interface Media {
   volumes: number | null;
   countryOfOrigin: string | null;
   isLicensed: boolean | null;
-  source: string | null;
+  source: MediaSource | null;
   hashtag: string | null;
   trailer: MediaTrailer | null;
   coverImage: MediaCoverImage;
@@ -225,6 +251,7 @@ export interface Media {
   externalLinks?: ExternalLink[];
   stats?: MediaStats;
   recommendations?: { nodes: MediaRecommendationNode[] };
+  nextAiringEpisode: NextAiringEpisode | null;
   isAdult: boolean | null;
   siteUrl: string | null;
 }
@@ -236,8 +263,18 @@ export interface SearchMediaOptions {
   status?: MediaStatus;
   season?: MediaSeason;
   seasonYear?: number;
+  /** Single genre filter (kept for backward compat) */
   genre?: string;
+  /** Single tag filter (kept for backward compat) */
   tag?: string;
+  /** Filter by multiple genres (media must match ALL) */
+  genres?: string[];
+  /** Filter by multiple tags (media must match ALL) */
+  tags?: string[];
+  /** Exclude media with any of these genres */
+  genresExclude?: string[];
+  /** Exclude media with any of these tags */
+  tagsExclude?: string[];
   isAdult?: boolean;
   sort?: MediaSort[];
   page?: number;

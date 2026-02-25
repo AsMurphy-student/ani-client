@@ -3,6 +3,18 @@
  */
 
 /**
+ * Normalize a GraphQL query string by collapsing all whitespace.
+ * Used for cache key generation and request body minification.
+ *
+ * @internal
+ * @param query - The raw GraphQL query string
+ * @returns The whitespace-normalized query
+ */
+export function normalizeQuery(query: string): string {
+  return query.replace(/\s+/g, " ").trim();
+}
+
+/**
  * Clamp a number to a maximum and minimum value.
  * Used internally to ensure perPage does not exceed AniList's limit of 50.
  *

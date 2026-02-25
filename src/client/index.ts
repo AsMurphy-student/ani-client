@@ -21,6 +21,7 @@ import {
   QUERY_USER_BY_ID,
   QUERY_USER_BY_NAME,
   QUERY_USER_MEDIA_LIST,
+  QUERY_USER_SEARCH,
   buildBatchCharacterQuery,
   buildBatchMediaQuery,
   buildBatchStaffQuery,
@@ -31,7 +32,7 @@ import { MemoryCache } from "../cache";
 import { AniListError } from "../errors";
 import { RateLimiter } from "../rate-limiter";
 
-import { MediaType } from "../types";
+import { MediaSort, MediaType } from "../types";
 import type {
   AiringSchedule,
   AniListClientOptions,
@@ -56,13 +57,14 @@ import type {
   SearchMediaOptions,
   SearchStaffOptions,
   SearchStudioOptions,
+  SearchUserOptions,
   Staff,
   StaffIncludeOptions,
-  StudioDetail,
+  Studio,
   User,
 } from "../types";
 
-import { chunk, clampPerPage } from "../utils";
+import { chunk, clampPerPage, normalizeQuery } from "../utils";
 
 const DEFAULT_API_URL = "https://graphql.anilist.co";
 
@@ -139,7 +141,7 @@ export class AniListClient {
     const start = Date.now();
     this.hooks.onRequest?.(query, variables);
 
-    const minifiedQuery = query.replace(/\s+/g, " ").trim();
+    const minifiedQuery = normalizeQuery(query);
 
     const res = await this.rateLimiter.fetchWithRetry(
       this.apiUrl,
@@ -239,10 +241,19 @@ export class AniListClient {
    * ```
    */
   async searchMedia(options: SearchMediaOptions = {}): Promise<PagedResult<Media>> {
-    const { query: search, page = 1, perPage = 20, ...filters } = options;
+    const { query: search, page = 1, perPage = 20, genres, tags, genresExclude, tagsExclude, ...filters } = options;
     return this.pagedRequest<Media>(
       QUERY_MEDIA_SEARCH,
-      { search, ...filters, page, perPage: clampPerPage(perPage) },
+      {
+        search,
+        ...filters,
+        genre_in: genres,
+        tag_in: tags,
+        genre_not_in: genresExclude,
+        tag_not_in: tagsExclude,
+        page,
+        perPage: clampPerPage(perPage),
+      },
       "media",
     );
   }
@@ -256,6 +267,32 @@ export class AniListClient {
    */
   async getTrending(type: MediaType = MediaType.ANIME, page = 1, perPage = 20): Promise<PagedResult<Media>> {
     return this.pagedRequest<Media>(QUERY_TRENDING, { type, page, perPage: clampPerPage(perPage) }, "media");
+  }
+
+  /**
+   * Get the most popular anime or manga.
+   *
+   * Convenience wrapper around `searchMedia` with `sort: POPULARITY_DESC`.
+   *
+   * @param type - `MediaType.ANIME` or `MediaType.MANGA` (defaults to ANIME)
+   * @param page - Page number (default 1)
+   * @param perPage - Results per page (default 20, max 50)
+   */
+  async getPopular(type: MediaType = MediaType.ANIME, page = 1, perPage = 20): Promise<PagedResult<Media>> {
+    return this.searchMedia({ type, sort: [MediaSort.POPULARITY_DESC], page, perPage });
+  }
+
+  /**
+   * Get the highest-rated anime or manga.
+   *
+   * Convenience wrapper around `searchMedia` with `sort: SCORE_DESC`.
+   *
+   * @param type - `MediaType.ANIME` or `MediaType.MANGA` (defaults to ANIME)
+   * @param page - Page number (default 1)
+   * @param perPage - Results per page (default 20, max 50)
+   */
+  async getTopRated(type: MediaType = MediaType.ANIME, page = 1, perPage = 20): Promise<PagedResult<Media>> {
+    return this.searchMedia({ type, sort: [MediaSort.SCORE_DESC], page, perPage });
   }
 
   /**
@@ -357,37 +394,52 @@ export class AniListClient {
   }
 
   /**
-   * Fetch a user by AniList ID.
+   * Fetch a user by AniList ID or username.
    *
-   * @param id - The AniList user ID
+   * @param idOrName - The AniList user ID (number) or username (string)
    * @returns The user object
    *
    * @example
    * ```ts
    * const user = await client.getUser(1);
+   * const user2 = await client.getUser("AniList");
    * console.log(user.name);
    * ```
    */
-  async getUser(id: number): Promise<User> {
-    const data = await this.request<{ User: User }>(QUERY_USER_BY_ID, { id });
+  async getUser(idOrName: number | string): Promise<User> {
+    if (typeof idOrName === "number") {
+      const data = await this.request<{ User: User }>(QUERY_USER_BY_ID, { id: idOrName });
+      return data.User;
+    }
+    const data = await this.request<{ User: User }>(QUERY_USER_BY_NAME, { name: idOrName });
     return data.User;
   }
 
   /**
    * Fetch a user by username.
    *
+   * @deprecated Use `getUser(name)` instead.
    * @param name - The AniList username
    * @returns The user object
+   */
+  async getUserByName(name: string): Promise<User> {
+    return this.getUser(name);
+  }
+
+  /**
+   * Search for users by name.
+   *
+   * @param options - Search / pagination parameters
+   * @returns Paginated results with matching users
    *
    * @example
    * ```ts
-   * const user = await client.getUserByName("AniList");
-   * console.log(user.statistics);
+   * const result = await client.searchUsers({ query: "AniList", perPage: 5 });
    * ```
    */
-  async getUserByName(name: string): Promise<User> {
-    const data = await this.request<{ User: User }>(QUERY_USER_BY_NAME, { name });
-    return data.User;
+  async searchUsers(options: SearchUserOptions = {}): Promise<PagedResult<User>> {
+    const { query: search, page = 1, perPage = 20, sort } = options;
+    return this.pagedRequest<User>(QUERY_USER_SEARCH, { search, sort, page, perPage: clampPerPage(perPage) }, "users");
   }
 
   /**
@@ -609,8 +661,8 @@ export class AniListClient {
    *
    * @param id - The AniList studio ID
    */
-  async getStudio(id: number): Promise<StudioDetail> {
-    const data = await this.request<{ Studio: StudioDetail }>(QUERY_STUDIO_BY_ID, { id });
+  async getStudio(id: number): Promise<Studio> {
+    const data = await this.request<{ Studio: Studio }>(QUERY_STUDIO_BY_ID, { id });
     return data.Studio;
   }
 
@@ -625,8 +677,8 @@ export class AniListClient {
    * const studios = await client.searchStudios({ query: "MAPPA" });
    * ```
    */
-  async searchStudios(options: SearchStudioOptions = {}): Promise<PagedResult<StudioDetail>> {
-    return this.pagedRequest<StudioDetail>(
+  async searchStudios(options: SearchStudioOptions = {}): Promise<PagedResult<Studio>> {
+    return this.pagedRequest<Studio>(
       QUERY_STUDIO_SEARCH,
       {
         search: options.query,
@@ -794,5 +846,17 @@ export class AniListClient {
       }
     }
     return count;
+  }
+
+  /**
+   * Clean up resources held by the client.
+   *
+   * Clears the in-memory cache and aborts any pending in-flight requests.
+   * If using a custom cache adapter (e.g. Redis), call its close/disconnect
+   * method separately.
+   */
+  async destroy(): Promise<void> {
+    await this.cacheAdapter.clear();
+    this.inFlight.clear();
   }
 }

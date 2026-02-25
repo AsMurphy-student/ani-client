@@ -34,19 +34,51 @@ const full = await client.getMedia(1, { characters: true, staff: true, stats: tr
 
 ### `searchMedia(options?)`
 
-Search for anime or manga with filters.
+Search for anime or manga with filters. Supports single and multi-criteria genre/tag filtering.
 
 | Param | Type |
 | --- | --- |
-| `options` | `SearchMediaOptions` (query, type, format, status, season, genre, tag, sort, page, perPage) |
+| `options` | `SearchMediaOptions` |
+
+**Key options:** `query`, `type`, `format`, `status`, `season`, `genre`, `tag`, `genres`, `tags`, `genresExclude`, `tagsExclude`, `isAdult`, `sort`, `page`, `perPage`
 
 **Returns:** `Promise<PagedResult<Media>>`
+
+```typescript
+// Multi-criteria search
+const result = await client.searchMedia({
+  type: MediaType.ANIME,
+  genres: ["Action", "Sci-Fi"],
+  tagsExclude: ["Gore"],
+  sort: [MediaSort.POPULARITY_DESC],
+});
+```
 
 ### `getTrending(type?, page?, perPage?)`
 
 Get currently trending anime or manga.
 
 **Returns:** `Promise<PagedResult<Media>>`
+
+### `getPopular(type?, page?, perPage?)`
+
+Get the most popular anime or manga. Convenience wrapper around `searchMedia` with `POPULARITY_DESC` sort.
+
+**Returns:** `Promise<PagedResult<Media>>`
+
+```typescript
+const popular = await client.getPopular(MediaType.ANIME, 1, 10);
+```
+
+### `getTopRated(type?, page?, perPage?)`
+
+Get the highest-rated anime or manga. Convenience wrapper around `searchMedia` with `SCORE_DESC` sort.
+
+**Returns:** `Promise<PagedResult<Media>>`
+
+```typescript
+const top = await client.getTopRated(MediaType.MANGA, 1, 10);
+```
 
 ### `getMediaBySeason(options)`
 
@@ -122,17 +154,40 @@ Search for staff (directors, voice actors, etc.).
 
 ## Users & Lists
 
-### `getUser(id)`
+### `getUser(idOrName)`
 
-Fetch a user by AniList ID.
+Fetch a user by AniList ID or username.
+
+| Param | Type | Description |
+| --- | --- | --- |
+| `idOrName` | `number \| string` | AniList user ID or username |
+
+**Returns:** `Promise<User>`
+
+```typescript
+const user = await client.getUser(1);        // by ID
+const user = await client.getUser("AniList"); // by username
+```
+
+### `getUserByName(name)` :badge[deprecated]
+
+Deprecated — use `getUser(name)` instead.
 
 **Returns:** `Promise<User>`
 
-### `getUserByName(name)`
+### `searchUsers(options?)`
 
-Fetch a user by their username.
+Search for AniList users by name.
 
-**Returns:** `Promise<User>`
+| Param | Type |
+| --- | --- |
+| `options` | `SearchUserOptions` (query?, sort?, page?, perPage?) |
+
+**Returns:** `Promise<PagedResult<User>>`
+
+```typescript
+const result = await client.searchUsers({ query: "AniList", perPage: 5 });
+```
 
 ### `getUserMediaList(options)`
 
@@ -152,13 +207,13 @@ Get a user's anime or manga list. Requires `userId` or `userName` and `type`.
 
 Fetch a studio by AniList ID, including its most popular productions.
 
-**Returns:** `Promise<StudioDetail>`
+**Returns:** `Promise<Studio>`
 
 ### `searchStudios(options?)`
 
 Search for studios by name.
 
-**Returns:** `Promise<PagedResult<StudioDetail>>`
+**Returns:** `Promise<PagedResult<Studio>>`
 
 ---
 
@@ -223,13 +278,32 @@ Clear the entire response cache.
 
 ### `invalidateCache(pattern)`
 
-Remove cache entries matching a string or RegExp pattern.
+Remove cache entries matching a pattern.
+
+- **String**: substring match (e.g. `"Media"` removes all keys containing `"Media"`)
+- **RegExp**: tested against each key directly
 
 **Returns:** `Promise<number>` (entries removed)
 
 ### `cacheSize`
 
 Number of entries currently cached. May return a `Promise<number>` for async adapters.
+
+---
+
+## Lifecycle
+
+### `destroy()`
+
+Clean up resources held by the client. Clears the in-memory cache and aborts pending in-flight requests.
+
+```typescript
+await client.destroy();
+```
+
+::: tip
+If using a custom cache adapter (e.g. Redis), call its close/disconnect method separately.
+:::
 
 ---
 

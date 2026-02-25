@@ -3,7 +3,7 @@
 All public types and enums exported by `ani-client`. Import them directly from the package root:
 
 ```typescript
-import { MediaType, MediaFormat, type Media, type AniListClientOptions } from "ani-client";
+import { MediaType, MediaFormat, MediaSource, type Media, type AniListClientOptions } from "ani-client";
 ```
 
 ## Enums
@@ -14,6 +14,28 @@ import { MediaType, MediaFormat, type Media, type AniListClientOptions } from "a
 | --- | --- |
 | `ANIME` | Japanese animation |
 | `MANGA` | Japanese comics |
+
+### MediaSource
+
+The origin of a media's adaptation.
+
+| Value | Description |
+| --- | --- |
+| `ORIGINAL` | Original work |
+| `MANGA` | Adapted from manga |
+| `LIGHT_NOVEL` | Adapted from a light novel |
+| `VISUAL_NOVEL` | Adapted from a visual novel |
+| `VIDEO_GAME` | Adapted from a video game |
+| `NOVEL` | Adapted from a novel |
+| `DOUJINSHI` | Adapted from doujinshi |
+| `ANIME` | Adapted from anime |
+| `WEB_NOVEL` | Adapted from a web novel |
+| `LIVE_ACTION` | Adapted from live action |
+| `GAME` | Adapted from a game |
+| `COMIC` | Adapted from a comic |
+| `MULTIMEDIA_PROJECT` | Part of a multimedia project |
+| `PICTURE_BOOK` | Adapted from a picture book |
+| `OTHER` | Other source |
 
 ### MediaFormat
 
@@ -79,6 +101,18 @@ All values also have a `_DESC` counterpart where applicable.
 
 `ID`, `ROLE`, `LANGUAGE`, `SEARCH_MATCH`, `FAVOURITES`, `RELEVANCE`
 
+### UserSort
+
+All values also have a `_DESC` counterpart where applicable.
+
+| Value | Description |
+| --- | --- |
+| `ID` | Sort by user ID |
+| `USERNAME` | Sort by username |
+| `WATCHED_TIME` | Sort by total watch time |
+| `CHAPTERS_READ` | Sort by chapters read |
+| `SEARCH_MATCH` | Sort by relevance to search query |
+
 ### AiringSort
 
 All values also have a `_DESC` counterpart.
@@ -121,6 +155,7 @@ The main anime/manga object. Key fields:
 | `format` | `MediaFormat \| null` | TV, MOVIE, MANGA, etc. |
 | `status` | `MediaStatus \| null` | RELEASING, FINISHED, etc. |
 | `description` | `string \| null` | Synopsis |
+| `source` | `MediaSource \| null` | Adaptation source (ORIGINAL, MANGA, etc.) |
 | `episodes` | `number \| null` | Episode count (anime) |
 | `chapters` | `number \| null` | Chapter count (manga) |
 | `coverImage` | `MediaCoverImage` | Cover art URLs |
@@ -131,10 +166,21 @@ The main anime/manga object. Key fields:
 | `tags` | `MediaTag[]` | Tags with rank and spoiler info |
 | `studios` | `StudioConnection` | Animation studios |
 | `relations` | `MediaConnection \| null` | Related media |
+| `nextAiringEpisode` | `NextAiringEpisode \| null` | Next episode airing info (anime only) |
 | `characters` | `MediaCharacterConnection` | *(optional, via include)* |
 | `staff` | `MediaStaffConnection` | *(optional, via include)* |
 | `isAdult` | `boolean \| null` | NSFW flag |
 | `siteUrl` | `string \| null` | AniList URL |
+
+### NextAiringEpisode
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `number` | Airing schedule ID |
+| `airingAt` | `number` | UNIX timestamp of airing |
+| `episode` | `number` | Episode number |
+| `mediaId` | `number` | Associated media ID |
+| `timeUntilAiring` | `number` | Seconds until airing |
 
 ### Character
 
@@ -171,6 +217,23 @@ The main anime/manga object. Key fields:
 | `avatar` | `UserAvatar` (large, medium) |
 | `statistics` | `{ anime: UserStatistics, manga: UserStatistics } \| null` |
 
+### Studio
+
+Represents an animation studio. Fields `favourites` and `media` are populated when fetched via `getStudio()`.
+
+| Field | Type |
+| --- | --- |
+| `id` | `number` |
+| `name` | `string` |
+| `isAnimationStudio` | `boolean` |
+| `siteUrl` | `string \| null` |
+| `favourites` | `number \| null` *(optional)* |
+| `media` | `{ pageInfo, nodes } \| null` *(optional)* |
+
+::: tip
+`StudioDetail` is a deprecated alias for `Studio`. Use `Studio` in new code.
+:::
+
 ### AiringSchedule
 
 | Field | Type |
@@ -199,6 +262,40 @@ The main anime/manga object. Key fields:
 | `rating` | `number \| null` |
 | `mediaRecommendation` | `Media` |
 | `user` | `{ id, name, avatar } \| null` |
+
+---
+
+## Search Options
+
+### SearchMediaOptions
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `query` | `string` | Search term |
+| `type` | `MediaType` | ANIME or MANGA |
+| `format` | `MediaFormat` | TV, MOVIE, etc. |
+| `status` | `MediaStatus` | RELEASING, FINISHED, etc. |
+| `season` | `MediaSeason` | WINTER, SPRING, etc. |
+| `seasonYear` | `number` | Year of the season |
+| `genre` | `string` | Single genre filter |
+| `tag` | `string` | Single tag filter |
+| `genres` | `string[]` | Multiple genre filter (AND) |
+| `tags` | `string[]` | Multiple tag filter (AND) |
+| `genresExclude` | `string[]` | Exclude genres |
+| `tagsExclude` | `string[]` | Exclude tags |
+| `isAdult` | `boolean` | Include/exclude adult content |
+| `sort` | `MediaSort[]` | Sort order |
+| `page` | `number` | Page number |
+| `perPage` | `number` | Results per page (max 50) |
+
+### SearchUserOptions
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `query` | `string` | Search term |
+| `sort` | `UserSort[]` | Sort order |
+| `page` | `number` | Page number |
+| `perPage` | `number` | Results per page (max 50) |
 
 ---
 
@@ -232,10 +329,14 @@ interface AniListClientOptions {
 | `maxRequests` | `number` | `85` | Max requests per window |
 | `windowMs` | `number` | `60_000` | Window size in ms |
 | `maxRetries` | `number` | `3` | Retries on HTTP 429 |
-| `retryDelayMs` | `number` | `2_000` | Base retry delay |
+| `retryDelayMs` | `number` | `2_000` | Base retry delay (exponential backoff applied) |
 | `timeoutMs` | `number` | `30_000` | Per-request timeout (0 = off) |
 | `retryOnNetworkError` | `boolean` | `true` | Retry on ECONNRESET, etc. |
 | `enabled` | `boolean` | `true` | Disable rate limiting |
+
+::: tip
+Retries use **exponential backoff with jitter** (capped at 30s). The `retryDelayMs` is the base delay.
+:::
 
 ### CacheAdapter
 

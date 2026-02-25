@@ -35,6 +35,13 @@ const MEDIA_FIELDS_BASE = `
   studios { nodes { id name isAnimationStudio siteUrl } }
   isAdult
   siteUrl
+  nextAiringEpisode {
+    id
+    airingAt
+    episode
+    mediaId
+    timeUntilAiring
+  }
 `;
 
 const RELATIONS_FIELDS = `
@@ -218,6 +225,10 @@ query (
   $seasonYear: Int,
   $genre: String,
   $tag: String,
+  $genre_in: [String],
+  $tag_in: [String],
+  $genre_not_in: [String],
+  $tag_not_in: [String],
   $isAdult: Boolean,
   $sort: [MediaSort],
   $page: Int,
@@ -234,6 +245,10 @@ query (
       seasonYear: $seasonYear,
       genre: $genre,
       tag: $tag,
+      genre_in: $genre_in,
+      tag_in: $tag_in,
+      genre_not_in: $genre_not_in,
+      tag_not_in: $tag_not_in,
       isAdult: $isAdult,
       sort: $sort
     ) {
@@ -322,6 +337,16 @@ export const QUERY_USER_BY_NAME = `
 query ($name: String!) {
   User(name: $name) {
     ${USER_FIELDS}
+  }
+}`;
+
+export const QUERY_USER_SEARCH = `
+query ($search: String, $sort: [UserSort], $page: Int, $perPage: Int) {
+  Page(page: $page, perPage: $perPage) {
+    pageInfo { total perPage currentPage lastPage hasNextPage }
+    users(search: $search, sort: $sort) {
+      ${USER_FIELDS}
+    }
   }
 }`;
 

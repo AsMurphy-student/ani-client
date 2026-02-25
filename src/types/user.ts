@@ -1,3 +1,15 @@
+export enum UserSort {
+  ID = "ID",
+  ID_DESC = "ID_DESC",
+  USERNAME = "USERNAME",
+  USERNAME_DESC = "USERNAME_DESC",
+  WATCHED_TIME = "WATCHED_TIME",
+  WATCHED_TIME_DESC = "WATCHED_TIME_DESC",
+  CHAPTERS_READ = "CHAPTERS_READ",
+  CHAPTERS_READ_DESC = "CHAPTERS_READ_DESC",
+  SEARCH_MATCH = "SEARCH_MATCH",
+}
+
 export interface UserAvatar {
   large: string | null;
   medium: string | null;
@@ -28,4 +40,11 @@ export interface User {
     anime: UserStatistics;
     manga: UserStatistics;
   } | null;
+}
+
+export interface SearchUserOptions {
+  query?: string;
+  sort?: UserSort[];
+  page?: number;
+  perPage?: number;
 }

@@ -5,6 +5,7 @@ export { RedisCache, type RedisCacheOptions, type RedisLikeClient } from "./cach
 export { RateLimiter } from "./rate-limiter";
 export {
   MediaType,
+  MediaSource,
   MediaFormat,
   MediaStatus,
   MediaSeason,
@@ -17,6 +18,7 @@ export {
   MediaListStatus,
   MediaListSort,
   StaffSort,
+  UserSort,
   type CacheAdapter,
   type CacheOptions,
   type RateLimitOptions,
@@ -29,6 +31,7 @@ export {
   type FuzzyDate,
   type Studio,
   type StudioConnection,
+  /** @deprecated Use `Studio` instead. */
   type StudioDetail,
   type MediaEdge,
   type MediaConnection,
@@ -43,6 +46,7 @@ export {
   type StatusDistribution,
   type MediaStats,
   type MediaRecommendationNode,
+  type NextAiringEpisode,
   type MediaIncludeOptions,
   type Character,
   type CharacterName,
@@ -66,6 +70,7 @@ export {
   type SearchCharacterOptions,
   type SearchStaffOptions,
   type SearchStudioOptions,
+  type SearchUserOptions,
   type GetAiringOptions,
   type GetRecentChaptersOptions,
   type GetPlanningOptions,

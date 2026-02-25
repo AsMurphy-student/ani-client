@@ -41,9 +41,29 @@ Triggering targeted evictions directly skips memory lifecycle polling when data 
 // Nuke the entire bucket
 await client.clearCache();
 
-// Nuke matched entries by regex
-const deletedMatches = await client.invalidateCache(/Media/);
+// Substring match — removes all keys containing "Media"
+const deletedMatches = await client.invalidateCache("Media");
+
+// RegExp match — more precise control
+const deletedRegex = await client.invalidateCache(/getMedia\|.*id.*1/);
 
 // Poll remaining nodes
 console.log(await client.cacheSize);
 ```
+
+::: tip
+**String patterns** use substring matching (e.g. `"Media"` matches all keys containing `"Media"`).  
+**RegExp patterns** are tested against each key directly for precise control.
+:::
+
+## Cleanup
+
+When you're done with the client, call `destroy()` to clear the cache and release in-flight request references:
+
+```typescript
+await client.destroy();
+```
+
+::: warning
+If using a custom cache adapter (e.g. Redis), you must close/disconnect it separately.
+:::

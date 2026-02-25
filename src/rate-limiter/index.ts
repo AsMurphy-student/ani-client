@@ -18,8 +18,10 @@ export class RateLimiter {
   private readonly timeoutMs: number;
   private readonly retryOnNetworkError: boolean;
 
-  /** @internal */
-  private timestamps: number[] = [];
+  /** @internal — sliding window: circular buffer of timestamps */
+  private readonly timestamps: number[];
+  private head = 0;
+  private count = 0;
 
   constructor(options: RateLimitOptions = {}) {
     this.maxRequests = options.maxRequests ?? 85;
@@ -29,6 +31,7 @@ export class RateLimiter {
     this.enabled = options.enabled ?? true;
     this.timeoutMs = options.timeoutMs ?? 30_000;
     this.retryOnNetworkError = options.retryOnNetworkError ?? true;
+    this.timestamps = new Array<number>(this.maxRequests).fill(0);
   }
 
   /**
@@ -37,22 +40,32 @@ export class RateLimiter {
   async acquire(): Promise<void> {
     if (!this.enabled) return;
 
-    const now = Date.now();
-    this.timestamps = this.timestamps.filter((t) => now - t < this.windowMs);
-
-    if (this.timestamps.length >= this.maxRequests) {
-      // biome-ignore lint/style/noNonNullAssertion: length check guarantees [0] exists
-      const oldest = this.timestamps[0]!;
-      const waitMs = this.windowMs - (now - oldest) + 50;
-      await this.sleep(waitMs);
-      return this.acquire(); // Re-check after waiting
+    if (this.count >= this.maxRequests) {
+      const oldest = this.timestamps[this.head];
+      const now = Date.now();
+      const elapsed = now - oldest;
+      if (elapsed < this.windowMs) {
+        const waitMs = this.windowMs - elapsed + 50;
+        await this.sleep(waitMs);
+      }
+      // The oldest slot is now expired; we'll overwrite it below
     }
 
-    this.timestamps.push(Date.now());
+    // Record this request in the circular buffer
+    const now = Date.now();
+    if (this.count < this.maxRequests) {
+      this.timestamps[(this.head + this.count) % this.maxRequests] = now;
+      this.count++;
+    } else {
+      // Overwrite the oldest entry
+      this.timestamps[this.head] = now;
+      this.head = (this.head + 1) % this.maxRequests;
+    }
   }
 
   /**
    * Execute a fetch with automatic retry on 429 responses and network errors.
+   * Uses exponential backoff with jitter for retry delays.
    */
   async fetchWithRetry(
     url: string,
@@ -77,7 +90,7 @@ export class RateLimiter {
         if (attempt === this.maxRetries) break;
 
         const retryAfter = res.headers.get("Retry-After");
-        const delayMs = retryAfter ? Number.parseInt(retryAfter, 10) * 1000 : this.retryDelayMs * (attempt + 1);
+        const delayMs = retryAfter ? Number.parseInt(retryAfter, 10) * 1000 : this.exponentialDelay(attempt);
 
         hooks?.onRateLimit?.(delayMs);
         hooks?.onRetry?.(attempt + 1, "HTTP 429", delayMs);
@@ -88,7 +101,7 @@ export class RateLimiter {
         lastError = err;
 
         if (this.retryOnNetworkError && isNetworkError(err) && attempt < this.maxRetries) {
-          const delayMs = this.retryDelayMs * (attempt + 1);
+          const delayMs = this.exponentialDelay(attempt);
           hooks?.onRetry?.(attempt + 1, `Network error: ${(err as Error).message}`, delayMs);
           await this.sleep(delayMs);
           await this.acquire();
@@ -101,6 +114,13 @@ export class RateLimiter {
 
     if (lastResponse) return lastResponse;
     throw lastError;
+  }
+
+  /** @internal — Exponential backoff with jitter, capped at 30s */
+  private exponentialDelay(attempt: number): number {
+    const base = this.retryDelayMs * 2 ** attempt;
+    const jitter = Math.random() * 1000;
+    return Math.min(base + jitter, 30_000);
   }
 
   /** @internal */

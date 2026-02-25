@@ -1,4 +1,5 @@
 import type { CacheAdapter, CacheOptions } from "../types";
+import { normalizeQuery } from "../utils";
 
 /**
  * Simple in-memory cache with configurable TTL.
@@ -27,7 +28,7 @@ export class MemoryCache implements CacheAdapter {
 
   /** Build a deterministic cache key from a query + variables pair. */
   static key(query: string, variables: Record<string, unknown>): string {
-    const normalized = query.replace(/\s+/g, " ").trim();
+    const normalized = normalizeQuery(query);
     return `${normalized}|${JSON.stringify(variables, Object.keys(variables).sort())}`;
   }
 
@@ -85,14 +86,18 @@ export class MemoryCache implements CacheAdapter {
   /**
    * Remove all entries whose key matches the given pattern.
    *
-   * @param pattern — A string (converted to RegExp) or RegExp.
+   * - **String**: treated as a substring match (e.g. `"Media"` removes all keys containing `"Media"`).
+   * - **RegExp**: tested against each key directly.
+   *
+   * @param pattern — A string (substring match) or RegExp.
    * @returns Number of entries removed.
    */
   invalidate(pattern: string | RegExp): number {
-    const regex = typeof pattern === "string" ? new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")) : pattern;
+    const test =
+      typeof pattern === "string" ? (key: string) => key.includes(pattern) : (key: string) => pattern.test(key);
     const toDelete: string[] = [];
     for (const key of this.store.keys()) {
-      if (regex.test(key)) toDelete.push(key);
+      if (test(key)) toDelete.push(key);
     }
     for (const key of toDelete) this.store.delete(key);
     return toDelete.length;
