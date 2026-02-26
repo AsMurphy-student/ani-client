@@ -12,7 +12,7 @@ While writing raw GraphQL queries is an option, `ani-client` abstracts away the 
 - **Universal compatibility** — works perfectly in Node.js (v20+), Bun, Deno, and the Browser.
 - **Strictly typed** — comprehensive TypeScript definitions for every return shape and configuration.
 - **Built-in caching** — ships with a localized LRU memory cache, and an official `RedisCache` adapter.
-- **Rate-limit aware** — transparently catches HTTP 429 Too Many Requests, implements progressive backoffs, and retries automatically.
+- **Rate-limit aware** — transparently catches HTTP 429 Too Many Requests, implements exponential backoff with jitter, and retries automatically.
 - **Request deduplication** — guarantees that multiple identical calls launched concurrently only use a single HTTP request natively yielding across all callers.
 - **Request chunking** — limits massive batch API requests seamlessly into sequential limits.
 

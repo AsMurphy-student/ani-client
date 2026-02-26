@@ -11,7 +11,7 @@
 - **Zero dependencies** — uses the native `fetch` API
 - **Universal** — Node.js ≥ 20, Bun, Deno and modern browsers
 - **Dual format** — ships ESM + CJS with full TypeScript declarations
-- **Reliable** — Built-in caching, Rate-limit protections, automatic retries & request deduplication!
+- **Reliable** — Built-in caching, Rate-limit protections with exponential backoff, automatic retries & request deduplication!
 
 ## 📖 Documentation
 
