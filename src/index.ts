@@ -3,6 +3,7 @@ export { AniListError } from "./errors";
 export { MemoryCache } from "./cache";
 export { RedisCache, type RedisCacheOptions, type RedisLikeClient } from "./cache/redis";
 export { RateLimiter } from "./rate-limiter";
+export { parseAniListMarkdown } from "./utils";
 export {
   MediaType,
   MediaSource,
