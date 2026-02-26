@@ -349,6 +349,37 @@ describe("AniListClient (integration)", () => {
     });
   });
 
+  // ── Threads ──
+
+  describe("Threads", () => {
+    it("getRecentThreads() returns forum threads", async () => {
+      const result = await client.getRecentThreads({ perPage: 3 });
+      expect(result.results.length).toBeGreaterThan(0);
+      expect(result.pageInfo).toBeDefined();
+      const thread = result.results[0];
+      expect(typeof thread.id).toBe("number");
+      expect(typeof thread.title).toBe("string");
+      expect(typeof thread.replyCount).toBe("number");
+    });
+
+    it("getThread(id) returns a specific thread", async () => {
+      const recent = await client.getRecentThreads({ perPage: 1 });
+      expect(recent.results.length).toBeGreaterThan(0);
+      const threadId = recent.results[0].id;
+
+      const thread = await client.getThread(threadId);
+      expect(thread.id).toBe(threadId);
+      expect(typeof thread.title).toBe("string");
+      expect(thread.user).toBeDefined();
+      expect(typeof thread.viewCount).toBe("number");
+    });
+
+    it("getRecentThreads({ query }) filters by search", async () => {
+      const result = await client.getRecentThreads({ query: "anime", perPage: 5 });
+      expect(Array.isArray(result.results)).toBe(true);
+    });
+  });
+
   // ── Paginate ──
 
   describe("Paginate", () => {

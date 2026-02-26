@@ -22,3 +22,4 @@ export { QUERY_USER_BY_ID, QUERY_USER_BY_NAME, QUERY_USER_SEARCH, QUERY_USER_MED
 export { QUERY_STUDIO_BY_ID, QUERY_STUDIO_SEARCH } from "./studio";
 export { QUERY_GENRES, QUERY_TAGS } from "./metadata";
 export { buildMediaByIdQuery, buildBatchMediaQuery, buildBatchCharacterQuery, buildBatchStaffQuery } from "./builders";
+export { QUERY_THREAD_BY_ID, QUERY_THREAD_SEARCH } from "./thread";

@@ -19,6 +19,7 @@ export {
   MediaListSort,
   StaffSort,
   UserSort,
+  ThreadSort,
   type CacheAdapter,
   type CacheOptions,
   type RateLimitOptions,
@@ -77,5 +78,9 @@ export {
   type GetSeasonOptions,
   type GetUserMediaListOptions,
   type GetRecommendationsOptions,
+  type Thread,
+  type ThreadCategory,
+  type ThreadMediaCategory,
+  type SearchThreadOptions,
   type AniListClientOptions,
 } from "./types";

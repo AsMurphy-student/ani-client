@@ -217,6 +217,47 @@ Search for studios by name.
 
 ---
 
+## Threads
+
+### `getThread(id)`
+
+Fetch a forum thread by its AniList ID.
+
+| Param | Type | Description |
+| --- | --- | --- |
+| `id` | `number` | AniList thread ID |
+
+**Returns:** `Promise<Thread>`
+
+```typescript
+const thread = await client.getThread(12345);
+console.log(thread.title, `— ${thread.replyCount} replies`);
+```
+
+### `getRecentThreads(options?)`
+
+Get recent forum threads, optionally filtered by search query, media ID, or category.
+
+| Param | Type |
+| --- | --- |
+| `options` | `SearchThreadOptions` (query?, mediaId?, categoryId?, sort?, page?, perPage?) |
+
+**Returns:** `Promise<PagedResult<Thread>>`
+
+```typescript
+import { ThreadSort } from "ani-client";
+
+const threads = await client.getRecentThreads({
+  sort: [ThreadSort.REPLIED_AT_DESC],
+  perPage: 10,
+});
+
+// Filter threads related to a specific anime
+const mediaThreads = await client.getRecentThreads({ mediaId: 1, perPage: 5 });
+```
+
+---
+
 ## Metadata
 
 ### `getGenres()`

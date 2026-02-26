@@ -28,10 +28,12 @@ import type {
   SearchMediaOptions,
   SearchStaffOptions,
   SearchStudioOptions,
+  SearchThreadOptions,
   SearchUserOptions,
   Staff,
   StaffIncludeOptions,
   Studio,
+  Thread,
   User,
 } from "../types";
 import { chunk, clampPerPage, normalizeQuery } from "../utils";
@@ -41,6 +43,7 @@ import * as characterMethods from "./character";
 import * as mediaMethods from "./media";
 import * as staffMethods from "./staff";
 import * as studioMethods from "./studio";
+import * as threadMethods from "./thread";
 import * as userMethods from "./user";
 
 const DEFAULT_API_URL = "https://graphql.anilist.co";
@@ -285,6 +288,18 @@ export class AniListClient {
   }
 
   // ── Metadata ──
+
+  // ── Threads ──
+
+  /** Fetch a forum thread by its AniList ID. */
+  async getThread(id: number): Promise<Thread> {
+    return threadMethods.getThread(this, id);
+  }
+
+  /** Get recent forum threads, optionally filtered by search, media, or category. */
+  async getRecentThreads(options: SearchThreadOptions = {}): Promise<PagedResult<Thread>> {
+    return threadMethods.getRecentThreads(this, options);
+  }
 
   /** Get all available genres on AniList. */
   async getGenres(): Promise<string[]> {
