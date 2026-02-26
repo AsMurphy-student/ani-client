@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.5.1] — 2026-02-26
+
+### Added
+- **Forum Threads API** — New methods `getThread(id)` and `getRecentThreads(options)` to fetch and search AniList forum threads.
+- **Thread Types** — New exported types: `Thread`, `ThreadCategory`, `ThreadMediaCategory`, `SearchThreadOptions`.
+- **`ThreadSort` enum** — Added to control thread sorting (e.g., `REPLIED_AT_DESC`, `VIEW_COUNT_DESC`).
+
+### Changed
+- **Internal Architecture Rewrite** — The monolithic API class has been completely split into standalone domain-specific modules (`media`, `user`, `character`, etc.). This greatly improves tree-shaking and maintainability.
+- **Bundle Size Reduced** — The package bundle is now **~12% smaller** (from 52KB down to 46KB CJS, and from 43KB down to 34KB DTS).
+- **Documentation Overhaul** — Major cleanup across API and type references. The "Fetching Data" guide now covers threads.
+
+### Removed
+- **`getUserByName()`** — Removed in favor of overloaded `getUser(idOrName)`.
+- **`StudioDetail`** — Removed this deprecated type alias completely. Use the unified `Studio` interface instead.
+
 ## [1.5.0] — 2026-02-26
 
 ### Added
