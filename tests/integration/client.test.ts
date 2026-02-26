@@ -183,6 +183,16 @@ describe("AniListClient (integration)", () => {
       expect(result.results.length).toBeGreaterThan(0);
       expect(result.results.every((m) => m.type === "ANIME")).toBe(true);
     });
+
+    it("getWeeklySchedule() returns the current week's airing schedule", async () => {
+      const schedule = await client.getWeeklySchedule();
+      expect(schedule).toBeDefined();
+
+      const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+      for (const day of days) {
+        expect(Array.isArray(schedule[day as keyof typeof schedule])).toBe(true);
+      }
+    });
   });
 
   // ── Season ──

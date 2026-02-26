@@ -380,3 +380,7 @@ export interface AiringSchedule {
   mediaId: number;
   media: Media;
 }
+
+export type DayOfWeek = "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday";
+
+export type WeeklySchedule = Record<DayOfWeek, AiringSchedule[]>;

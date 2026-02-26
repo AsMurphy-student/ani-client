@@ -74,6 +74,19 @@ const top = await client.getTopRated(MediaType.MANGA, 1, 10);
 top.results.forEach((m) => console.log(`${m.title.romaji} — ${m.averageScore}/100`));
 ```
 
+### `getWeeklySchedule(date?)`
+
+Fetches the airing schedule for the entire week of the specified date (defaults to the current week) and groups the episodes by day of the week (Monday to Sunday).
+
+```typescript
+const schedule = await client.getWeeklySchedule();
+
+// Log all anime airing this Monday
+schedule.Monday.forEach((episode) => {
+  console.log(`${episode.media.title.romaji} - Episode ${episode.episode}`);
+});
+```
+
 ### `getMediaBySeason(options)`
 
 Fetches Anime mapping to an explicit season chart.

@@ -3,9 +3,12 @@
 ## [1.5.1] — 2026-02-26
 
 ### Added
+- **`parseAniListMarkdown(text)`** — New utility function to parse AniList's custom markdown syntax into standard HTML (handles spoilers, images, youtube embeds, centered text, etc.).
+- **`getWeeklySchedule(date?)`** — New method to easily retrieve the airing schedule for the current week, grouped by day of the week (Monday to Sunday).
 - **Forum Threads API** — New methods `getThread(id)` and `getRecentThreads(options)` to fetch and search AniList forum threads.
 - **Thread Types** — New exported types: `Thread`, `ThreadCategory`, `ThreadMediaCategory`, `SearchThreadOptions`.
-- **`ThreadSort` enum** — Added to control thread sorting (e.g., `REPLIED_AT_DESC`, `VIEW_COUNT_DESC`).
+- **`ThreadSort` enum** — Added to control thread sorting.
+- **``**
 
 ### Changed
 - **Internal Architecture Rewrite** — The monolithic API class has been completely split into standalone domain-specific modules (`media`, `user`, `character`, etc.). This greatly improves tree-shaking and maintainability.

@@ -48,6 +48,8 @@ export {
   type MediaRecommendationNode,
   type NextAiringEpisode,
   type MediaIncludeOptions,
+  type WeeklySchedule,
+  type DayOfWeek,
   type Character,
   type CharacterName,
   type CharacterImage,

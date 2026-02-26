@@ -35,6 +35,7 @@ import type {
   Studio,
   Thread,
   User,
+  WeeklySchedule,
 } from "../types";
 import { chunk, clampPerPage, normalizeQuery } from "../utils";
 
@@ -202,6 +203,11 @@ export class AniListClient {
   /** Get currently releasing manga. */
   async getAiredChapters(options: GetRecentChaptersOptions = {}): Promise<PagedResult<Media>> {
     return mediaMethods.getAiredChapters(this, options);
+  }
+
+  /** Get the detailed schedule for the current week, sorted by day. */
+  async getWeeklySchedule(date?: Date): Promise<WeeklySchedule> {
+    return mediaMethods.getWeeklySchedule(this, date);
   }
 
   /** Get upcoming (not yet released) media. */

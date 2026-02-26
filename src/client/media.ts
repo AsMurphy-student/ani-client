@@ -23,6 +23,8 @@ import type {
   PagedResult,
   Recommendation,
   SearchMediaOptions,
+  WeeklySchedule,
+  DayOfWeek,
 } from "../types";
 
 import { clampPerPage } from "../utils";
@@ -164,4 +166,49 @@ export async function getMediaBySeason(client: ClientBase, options: GetSeasonOpt
     },
     "media",
   );
+}
+
+export async function getWeeklySchedule(client: ClientBase, date: Date = new Date()): Promise<WeeklySchedule> {
+  const schedule: WeeklySchedule = {
+    Monday: [],
+    Tuesday: [],
+    Wednesday: [],
+    Thursday: [],
+    Friday: [],
+    Saturday: [],
+    Sunday: [],
+  };
+
+  // Get Monday 00:00:00 of the week
+  const startOfWeek = new Date(date);
+  const day = startOfWeek.getDay(); // 0 is Sunday, 1 is Monday...
+  const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1);
+  startOfWeek.setDate(diff);
+  startOfWeek.setHours(0, 0, 0, 0);
+
+  // Get Sunday 23:59:59 of the week
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() + 6);
+  endOfWeek.setHours(23, 59, 59, 999);
+
+  const startTimestamp = Math.floor(startOfWeek.getTime() / 1000);
+  const endTimestamp = Math.floor(endOfWeek.getTime() / 1000);
+
+  const iterator = client.paginate((page) =>
+    getAiredEpisodes(client, {
+      airingAtGreater: startTimestamp,
+      airingAtLesser: endTimestamp,
+      page,
+      perPage: 50,
+    }),
+  );
+
+  for await (const episode of iterator) {
+    const epDate = new Date(episode.airingAt * 1000);
+    const names: DayOfWeek[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const dayName = names[epDate.getDay()];
+    schedule[dayName].push(episode);
+  }
+
+  return schedule;
 }

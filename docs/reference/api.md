@@ -80,6 +80,12 @@ Get the highest-rated anime or manga. Convenience wrapper around `searchMedia` w
 const top = await client.getTopRated(MediaType.MANGA, 1, 10);
 ```
 
+### `getWeeklySchedule(date?)`
+
+Fetches the airing schedule for the entire week of the specified date (defaults to the current week). Returns a `WeeklySchedule` object grouped by day of the week.
+
+**Returns:** `Promise<WeeklySchedule>`
+
 ### `getMediaBySeason(options)`
 
 Get anime/manga for a specific season + year.
@@ -260,11 +266,27 @@ Get all available genres on AniList.
 
 **Returns:** `Promise<string[]>`
 
-### `getTags()`
-
-Get all available media tags.
-
 **Returns:** `Promise<MediaTag[]>`
+
+---
+
+## Utilities
+
+### `parseAniListMarkdown(text)`
+
+Parses AniList's custom markdown dialect into standard HTML. It supports spoiler tags, images, webm, youtube, and standard formatting.
+
+| Param | Type | Description |
+| --- | --- | --- |
+| `text` | `string` | AniList markdown string |
+
+**Returns:** `string` (HTML)
+
+```typescript
+import { parseAniListMarkdown } from "ani-client";
+
+const html = parseAniListMarkdown("~!Spoiler!~");
+```
 
 ---
 
