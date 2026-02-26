@@ -8,7 +8,6 @@
 - **Forum Threads API** — New methods `getThread(id)` and `getRecentThreads(options)` to fetch and search AniList forum threads.
 - **Thread Types** — New exported types: `Thread`, `ThreadCategory`, `ThreadMediaCategory`, `SearchThreadOptions`.
 - **`ThreadSort` enum** — Added to control thread sorting.
-- **``**
 
 ### Changed
 - **Internal Architecture Rewrite** — The monolithic API class has been completely split into standalone domain-specific modules (`media`, `user`, `character`, etc.). This greatly improves tree-shaking and maintainability.
