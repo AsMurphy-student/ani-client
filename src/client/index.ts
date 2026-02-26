@@ -257,14 +257,6 @@ export class AniListClient {
     return userMethods.getUser(this, idOrName);
   }
 
-  /**
-   * Fetch a user by username.
-   * @deprecated Use `getUser(name)` instead.
-   */
-  async getUserByName(name: string): Promise<User> {
-    return userMethods.getUserByName(this, name);
-  }
-
   /** Search for users by name. */
   async searchUsers(options: SearchUserOptions = {}): Promise<PagedResult<User>> {
     return userMethods.searchUsers(this, options);

@@ -15,10 +15,6 @@ export async function getUser(client: ClientBase, idOrName: number | string): Pr
   return data.User;
 }
 
-export async function getUserByName(client: ClientBase, name: string): Promise<User> {
-  return getUser(client, name);
-}
-
 export async function searchUsers(client: ClientBase, options: SearchUserOptions = {}): Promise<PagedResult<User>> {
   const { query: search, page = 1, perPage = 20, sort } = options;
   return client.pagedRequest<User>(QUERY_USER_SEARCH, { search, sort, page, perPage: clampPerPage(perPage) }, "users");

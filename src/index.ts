@@ -32,8 +32,6 @@ export {
   type FuzzyDate,
   type Studio,
   type StudioConnection,
-  /** @deprecated Use `Studio` instead. */
-  type StudioDetail,
   type MediaEdge,
   type MediaConnection,
   type MediaCharacterEdge,

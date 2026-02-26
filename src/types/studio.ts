@@ -17,11 +17,6 @@ export interface StudioConnection {
   nodes: Studio[];
 }
 
-/**
- * @deprecated Use `Studio` instead. `StudioDetail` is an alias kept for backward compatibility.
- */
-export type StudioDetail = Studio;
-
 export interface SearchStudioOptions {
   query?: string;
   page?: number;

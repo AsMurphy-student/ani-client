@@ -169,12 +169,6 @@ const user = await client.getUser(1);        // by ID
 const user = await client.getUser("AniList"); // by username
 ```
 
-### `getUserByName(name)` :badge[deprecated]
-
-Deprecated — use `getUser(name)` instead.
-
-**Returns:** `Promise<User>`
-
 ### `searchUsers(options?)`
 
 Search for AniList users by name.

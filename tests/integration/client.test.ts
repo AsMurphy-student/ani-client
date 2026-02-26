@@ -135,11 +135,6 @@ describe("AniListClient (integration)", () => {
       expect(userById.name.toLowerCase()).toBe("anilist");
     });
 
-    it("getUserByName('AniList') (deprecated alias)", async () => {
-      const user = await client.getUserByName("AniList");
-      expect(user.name.toLowerCase()).toBe("anilist");
-    });
-
     it("searchUsers({ query: 'AniList' })", async () => {
       const result = await client.searchUsers({ query: "AniList", perPage: 5 });
       expect(result.results.length).toBeGreaterThan(0);

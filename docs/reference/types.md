@@ -244,10 +244,6 @@ Represents an animation studio. Fields `favourites` and `media` are populated wh
 | `favourites` | `number \| null` *(optional)* |
 | `media` | `{ pageInfo, nodes } \| null` *(optional)* |
 
-::: tip
-`StudioDetail` is a deprecated alias for `Studio`. Use `Studio` in new code.
-:::
-
 ### AiringSchedule
 
 | Field | Type |
