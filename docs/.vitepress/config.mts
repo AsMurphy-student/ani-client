@@ -40,6 +40,7 @@ export default defineConfig({
             { text: "Caching", link: "/guide/caching" },
             { text: "Rate Limiting & Retries", link: "/guide/rate-limiting" },
             { text: "Event Hooks", link: "/guide/event-hooks" },
+            { text: "Markdown Parser", link: "/guide/markdown-parser" },
           ],
         },
       ],

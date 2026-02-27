@@ -74,6 +74,19 @@ const top = await client.getTopRated(MediaType.MANGA, 1, 10);
 top.results.forEach((m) => console.log(`${m.title.romaji} — ${m.averageScore}/100`));
 ```
 
+### `getWeeklySchedule(date?)`
+
+Fetches the airing schedule for the entire week of the specified date (defaults to the current week) and groups the episodes by day of the week (Monday to Sunday).
+
+```typescript
+const schedule = await client.getWeeklySchedule();
+
+// Log all anime airing this Monday
+schedule.Monday.forEach((episode) => {
+  console.log(`${episode.media.title.romaji} - Episode ${episode.episode}`);
+});
+```
+
 ### `getMediaBySeason(options)`
 
 Fetches Anime mapping to an explicit season chart.
@@ -155,4 +168,35 @@ const list = await client.getUserMediaList({
 });
 
 list.results.forEach((entry) => console.log(`${entry.media.title.romaji} — ${entry.score}/100`));
+```
+
+## Forum Threads
+
+Access AniList forum threads — fetch individual threads or browse recent activity.
+
+### `getThread(id)`
+
+Fetch a single forum thread by its ID.
+
+```typescript
+const thread = await client.getThread(12345);
+console.log(thread.title);
+console.log(`${thread.replyCount} replies · ${thread.viewCount} views`);
+```
+
+### `getRecentThreads(options?)`
+
+Get recent forum threads, sorted by latest reply by default.
+
+```typescript
+import { ThreadSort } from "ani-client";
+
+// Most recent threads
+const recent = await client.getRecentThreads({ perPage: 10 });
+
+// Threads related to a specific anime
+const mediaThreads = await client.getRecentThreads({ mediaId: 1, perPage: 5 });
+
+// Search threads
+const search = await client.getRecentThreads({ query: "best anime 2026" });
 ```

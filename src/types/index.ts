@@ -5,3 +5,4 @@ export * from "./staff";
 export * from "./user";
 export * from "./studio";
 export * from "./lists";
+export * from "./thread";

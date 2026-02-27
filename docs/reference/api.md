@@ -80,6 +80,12 @@ Get the highest-rated anime or manga. Convenience wrapper around `searchMedia` w
 const top = await client.getTopRated(MediaType.MANGA, 1, 10);
 ```
 
+### `getWeeklySchedule(date?)`
+
+Fetches the airing schedule for the entire week of the specified date (defaults to the current week). Returns a `WeeklySchedule` object grouped by day of the week.
+
+**Returns:** `Promise<WeeklySchedule>`
+
 ### `getMediaBySeason(options)`
 
 Get anime/manga for a specific season + year.
@@ -169,12 +175,6 @@ const user = await client.getUser(1);        // by ID
 const user = await client.getUser("AniList"); // by username
 ```
 
-### `getUserByName(name)` :badge[deprecated]
-
-Deprecated — use `getUser(name)` instead.
-
-**Returns:** `Promise<User>`
-
 ### `searchUsers(options?)`
 
 Search for AniList users by name.
@@ -217,6 +217,47 @@ Search for studios by name.
 
 ---
 
+## Threads
+
+### `getThread(id)`
+
+Fetch a forum thread by its AniList ID.
+
+| Param | Type | Description |
+| --- | --- | --- |
+| `id` | `number` | AniList thread ID |
+
+**Returns:** `Promise<Thread>`
+
+```typescript
+const thread = await client.getThread(12345);
+console.log(thread.title, `— ${thread.replyCount} replies`);
+```
+
+### `getRecentThreads(options?)`
+
+Get recent forum threads, optionally filtered by search query, media ID, or category.
+
+| Param | Type |
+| --- | --- |
+| `options` | `SearchThreadOptions` (query?, mediaId?, categoryId?, sort?, page?, perPage?) |
+
+**Returns:** `Promise<PagedResult<Thread>>`
+
+```typescript
+import { ThreadSort } from "ani-client";
+
+const threads = await client.getRecentThreads({
+  sort: [ThreadSort.REPLIED_AT_DESC],
+  perPage: 10,
+});
+
+// Filter threads related to a specific anime
+const mediaThreads = await client.getRecentThreads({ mediaId: 1, perPage: 5 });
+```
+
+---
+
 ## Metadata
 
 ### `getGenres()`
@@ -225,11 +266,27 @@ Get all available genres on AniList.
 
 **Returns:** `Promise<string[]>`
 
-### `getTags()`
-
-Get all available media tags.
-
 **Returns:** `Promise<MediaTag[]>`
+
+---
+
+## Utilities
+
+### `parseAniListMarkdown(text)`
+
+Parses AniList's custom markdown dialect into standard HTML. It supports spoiler tags, images, webm, youtube, and standard formatting.
+
+| Param | Type | Description |
+| --- | --- | --- |
+| `text` | `string` | AniList markdown string |
+
+**Returns:** `string` (HTML)
+
+```typescript
+import { parseAniListMarkdown } from "ani-client";
+
+const html = parseAniListMarkdown("~!Spoiler!~");
+```
 
 ---
 

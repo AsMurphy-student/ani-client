@@ -22,29 +22,6 @@ pnpm install
 pnpm build
 ```
 
-## Project structure
-
-```
-src/
-├── index.ts              # Barrel exports
-├── client/index.ts       # AniListClient class (main entry point)
-├── cache/
-│   ├── index.ts          # MemoryCache (LRU, in-memory)
-│   └── redis.ts          # RedisCache adapter
-├── errors/index.ts       # AniListError class
-├── queries/index.ts      # GraphQL query strings & batch builders
-├── rate-limiter/index.ts # Rate limiter with timeout & retry
-├── types/                # TypeScript types, split by domain
-└── utils/index.ts        # Internal generic utilities
-
-tests/
-├── unit/                 # Vitest unit tests (mocked, no network)
-│   ├── cache.test.ts
-│   ├── client.test.ts
-│   └── rate-limiter.test.ts
-└── client.test.ts        # Integration tests (hits real AniList API)
-```
-
 ## Development workflow
 
 ### Available scripts
@@ -62,7 +39,7 @@ tests/
 
 ### Typical flow
 
-1. Create a feature branch from `main`
+1. Create a feature branch from `dev`
 2. Make your changes
 3. Run `pnpm lint` — must pass with zero errors
 4. Run `pnpm test:unit` — all unit tests must pass
@@ -106,21 +83,52 @@ Guidelines:
 
 ### Integration tests
 
-Integration tests live in `tests/client.test.ts` and hit the real AniList API. They run with `tsx`.
+Integration tests live in `tests/integration/` and hit the real AniList API. They use Vitest (`pnpm test:integration`).
 
 - Keep them idempotent (read-only queries only)
 - Be mindful of rate limits — use small `perPage` values
 - These are **not** run in CI by default (they depend on network)
 
+## Project structure
+
+```
+src/
+├── client/          # AniList client class
+│   ├── index.ts     # AniListClient (constructor + core infra)
+│   ├── base.ts      # ClientBase interface (shared by domain modules)
+│   ├── media.ts     # Media methods (getMedia, searchMedia, getTrending, ...)
+│   ├── character.ts # Character methods
+│   ├── staff.ts     # Staff methods
+│   ├── user.ts      # User methods (getUser, searchUsers, getUserMediaList)
+│   └── studio.ts    # Studio methods
+├── queries/         # GraphQL queries
+│   ├── index.ts     # Barrel re-export
+│   ├── fragments.ts # Shared field fragments
+│   ├── media.ts     # Media queries
+│   ├── character.ts # Character queries
+│   ├── staff.ts     # Staff queries
+│   ├── user.ts      # User queries
+│   ├── studio.ts    # Studio queries
+│   ├── metadata.ts  # Genres + tags queries
+│   └── builders.ts  # Dynamic query builders + batch builders
+├── types/           # TypeScript interfaces & enums (one file per domain)
+├── cache/           # MemoryCache + CacheAdapter interface
+├── errors/          # AniListError class
+├── rate-limiter/    # Rate limiter with exponential backoff
+├── utils/           # Shared helpers (clampPerPage, normalizeQuery, chunk)
+└── index.ts         # Public barrel export
+```
+
 ## Adding a new API method
 
-1. **Define the type** in `src/types/index.ts` (response interface + options interface if needed)
-2. **Write the query** in `src/queries/index.ts`
-3. **Add the method** in `src/client/index.ts` — use `pagedRequest()` for paginated endpoints
-4. **Export** new types from `src/index.ts`
-5. **Write unit tests** in `tests/unit/client.test.ts`
-6. **Add an integration test** in `tests/client.test.ts`
-7. **Update the README** API reference table
+1. **Define the type** in the appropriate `src/types/*.ts` file (response interface + options if needed)
+2. **Write the query** in the matching `src/queries/*.ts` domain file and re-export from `src/queries/index.ts`
+3. **Add the implementation** as a standalone function in the matching `src/client/*.ts` domain file
+4. **Add the delegation method** to `AniListClient` in `src/client/index.ts`
+5. **Export** new types from `src/index.ts`
+6. **Write unit tests** in `tests/unit/`
+7. **Add an integration test** in `tests/integration/client.test.ts`
+8. **Update the docs** in `docs/`
 
 ## Commit conventions
 

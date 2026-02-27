@@ -3,6 +3,7 @@ export { AniListError } from "./errors";
 export { MemoryCache } from "./cache";
 export { RedisCache, type RedisCacheOptions, type RedisLikeClient } from "./cache/redis";
 export { RateLimiter } from "./rate-limiter";
+export { parseAniListMarkdown } from "./utils";
 export {
   MediaType,
   MediaSource,
@@ -19,6 +20,7 @@ export {
   MediaListSort,
   StaffSort,
   UserSort,
+  ThreadSort,
   type CacheAdapter,
   type CacheOptions,
   type RateLimitOptions,
@@ -31,8 +33,6 @@ export {
   type FuzzyDate,
   type Studio,
   type StudioConnection,
-  /** @deprecated Use `Studio` instead. */
-  type StudioDetail,
   type MediaEdge,
   type MediaConnection,
   type MediaCharacterEdge,
@@ -48,6 +48,8 @@ export {
   type MediaRecommendationNode,
   type NextAiringEpisode,
   type MediaIncludeOptions,
+  type WeeklySchedule,
+  type DayOfWeek,
   type Character,
   type CharacterName,
   type CharacterImage,
@@ -77,5 +79,9 @@ export {
   type GetSeasonOptions,
   type GetUserMediaListOptions,
   type GetRecommendationsOptions,
+  type Thread,
+  type ThreadCategory,
+  type ThreadMediaCategory,
+  type SearchThreadOptions,
   type AniListClientOptions,
 } from "./types";

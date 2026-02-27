@@ -135,11 +135,6 @@ describe("AniListClient (integration)", () => {
       expect(userById.name.toLowerCase()).toBe("anilist");
     });
 
-    it("getUserByName('AniList') (deprecated alias)", async () => {
-      const user = await client.getUserByName("AniList");
-      expect(user.name.toLowerCase()).toBe("anilist");
-    });
-
     it("searchUsers({ query: 'AniList' })", async () => {
       const result = await client.searchUsers({ query: "AniList", perPage: 5 });
       expect(result.results.length).toBeGreaterThan(0);
@@ -187,6 +182,16 @@ describe("AniListClient (integration)", () => {
       const result = await client.getPlanning({ type: MediaType.ANIME, perPage: 5 });
       expect(result.results.length).toBeGreaterThan(0);
       expect(result.results.every((m) => m.type === "ANIME")).toBe(true);
+    });
+
+    it("getWeeklySchedule() returns the current week's airing schedule", async () => {
+      const schedule = await client.getWeeklySchedule();
+      expect(schedule).toBeDefined();
+
+      const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+      for (const day of days) {
+        expect(Array.isArray(schedule[day as keyof typeof schedule])).toBe(true);
+      }
     });
   });
 
@@ -346,6 +351,37 @@ describe("AniListClient (integration)", () => {
       expect(tags.length).toBeGreaterThan(0);
       expect(typeof tags[0].id).toBe("number");
       expect(typeof tags[0].name).toBe("string");
+    });
+  });
+
+  // ── Threads ──
+
+  describe("Threads", () => {
+    it("getRecentThreads() returns forum threads", async () => {
+      const result = await client.getRecentThreads({ perPage: 3 });
+      expect(result.results.length).toBeGreaterThan(0);
+      expect(result.pageInfo).toBeDefined();
+      const thread = result.results[0];
+      expect(typeof thread.id).toBe("number");
+      expect(typeof thread.title).toBe("string");
+      expect(typeof thread.replyCount).toBe("number");
+    });
+
+    it("getThread(id) returns a specific thread", async () => {
+      const recent = await client.getRecentThreads({ perPage: 1 });
+      expect(recent.results.length).toBeGreaterThan(0);
+      const threadId = recent.results[0].id;
+
+      const thread = await client.getThread(threadId);
+      expect(thread.id).toBe(threadId);
+      expect(typeof thread.title).toBe("string");
+      expect(thread.user).toBeDefined();
+      expect(typeof thread.viewCount).toBe("number");
+    });
+
+    it("getRecentThreads({ query }) filters by search", async () => {
+      const result = await client.getRecentThreads({ query: "anime", perPage: 5 });
+      expect(Array.isArray(result.results)).toBe(true);
     });
   });
 

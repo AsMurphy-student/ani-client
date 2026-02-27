@@ -113,6 +113,20 @@ All values also have a `_DESC` counterpart where applicable.
 | `CHAPTERS_READ` | Sort by chapters read |
 | `SEARCH_MATCH` | Sort by relevance to search query |
 
+### ThreadSort
+
+| Value | Description |
+| --- | --- |
+| `ID` / `ID_DESC` | Sort by thread ID |
+| `TITLE` / `TITLE_DESC` | Sort by title |
+| `CREATED_AT` / `CREATED_AT_DESC` | Sort by creation date |
+| `UPDATED_AT` / `UPDATED_AT_DESC` | Sort by last update |
+| `REPLIED_AT` / `REPLIED_AT_DESC` | Sort by last reply (default: `REPLIED_AT_DESC`) |
+| `REPLY_COUNT` / `REPLY_COUNT_DESC` | Sort by number of replies |
+| `VIEW_COUNT` / `VIEW_COUNT_DESC` | Sort by view count |
+| `IS_STICKY` | Show sticky threads first |
+| `SEARCH_MATCH` | Sort by relevance to search query |
+
 ### AiringSort
 
 All values also have a `_DESC` counterpart.
@@ -230,10 +244,6 @@ Represents an animation studio. Fields `favourites` and `media` are populated wh
 | `favourites` | `number \| null` *(optional)* |
 | `media` | `{ pageInfo, nodes } \| null` *(optional)* |
 
-::: tip
-`StudioDetail` is a deprecated alias for `Studio`. Use `Studio` in new code.
-:::
-
 ### AiringSchedule
 
 | Field | Type |
@@ -294,6 +304,36 @@ Represents an animation studio. Fields `favourites` and `media` are populated wh
 | --- | --- | --- |
 | `query` | `string` | Search term |
 | `sort` | `UserSort[]` | Sort order |
+| `page` | `number` | Page number |
+| `perPage` | `number` | Results per page (max 50) |
+
+### Thread
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | `number` | Thread ID |
+| `title` | `string` | Thread title |
+| `body` | `string \| null` | Thread body (markdown) |
+| `userId` | `number` | Author user ID |
+| `user` | `{ id, name, avatar }` | Author user object |
+| `replyCount` | `number` | Number of replies |
+| `viewCount` | `number` | Number of views |
+| `isLocked` | `boolean` | Whether new comments are blocked |
+| `isSticky` | `boolean` | Pinned thread |
+| `repliedAt` | `number \| null` | Timestamp of last reply |
+| `createdAt` | `number` | Creation timestamp |
+| `categories` | `ThreadCategory[] \| null` | Forum categories |
+| `mediaCategories` | `ThreadMediaCategory[] \| null` | Related media |
+| `siteUrl` | `string \| null` | AniList URL |
+
+### SearchThreadOptions
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `query` | `string` | Search term |
+| `mediaId` | `number` | Filter by media ID |
+| `categoryId` | `number` | Filter by category ID |
+| `sort` | `ThreadSort[]` | Sort order (default: `REPLIED_AT_DESC`) |
 | `page` | `number` | Page number |
 | `perPage` | `number` | Results per page (max 50) |
 
