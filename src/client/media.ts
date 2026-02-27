@@ -13,6 +13,7 @@ import {
 import { MediaSort, MediaType } from "../types";
 import type {
   AiringSchedule,
+  DayOfWeek,
   GetAiringOptions,
   GetPlanningOptions,
   GetRecentChaptersOptions,
@@ -24,7 +25,6 @@ import type {
   Recommendation,
   SearchMediaOptions,
   WeeklySchedule,
-  DayOfWeek,
 } from "../types";
 
 import { clampPerPage } from "../utils";
