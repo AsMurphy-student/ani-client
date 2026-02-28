@@ -18,7 +18,7 @@
 
 The full API reference, usage guide, and configuration examples are available on our official documentation website!
 
-**[👉 View the full documentation here](https://docs-aniclient.gonzyuidev.xyz/)**
+**[👉 View the full documentation here](https://gonzyuidev.xyz/docs/aniclient/)**
 
 ## Install
 
