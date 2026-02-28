@@ -12,7 +12,9 @@
       "require": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "sideEffects": false,
   "scripts": {
     "build": "tsup",
@@ -28,7 +30,15 @@
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"
   },
-  "keywords": ["anilist", "anime", "manga", "graphql", "api", "client", "typescript"],
+  "keywords": [
+    "anilist",
+    "anime",
+    "manga",
+    "graphql",
+    "api",
+    "client",
+    "typescript"
+  ],
   "author": "gonzyui",
   "license": "MIT",
   "engines": {
@@ -38,7 +48,7 @@
     "type": "git",
     "url": "https://github.com/gonzyui/ani-client.git"
   },
-  "homepage": "https://docs-aniclient.gonzyuidev.xyz/",
+  "homepage": "https://gonzyuidev.xyz/docs/aniclient/",
   "bugs": {
     "url": "https://github.com/gonzyui/ani-client/issues"
   },
