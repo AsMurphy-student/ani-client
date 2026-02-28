@@ -1,6 +1,6 @@
 # ani-client 
 
-![ani-client logo](docs/assets/logo.png)
+![ani-client logo](docs/public/assets/logo.png)
 [![CI](https://github.com/gonzyui/ani-client/actions/workflows/ci.yml/badge.svg)](https://github.com/gonzyui/ani-client/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/ani-client)](https://www.npmjs.com/package/ani-client)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
