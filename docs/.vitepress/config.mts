@@ -3,7 +3,7 @@ import { defineConfig } from "vitepress";
 export default defineConfig({
   title: "ani-client",
   description: "A simple, typed client to fetch anime, manga, character, staff and user data from AniList.",
-  head: [["link", { rel: "icon", href: "/public/assets/favicons/favicon.ico", type: "image/x-icon" }]],
+  head: [["link", { rel: "icon", href: "/assets/favicons/favicon.ico", type: "image/x-icon" }]],
   cleanUrls: true,
   lastUpdated: true,
 
@@ -15,7 +15,7 @@ export default defineConfig({
       { text: "Showcase", link: "/showcase" },
       { text: "Changelog", link: "/changelog" },
     ],
-    logo: "/public/assets/logo.png",
+    logo: "/assets/logo.png",
 
     sidebar: {
       "/guide/": [
