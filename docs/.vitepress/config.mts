@@ -3,7 +3,7 @@ import { defineConfig } from "vitepress";
 export default defineConfig({
   title: "ani-client",
   description: "A simple, typed client to fetch anime, manga, character, staff and user data from AniList.",
-
+  head: [["link", { rel: "icon", href: "/assets/favicons/favicon.ico", type: "image/x-icon" }]],
   cleanUrls: true,
   lastUpdated: true,
 
@@ -15,6 +15,7 @@ export default defineConfig({
       { text: "Showcase", link: "/showcase" },
       { text: "Changelog", link: "/changelog" },
     ],
+    logo: "/assets/logo.png",
 
     sidebar: {
       "/guide/": [
@@ -55,7 +56,10 @@ export default defineConfig({
       ],
     },
 
-    socialLinks: [{ icon: "github", link: "https://github.com/gonzyui/ani-client" }],
+    socialLinks: [
+      { icon: "github", link: "https://github.com/gonzyui/ani-client" },
+      { icon: "npm", link: "https://www.npmjs.com/package/ani-client" },
+    ],
 
     search: {
       provider: "local",
@@ -63,7 +67,7 @@ export default defineConfig({
 
     footer: {
       message: "Released under the MIT License.",
-      copyright: "Copyright © gonzyui",
+      copyright: "Copyright © <a href='https://github.com/gonzyui'>gonzyui</a>",
     },
   },
 });

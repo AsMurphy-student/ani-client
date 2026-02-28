@@ -1,5 +1,6 @@
-# ani-client
+# ani-client 
 
+![ani-client logo](docs/assets/logo.png)
 [![CI](https://github.com/gonzyui/ani-client/actions/workflows/ci.yml/badge.svg)](https://github.com/gonzyui/ani-client/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/ani-client)](https://www.npmjs.com/package/ani-client)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -17,7 +18,7 @@
 
 The full API reference, usage guide, and configuration examples are available on our official documentation website!
 
-**[👉 View the full documentation here](https://docs-aniclient.gonzyuidev.xyz/)**
+**[👉 View the full documentation here](https://gonzyuidev.xyz/docs/aniclient/)**
 
 ## Install
 
