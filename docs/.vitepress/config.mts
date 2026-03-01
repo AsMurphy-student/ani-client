@@ -1,7 +1,7 @@
 import { defineConfig } from "vitepress";
 
 export default defineConfig({
-  base: '/docs/aniclient',
+  base: '/projects/aniclient',
   title: "ani-client",
   description: "A simple, typed client to fetch anime, manga, character, staff and user data from AniList.",
   head: [["link", { rel: "icon", href: "./assets/favicon.ico", type: "image/x-icon" }]],
