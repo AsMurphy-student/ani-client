@@ -99,8 +99,9 @@ src/
 │   ├── media.ts     # Media methods (getMedia, searchMedia, getTrending, ...)
 │   ├── character.ts # Character methods
 │   ├── staff.ts     # Staff methods
-│   ├── user.ts      # User methods (getUser, searchUsers, getUserMediaList)
-│   └── studio.ts    # Studio methods
+│   ├── user.ts      # User methods (getUser, searchUsers, getUserMediaList, getUserFavorites)
+│   ├── studio.ts    # Studio methods
+│   └── thread.ts    # Thread methods (getThread, getRecentThreads)
 ├── queries/         # GraphQL queries
 │   ├── index.ts     # Barrel re-export
 │   ├── fragments.ts # Shared field fragments
@@ -109,13 +110,14 @@ src/
 │   ├── staff.ts     # Staff queries
 │   ├── user.ts      # User queries
 │   ├── studio.ts    # Studio queries
+│   ├── thread.ts    # Thread queries
 │   ├── metadata.ts  # Genres + tags queries
 │   └── builders.ts  # Dynamic query builders + batch builders
 ├── types/           # TypeScript interfaces & enums (one file per domain)
-├── cache/           # MemoryCache + CacheAdapter interface
+├── cache/           # MemoryCache + RedisCache + CacheAdapter interface
 ├── errors/          # AniListError class
 ├── rate-limiter/    # Rate limiter with exponential backoff
-├── utils/           # Shared helpers (clampPerPage, normalizeQuery, chunk)
+├── utils/           # Shared helpers (clampPerPage, normalizeQuery, chunk, validateId)
 └── index.ts         # Public barrel export
 ```
 

@@ -51,8 +51,36 @@ const client = new AniListClient({
   hooks: {
     onRequest: (query, variables) => console.log('Firing request!'),
     onRateLimit: (retryAfterMs) => console.warn(`Hold on, wait ${retryAfterMs}ms`),
-  }
+  },
+
+  // Cancel all in-flight requests from this client (optional)
+  signal: AbortSignal.timeout(30_000),
 });
 ```
 
 See the [Caching](./caching) or [Rate Limiting](./rate-limiting) docs to learn more about advanced integrations like Redis!
+
+## Request Cancellation
+
+You can pass an `AbortSignal` to cancel all in-flight requests when you no longer need them:
+
+```typescript
+const controller = new AbortController();
+
+const client = new AniListClient({ signal: controller.signal });
+
+// Cancel all requests after 5 seconds
+setTimeout(() => controller.abort(), 5_000);
+
+try {
+  const anime = await client.getMedia(1);
+} catch (err) {
+  if (err.name === "AbortError") {
+    console.log("Request was cancelled!");
+  }
+}
+```
+
+::: tip
+You can also use `AbortSignal.timeout(ms)` for a built-in timeout mechanism.
+:::

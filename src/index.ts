@@ -84,4 +84,11 @@ export {
   type ThreadMediaCategory,
   type SearchThreadOptions,
   type AniListClientOptions,
+  type RateLimitInfo,
+  type ResponseMeta,
+  type UserFavorites,
+  type FavoriteMediaNode,
+  type FavoriteCharacterNode,
+  type FavoriteStaffNode,
+  type FavoriteStudioNode,
 } from "./types";

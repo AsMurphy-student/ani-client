@@ -23,7 +23,9 @@ import type {
   MediaType,
   PageInfo,
   PagedResult,
+  RateLimitInfo,
   Recommendation,
+  ResponseMeta,
   SearchCharacterOptions,
   SearchMediaOptions,
   SearchStaffOptions,
@@ -35,9 +37,10 @@ import type {
   Studio,
   Thread,
   User,
+  UserFavorites,
   WeeklySchedule,
 } from "../types";
-import { chunk, clampPerPage, normalizeQuery } from "../utils";
+import { chunk, clampPerPage, normalizeQuery, validateId, validateIds } from "../utils";
 
 import * as characterMethods from "./character";
 // ── Domain method imports ──
@@ -73,7 +76,10 @@ export class AniListClient {
   private readonly cacheAdapter: CacheAdapter;
   private readonly rateLimiter: RateLimiter;
   private readonly hooks: AniListHooks;
+  private readonly signal?: AbortSignal;
   private readonly inFlight = new Map<string, Promise<unknown>>();
+  private _rateLimitInfo?: RateLimitInfo;
+  private _lastRequestMeta?: ResponseMeta;
 
   constructor(options: AniListClientOptions = {}) {
     this.apiUrl = options.apiUrl ?? DEFAULT_API_URL;
@@ -87,6 +93,23 @@ export class AniListClient {
     this.cacheAdapter = options.cacheAdapter ?? new MemoryCache(options.cache);
     this.rateLimiter = new RateLimiter(options.rateLimit);
     this.hooks = options.hooks ?? {};
+    this.signal = options.signal;
+  }
+
+  /**
+   * The current rate limit information from the last API response.
+   * Updated after every non-cached request.
+   */
+  get rateLimitInfo(): RateLimitInfo | undefined {
+    return this._rateLimitInfo;
+  }
+
+  /**
+   * Metadata about the last request (duration, cache status, rate limit info).
+   * Useful for debugging and monitoring.
+   */
+  get lastRequestMeta(): ResponseMeta | undefined {
+    return this._lastRequestMeta;
   }
 
   // ── Core infrastructure (internal) ──
@@ -98,6 +121,8 @@ export class AniListClient {
     const cached = await this.cacheAdapter.get<T>(cacheKey);
     if (cached !== undefined) {
       this.hooks.onCacheHit?.(cacheKey);
+      const meta: ResponseMeta = { durationMs: 0, fromCache: true };
+      this._lastRequestMeta = meta;
       this.hooks.onResponse?.(query, 0, true);
       return cached;
     }
@@ -128,6 +153,7 @@ export class AniListClient {
         method: "POST",
         headers: this.headers,
         body: JSON.stringify({ query: minifiedQuery, variables }),
+        signal: this.signal,
       },
       { onRetry: this.hooks.onRetry, onRateLimit: this.hooks.onRateLimit },
     );
@@ -140,9 +166,25 @@ export class AniListClient {
       throw new AniListError(message, res.status, json.errors ?? []);
     }
 
+    // Parse rate limit headers
+    const rlLimit = res.headers.get("X-RateLimit-Limit");
+    const rlRemaining = res.headers.get("X-RateLimit-Remaining");
+    const rlReset = res.headers.get("X-RateLimit-Reset");
+    if (rlLimit && rlRemaining && rlReset) {
+      this._rateLimitInfo = {
+        limit: Number.parseInt(rlLimit, 10),
+        remaining: Number.parseInt(rlRemaining, 10),
+        reset: Number.parseInt(rlReset, 10),
+      };
+    }
+
+    const durationMs = Date.now() - start;
     const data = json.data as T;
     await this.cacheAdapter.set(cacheKey, data);
-    this.hooks.onResponse?.(query, Date.now() - start, false);
+
+    const meta: ResponseMeta = { durationMs, fromCache: false, rateLimitInfo: this._rateLimitInfo };
+    this._lastRequestMeta = meta;
+    this.hooks.onResponse?.(query, durationMs, false, this._rateLimitInfo);
     return data;
   }
 
@@ -273,6 +315,22 @@ export class AniListClient {
     return userMethods.getUserMediaList(this, options);
   }
 
+  /**
+   * Fetch a user's favorite anime, manga, characters, staff, and studios.
+   *
+   * @param idOrName - AniList user ID (number) or username (string)
+   * @returns The user's favorites grouped by category
+   *
+   * @example
+   * ```typescript
+   * const favs = await client.getUserFavorites("AniList");
+   * favs.anime.forEach(a => console.log(a.title.romaji));
+   * ```
+   */
+  async getUserFavorites(idOrName: number | string): Promise<UserFavorites> {
+    return userMethods.getUserFavorites(this, idOrName);
+  }
+
   // ── Studios ──
 
   /** Fetch a studio by its AniList ID. */
@@ -348,6 +406,7 @@ export class AniListClient {
   /** Fetch multiple media entries in a single API request. */
   async getMediaBatch(ids: number[]): Promise<Media[]> {
     if (ids.length === 0) return [];
+    validateIds(ids, "mediaId");
     if (ids.length === 1) return [await this.getMedia(ids[0])];
     return this.executeBatch<Media>(ids, buildBatchMediaQuery, "m");
   }
@@ -355,6 +414,7 @@ export class AniListClient {
   /** Fetch multiple characters in a single API request. */
   async getCharacterBatch(ids: number[]): Promise<Character[]> {
     if (ids.length === 0) return [];
+    validateIds(ids, "characterId");
     if (ids.length === 1) return [await this.getCharacter(ids[0])];
     return this.executeBatch<Character>(ids, buildBatchCharacterQuery, "c");
   }
@@ -362,6 +422,7 @@ export class AniListClient {
   /** Fetch multiple staff members in a single API request. */
   async getStaffBatch(ids: number[]): Promise<Staff[]> {
     if (ids.length === 0) return [];
+    validateIds(ids, "staffId");
     if (ids.length === 1) return [await this.getStaff(ids[0])];
     return this.executeBatch<Staff>(ids, buildBatchStaffQuery, "s");
   }
@@ -369,12 +430,13 @@ export class AniListClient {
   /** @internal */
   private async executeBatch<T>(ids: number[], buildQuery: (ids: number[]) => string, prefix: string): Promise<T[]> {
     const chunks = chunk(ids, 50);
-    const chunkResults: T[][] = [];
-    for (const idChunk of chunks) {
-      const query = buildQuery(idChunk);
-      const data = await this.request<Record<string, T>>(query);
-      chunkResults.push(idChunk.map((_, i) => data[`${prefix}${i}`]));
-    }
+    const chunkResults = await Promise.all(
+      chunks.map(async (idChunk) => {
+        const query = buildQuery(idChunk);
+        const data = await this.request<Record<string, T>>(query);
+        return idChunk.map((_, i) => data[`${prefix}${i}`]);
+      }),
+    );
     return chunkResults.flat();
   }
 

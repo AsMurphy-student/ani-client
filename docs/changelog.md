@@ -1,5 +1,42 @@
 # Changelog
 
+## [1.6.0] — 2026-03-02
+
+### Added
+- **`AbortSignal` support** — New `signal` option in `AniListClientOptions` allows cancelling all in-flight requests via `AbortController` or `AbortSignal.timeout()`.
+- **Input validation** — All `get*` methods now validate IDs before sending requests. Invalid values (negative, zero, `NaN`, `Infinity`, non-integer) throw a `RangeError` immediately.
+- **`getUserFavorites(idOrName)`** — New method to fetch a user's favorite anime, manga, characters, staff, and studios. Supports both user ID and username.
+- **Custom retry strategy** — New `retryStrategy` option in `RateLimitOptions` allows overriding the default exponential backoff with a custom delay function.
+- **Rate limit headers tracking** — New `client.rateLimitInfo` getter exposes `X-RateLimit-Limit`, `X-RateLimit-Remaining`, and `X-RateLimit-Reset` parsed from API responses.
+- **Response metadata** — New `client.lastRequestMeta` getter providing `durationMs`, `fromCache`, and `rateLimitInfo` for the last request. The `onResponse` hook now receives `rateLimitInfo` as a 4th argument.
+- **`validateId()` / `validateIds()`** — New utility functions for ID validation, exported internally.
+- **`sortObjectKeys()`** — New utility for deep-sorting object keys recursively, used internally for deterministic cache keys.
+- **New types** — `UserFavorites`, `FavoriteMediaNode`, `FavoriteCharacterNode`, `FavoriteStaffNode`, `FavoriteStudioNode`, `RateLimitInfo`, `ResponseMeta`.
+- **77 new unit tests** — `utils.test.ts` (26), `builders.test.ts` (16), `errors.test.ts` (12), `redis-cache.test.ts` (13), `features.test.ts` (10). Total: **129 unit tests**.
+
+### Changed
+- **Parallel batch execution** — `executeBatch` (used by `getMediaBatch`, `getCharacterBatch`, `getStaffBatch`) now processes chunks with `Promise.all` instead of sequentially, significantly reducing latency for large batches.
+- **Deterministic cache keys** — `MemoryCache.key()` now uses recursive deep-sorting via `sortObjectKeys()` instead of shallow `JSON.stringify` replacer, fixing cache misses when nested variable objects had different key ordering.
+- **Pre-compiled regex** — `normalizeQuery()` regex extracted to module-level `WHITESPACE_RE` constant for marginal performance gains.
+- **`getWeeklySchedule` optimization** — Day-of-week names array moved outside the `for await` loop to avoid unnecessary re-allocation.
+
+### Fixed
+- **Broken README links** — Removed trailing escaped quotes (`\"`) from two markdown URLs.
+- **`pnpm-workspace.yaml` now tracked** — Removed from `.gitignore` so contributors get consistent installs.
+- **`CONTRIBUTING.md`** — Added missing `thread.ts` to the project structure section, updated `cache/` and `utils/` descriptions.
+
+### CI/CD
+- **`dev` branch triggers** — CI now runs on `push`/`pull_request` to both `main` and `dev` branches.
+- **`tsc --noEmit` type check** — Added to CI pipeline between lint and build steps.
+- **Pinned `pnpm/action-setup@v4.1.0`** — In both `ci.yml` and `publish.yml` for reproducible builds.
+
+### Docs
+- **Request Cancellation guide** — New section in Getting Started documenting `AbortSignal` usage with examples.
+- **Input Validation docs** — New section in API Reference with error examples.
+- **Batch queries** — Updated wording from "sequential" to "parallel" to reflect the new behavior, added validation tip.
+- **`getTags()` section** — Fixed missing method header in API Reference (was merged with `getGenres()`).
+- **`AniListClientOptions.signal`** — Documented in both API Reference and Types & Enums.
+
 ## [1.5.1] — 2026-02-26
 
 ### Added

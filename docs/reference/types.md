@@ -351,6 +351,7 @@ interface AniListClientOptions {
   cacheAdapter?: CacheAdapter; // Custom adapter (e.g. RedisCache)
   rateLimit?: RateLimitOptions;
   hooks?: AniListHooks;
+  signal?: AbortSignal;     // Cancel all requests (optional)
 }
 ```
 
@@ -372,10 +373,11 @@ interface AniListClientOptions {
 | `retryDelayMs` | `number` | `2_000` | Base retry delay (exponential backoff applied) |
 | `timeoutMs` | `number` | `30_000` | Per-request timeout (0 = off) |
 | `retryOnNetworkError` | `boolean` | `true` | Retry on ECONNRESET, etc. |
+| `retryStrategy` | `(attempt, baseDelayMs) => number` | `undefined` | Custom retry delay function (overrides exponential backoff) |
 | `enabled` | `boolean` | `true` | Disable rate limiting |
 
 ::: tip
-Retries use **exponential backoff with jitter** (capped at 30s). The `retryDelayMs` is the base delay.
+When `retryStrategy` is not provided, retries use **exponential backoff with jitter** (capped at 30s). The `retryDelayMs` is the base delay.
 :::
 
 ### CacheAdapter
@@ -402,4 +404,38 @@ interface CacheAdapter {
 | `onCacheHit` | `(key) => void` | Response served from cache |
 | `onRateLimit` | `(retryAfterMs) => void` | HTTP 429 received |
 | `onRetry` | `(attempt, reason, delayMs) => void` | Request retried |
-| `onResponse` | `(query, durationMs, fromCache) => void` | Request completed |
+| `onResponse` | `(query, durationMs, fromCache, rateLimitInfo?) => void` | Request completed |
+
+---
+
+### RateLimitInfo
+
+Parsed from `X-RateLimit-*` API response headers. Accessible via `client.rateLimitInfo`.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `limit` | `number` | Max requests allowed per window |
+| `remaining` | `number` | Requests remaining in current window |
+| `reset` | `number` | UNIX timestamp (seconds) when the window resets |
+
+### ResponseMeta
+
+Metadata about the last request. Accessible via `client.lastRequestMeta`.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `durationMs` | `number` | Request duration in ms |
+| `fromCache` | `boolean` | Whether the response was served from cache |
+| `rateLimitInfo` | `RateLimitInfo?` | Rate limit info (only for non-cached requests) |
+
+### UserFavorites
+
+Returned by `getUserFavorites()`. Contains arrays of lightweight nodes for each category.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `anime` | `FavoriteMediaNode[]` | Favorite anime (id, title, coverImage, type, format, siteUrl) |
+| `manga` | `FavoriteMediaNode[]` | Favorite manga |
+| `characters` | `FavoriteCharacterNode[]` | Favorite characters (id, name, image, siteUrl) |
+| `staff` | `FavoriteStaffNode[]` | Favorite staff (id, name, image, siteUrl) |
+| `studios` | `FavoriteStudioNode[]` | Favorite studios (id, name, siteUrl) |

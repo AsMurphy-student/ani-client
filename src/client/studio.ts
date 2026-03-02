@@ -2,10 +2,11 @@ import { QUERY_STUDIO_BY_ID, QUERY_STUDIO_SEARCH } from "../queries";
 
 import type { PagedResult, SearchStudioOptions, Studio } from "../types";
 
-import { clampPerPage } from "../utils";
+import { clampPerPage, validateId } from "../utils";
 import type { ClientBase } from "./base";
 
 export async function getStudio(client: ClientBase, id: number): Promise<Studio> {
+  validateId(id, "studioId");
   const data = await client.request<{ Studio: Studio }>(QUERY_STUDIO_BY_ID, { id });
   return data.Studio;
 }

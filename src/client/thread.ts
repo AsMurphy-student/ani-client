@@ -1,10 +1,11 @@
 import { QUERY_THREAD_BY_ID, QUERY_THREAD_SEARCH } from "../queries";
 import type { PagedResult, SearchThreadOptions, Thread } from "../types";
 import { ThreadSort } from "../types";
-import { clampPerPage } from "../utils";
+import { clampPerPage, validateId } from "../utils";
 import type { ClientBase } from "./base";
 
 export async function getThread(client: ClientBase, id: number): Promise<Thread> {
+  validateId(id, "threadId");
   const data = await client.request<{ Thread: Thread }>(QUERY_THREAD_BY_ID, { id });
   return data.Thread;
 }

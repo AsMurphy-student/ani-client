@@ -206,6 +206,55 @@ export const USER_FIELDS = `
   }
 `;
 
+/** Favorites fragment — lightweight fields for each favorite category. */
+export const USER_FAVORITES_FIELDS = `
+  favourites {
+    anime(perPage: 25) {
+      nodes {
+        id
+        title { romaji english native userPreferred }
+        coverImage { large medium }
+        type
+        format
+        siteUrl
+      }
+    }
+    manga(perPage: 25) {
+      nodes {
+        id
+        title { romaji english native userPreferred }
+        coverImage { large medium }
+        type
+        format
+        siteUrl
+      }
+    }
+    characters(perPage: 25) {
+      nodes {
+        id
+        name { full native }
+        image { large medium }
+        siteUrl
+      }
+    }
+    staff(perPage: 25) {
+      nodes {
+        id
+        name { full native }
+        image { large medium }
+        siteUrl
+      }
+    }
+    studios(perPage: 25) {
+      nodes {
+        id
+        name
+        siteUrl
+      }
+    }
+  }
+`;
+
 export const MEDIA_LIST_FIELDS = `
   id
   mediaId

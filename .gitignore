@@ -4,7 +4,6 @@ dist/
 *.env
 *.log
 .DS_Store
-pnpm-workspace.yaml
 
 # Docs
 docs/.vitepress/dist

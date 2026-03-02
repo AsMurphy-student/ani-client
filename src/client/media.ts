@@ -27,12 +27,13 @@ import type {
   WeeklySchedule,
 } from "../types";
 
-import { clampPerPage } from "../utils";
+import { clampPerPage, validateId } from "../utils";
 import type { ClientBase } from "./base";
 
 // ── Media methods ──
 
 export async function getMedia(client: ClientBase, id: number, include?: MediaIncludeOptions): Promise<Media> {
+  validateId(id, "mediaId");
   const query = buildMediaByIdQuery(include);
   const data = await client.request<{ Media: Media }>(query, { id });
   return data.Media;
@@ -203,9 +204,10 @@ export async function getWeeklySchedule(client: ClientBase, date: Date = new Dat
     }),
   );
 
+  const names: DayOfWeek[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
   for await (const episode of iterator) {
     const epDate = new Date(episode.airingAt * 1000);
-    const names: DayOfWeek[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const dayName = names[epDate.getDay()];
     schedule[dayName].push(episode);
   }

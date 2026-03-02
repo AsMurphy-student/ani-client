@@ -7,7 +7,7 @@
 
 > A simple, typed client to fetch anime, manga, character, staff and user data from [AniList](https://anilist.co).
 
-✨ **Showcase**: [Check here](https://gonzyuidev.xyz/projects/aniclient/showcase") to see which projects use this package!
+✨ **Showcase**: [Check here](https://gonzyuidev.xyz/projects/aniclient/showcase) to see which projects use this package!
 
 - **Zero dependencies** — uses the native `fetch` API
 - **Universal** — Node.js ≥ 20, Bun, Deno and modern browsers
@@ -18,7 +18,7 @@
 
 The full API reference, usage guide, and configuration examples are available on our official documentation website!
 
-**[👉 View the full documentation here](https://gonzyuidev.xyz/projects/aniclient/")**
+**[👉 View the full documentation here](https://gonzyuidev.xyz/projects/aniclient/)**
 
 ## Install
 
@@ -54,6 +54,43 @@ const results = await client.searchMedia({
   perPage: 5,
 });
 console.log(results.results.map((m) => m.title.english));
+```
+
+### Fetch user favorites
+
+```ts
+const favs = await client.getUserFavorites("AniList");
+
+favs.anime.forEach((a) => console.log(a.title.romaji));
+favs.characters.forEach((c) => console.log(c.name.full));
+```
+
+### Monitor rate limits
+
+```ts
+const client = new AniListClient({
+  rateLimit: {
+    retryStrategy: (attempt) => (attempt + 1) * 1000, // linear backoff
+  },
+});
+
+await client.getMedia(1);
+
+const info = client.rateLimitInfo;
+console.log(`${info?.remaining}/${info?.limit} requests remaining`);
+
+const meta = client.lastRequestMeta;
+console.log(`${meta?.durationMs}ms, cache: ${meta?.fromCache}`);
+```
+
+### Cancel requests
+
+```ts
+const controller = new AbortController();
+const client = new AniListClient({ signal: controller.signal });
+
+setTimeout(() => controller.abort(), 5_000);
+await client.getMedia(1); // aborted after 5s
 ```
 
 ## Contributing

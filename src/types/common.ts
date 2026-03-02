@@ -73,6 +73,16 @@ export interface RateLimitOptions {
   timeoutMs?: number;
   /** Retry on network errors like ECONNRESET / ETIMEDOUT (default: true) */
   retryOnNetworkError?: boolean;
+  /**
+   * Custom retry delay strategy. Receives the attempt number (0-based) and the base delay,
+   * and should return the delay in ms before retrying.
+   * When omitted, the default exponential backoff with jitter is used.
+   *
+   * @example
+   * // Linear backoff: 1s, 2s, 3s, ...
+   * retryStrategy: (attempt) => (attempt + 1) * 1000
+   */
+  retryStrategy?: (attempt: number, baseDelayMs: number) => number;
 }
 
 /** Event hooks for logging, debugging, and monitoring. */
@@ -86,7 +96,27 @@ export interface AniListHooks {
   /** Called when a request is retried (429 or network error). */
   onRetry?: (attempt: number, reason: string, delayMs: number) => void;
   /** Called when a request completes. */
-  onResponse?: (query: string, durationMs: number, fromCache: boolean) => void;
+  onResponse?: (query: string, durationMs: number, fromCache: boolean, rateLimitInfo?: RateLimitInfo) => void;
+}
+
+/** Rate limit information parsed from AniList API response headers. */
+export interface RateLimitInfo {
+  /** Maximum number of requests allowed per window. */
+  limit: number;
+  /** Remaining requests in the current window. */
+  remaining: number;
+  /** UNIX timestamp (seconds) when the rate limit window resets. */
+  reset: number;
+}
+
+/** Metadata about the last request, useful for debugging and monitoring. */
+export interface ResponseMeta {
+  /** Duration of the request in milliseconds. */
+  durationMs: number;
+  /** Whether the response was served from cache. */
+  fromCache: boolean;
+  /** Rate limit information from the API response headers (not present for cached responses). */
+  rateLimitInfo?: RateLimitInfo;
 }
 
 export interface AniListClientOptions {
@@ -102,4 +132,6 @@ export interface AniListClientOptions {
   rateLimit?: RateLimitOptions;
   /** Event hooks for logging, debugging, and monitoring */
   hooks?: AniListHooks;
+  /** Optional AbortSignal to cancel all requests made by this client */
+  signal?: AbortSignal;
 }

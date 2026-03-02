@@ -1,4 +1,4 @@
-import { MEDIA_LIST_FIELDS, USER_FIELDS } from "./fragments";
+import { MEDIA_LIST_FIELDS, USER_FAVORITES_FIELDS, USER_FIELDS } from "./fragments";
 
 export const QUERY_USER_BY_ID = `
 query ($id: Int!) {
@@ -31,5 +31,23 @@ query ($userId: Int, $userName: String, $type: MediaType!, $status: MediaListSta
     mediaList(userId: $userId, userName: $userName, type: $type, status: $status, sort: $sort) {
       ${MEDIA_LIST_FIELDS}
     }
+  }
+}`;
+
+export const QUERY_USER_FAVORITES_BY_ID = `
+query ($id: Int!) {
+  User(id: $id) {
+    id
+    name
+    ${USER_FAVORITES_FIELDS}
+  }
+}`;
+
+export const QUERY_USER_FAVORITES_BY_NAME = `
+query ($name: String!) {
+  User(name: $name) {
+    id
+    name
+    ${USER_FAVORITES_FIELDS}
   }
 }`;

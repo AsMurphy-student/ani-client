@@ -199,6 +199,22 @@ Get a user's anime or manga list. Requires `userId` or `userName` and `type`.
 
 **Returns:** `Promise<PagedResult<MediaListEntry>>`
 
+### `getUserFavorites(idOrName)`
+
+Fetch a user's favorite anime, manga, characters, staff, and studios.
+
+| Param | Type | Description |
+| --- | --- | --- |
+| `idOrName` | `number \| string` | AniList user ID or username |
+
+**Returns:** `Promise<UserFavorites>`
+
+```typescript
+const favs = await client.getUserFavorites("AniList");
+favs.anime.forEach(a => console.log(a.title.romaji));
+favs.characters.forEach(c => console.log(c.name.full));
+```
+
 ---
 
 ## Studios
@@ -265,6 +281,10 @@ const mediaThreads = await client.getRecentThreads({ mediaId: 1, perPage: 5 });
 Get all available genres on AniList.
 
 **Returns:** `Promise<string[]>`
+
+### `getTags()`
+
+Get all available media tags on AniList.
 
 **Returns:** `Promise<MediaTag[]>`
 
@@ -394,4 +414,20 @@ try {
     console.error(err.errors);  // Raw error array
   }
 }
+```
+
+### Input Validation
+
+All `get*` methods validate their ID parameter before making any request. Invalid IDs (negative, zero, `NaN`, `Infinity`, non-integer) throw a `RangeError` synchronously:
+
+```typescript
+await client.getMedia(-1);    // RangeError: Invalid mediaId: expected a positive integer, got -1
+await client.getMedia(NaN);   // RangeError: Invalid mediaId: expected a positive integer, got NaN
+await client.getMedia(1);     // OK
+```
+
+Batch methods validate all IDs before sending any requests:
+
+```typescript
+await client.getMediaBatch([1, -1]); // RangeError — fails fast before any API call
 ```

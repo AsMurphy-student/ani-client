@@ -18,7 +18,14 @@ export {
   QUERY_CHARACTER_SEARCH_WITH_VA,
 } from "./character";
 export { QUERY_STAFF_BY_ID, QUERY_STAFF_BY_ID_WITH_MEDIA, QUERY_STAFF_SEARCH } from "./staff";
-export { QUERY_USER_BY_ID, QUERY_USER_BY_NAME, QUERY_USER_SEARCH, QUERY_USER_MEDIA_LIST } from "./user";
+export {
+  QUERY_USER_BY_ID,
+  QUERY_USER_BY_NAME,
+  QUERY_USER_SEARCH,
+  QUERY_USER_MEDIA_LIST,
+  QUERY_USER_FAVORITES_BY_ID,
+  QUERY_USER_FAVORITES_BY_NAME,
+} from "./user";
 export { QUERY_STUDIO_BY_ID, QUERY_STUDIO_SEARCH } from "./studio";
 export { QUERY_GENRES, QUERY_TAGS } from "./metadata";
 export { buildMediaByIdQuery, buildBatchMediaQuery, buildBatchCharacterQuery, buildBatchStaffQuery } from "./builders";
