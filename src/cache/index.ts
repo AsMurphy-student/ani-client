@@ -1,5 +1,5 @@
 import type { CacheAdapter, CacheOptions } from "../types";
-import { normalizeQuery } from "../utils";
+import { normalizeQuery, sortObjectKeys } from "../utils";
 
 /**
  * Simple in-memory cache with configurable TTL.
@@ -29,7 +29,7 @@ export class MemoryCache implements CacheAdapter {
   /** Build a deterministic cache key from a query + variables pair. */
   static key(query: string, variables: Record<string, unknown>): string {
     const normalized = normalizeQuery(query);
-    return `${normalized}|${JSON.stringify(variables, Object.keys(variables).sort())}`;
+    return `${normalized}|${JSON.stringify(sortObjectKeys(variables))}`;
   }
 
   /** Retrieve a cached value, or `undefined` if missing / expired. */

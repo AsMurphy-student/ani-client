@@ -102,4 +102,6 @@ export interface AniListClientOptions {
   rateLimit?: RateLimitOptions;
   /** Event hooks for logging, debugging, and monitoring */
   hooks?: AniListHooks;
+  /** Optional AbortSignal to cancel all requests made by this client */
+  signal?: AbortSignal;
 }

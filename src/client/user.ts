@@ -3,11 +3,12 @@ import { QUERY_USER_BY_ID, QUERY_USER_BY_NAME, QUERY_USER_MEDIA_LIST, QUERY_USER
 import type { GetUserMediaListOptions, MediaListEntry, PagedResult, SearchUserOptions, User } from "../types";
 
 import { AniListError } from "../errors";
-import { clampPerPage } from "../utils";
+import { clampPerPage, validateId } from "../utils";
 import type { ClientBase } from "./base";
 
 export async function getUser(client: ClientBase, idOrName: number | string): Promise<User> {
   if (typeof idOrName === "number") {
+    validateId(idOrName, "userId");
     const data = await client.request<{ User: User }>(QUERY_USER_BY_ID, { id: idOrName });
     return data.User;
   }

@@ -7,7 +7,7 @@ import {
 
 import type { Character, CharacterIncludeOptions, PagedResult, SearchCharacterOptions } from "../types";
 
-import { clampPerPage } from "../utils";
+import { clampPerPage, validateId } from "../utils";
 import type { ClientBase } from "./base";
 
 export async function getCharacter(
@@ -15,6 +15,7 @@ export async function getCharacter(
   id: number,
   include?: CharacterIncludeOptions,
 ): Promise<Character> {
+  validateId(id, "characterId");
   const query = include?.voiceActors ? QUERY_CHARACTER_BY_ID_WITH_VA : QUERY_CHARACTER_BY_ID;
   const data = await client.request<{ Character: Character }>(query, { id });
   return data.Character;

@@ -2,6 +2,8 @@
  * Utility functions for internal use.
  */
 
+const WHITESPACE_RE = /\s+/g;
+
 /**
  * Normalize a GraphQL query string by collapsing all whitespace.
  * Used for cache key generation and request body minification.
@@ -11,7 +13,7 @@
  * @returns The whitespace-normalized query
  */
 export function normalizeQuery(query: string): string {
-  return query.replace(/\s+/g, " ").trim();
+  return query.replace(WHITESPACE_RE, " ").trim();
 }
 
 /**
@@ -41,6 +43,49 @@ export function chunk<T>(arr: T[], size: number): T[][] {
     chunks.push(arr.slice(i, i + size));
   }
   return chunks;
+}
+
+/**
+ * Validate that a value is a finite positive integer (valid AniList ID).
+ *
+ * @internal
+ * @param id - The ID to validate
+ * @param label - Label for the error message (e.g. "mediaId")
+ * @throws {RangeError} If the ID is not a finite positive integer
+ */
+export function validateId(id: number, label = "id"): void {
+  if (!Number.isFinite(id) || !Number.isInteger(id) || id < 1) {
+    throw new RangeError(`Invalid ${label}: expected a positive integer, got ${id}`);
+  }
+}
+
+/**
+ * Validate an array of IDs.
+ *
+ * @internal
+ * @param ids - The IDs to validate
+ * @param label - Label for the error message
+ * @throws {RangeError} If any ID is not a finite positive integer
+ */
+export function validateIds(ids: number[], label = "id"): void {
+  for (const id of ids) {
+    validateId(id, label);
+  }
+}
+
+/**
+ * Deep-sort an object's keys recursively for deterministic JSON serialization.
+ *
+ * @internal
+ */
+export function sortObjectKeys(obj: unknown): unknown {
+  if (obj === null || typeof obj !== "object") return obj;
+  if (Array.isArray(obj)) return obj.map(sortObjectKeys);
+  const sorted: Record<string, unknown> = {};
+  for (const key of Object.keys(obj as Record<string, unknown>).sort()) {
+    sorted[key] = sortObjectKeys((obj as Record<string, unknown>)[key]);
+  }
+  return sorted;
 }
 
 export * from "./markdown";

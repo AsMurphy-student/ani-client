@@ -37,7 +37,7 @@ import type {
   User,
   WeeklySchedule,
 } from "../types";
-import { chunk, clampPerPage, normalizeQuery } from "../utils";
+import { chunk, clampPerPage, normalizeQuery, validateId, validateIds } from "../utils";
 
 import * as characterMethods from "./character";
 // ── Domain method imports ──
@@ -73,6 +73,7 @@ export class AniListClient {
   private readonly cacheAdapter: CacheAdapter;
   private readonly rateLimiter: RateLimiter;
   private readonly hooks: AniListHooks;
+  private readonly signal?: AbortSignal;
   private readonly inFlight = new Map<string, Promise<unknown>>();
 
   constructor(options: AniListClientOptions = {}) {
@@ -87,6 +88,7 @@ export class AniListClient {
     this.cacheAdapter = options.cacheAdapter ?? new MemoryCache(options.cache);
     this.rateLimiter = new RateLimiter(options.rateLimit);
     this.hooks = options.hooks ?? {};
+    this.signal = options.signal;
   }
 
   // ── Core infrastructure (internal) ──
@@ -128,6 +130,7 @@ export class AniListClient {
         method: "POST",
         headers: this.headers,
         body: JSON.stringify({ query: minifiedQuery, variables }),
+        signal: this.signal,
       },
       { onRetry: this.hooks.onRetry, onRateLimit: this.hooks.onRateLimit },
     );
@@ -348,6 +351,7 @@ export class AniListClient {
   /** Fetch multiple media entries in a single API request. */
   async getMediaBatch(ids: number[]): Promise<Media[]> {
     if (ids.length === 0) return [];
+    validateIds(ids, "mediaId");
     if (ids.length === 1) return [await this.getMedia(ids[0])];
     return this.executeBatch<Media>(ids, buildBatchMediaQuery, "m");
   }
@@ -355,6 +359,7 @@ export class AniListClient {
   /** Fetch multiple characters in a single API request. */
   async getCharacterBatch(ids: number[]): Promise<Character[]> {
     if (ids.length === 0) return [];
+    validateIds(ids, "characterId");
     if (ids.length === 1) return [await this.getCharacter(ids[0])];
     return this.executeBatch<Character>(ids, buildBatchCharacterQuery, "c");
   }
@@ -362,6 +367,7 @@ export class AniListClient {
   /** Fetch multiple staff members in a single API request. */
   async getStaffBatch(ids: number[]): Promise<Staff[]> {
     if (ids.length === 0) return [];
+    validateIds(ids, "staffId");
     if (ids.length === 1) return [await this.getStaff(ids[0])];
     return this.executeBatch<Staff>(ids, buildBatchStaffQuery, "s");
   }
@@ -369,12 +375,13 @@ export class AniListClient {
   /** @internal */
   private async executeBatch<T>(ids: number[], buildQuery: (ids: number[]) => string, prefix: string): Promise<T[]> {
     const chunks = chunk(ids, 50);
-    const chunkResults: T[][] = [];
-    for (const idChunk of chunks) {
-      const query = buildQuery(idChunk);
-      const data = await this.request<Record<string, T>>(query);
-      chunkResults.push(idChunk.map((_, i) => data[`${prefix}${i}`]));
-    }
+    const chunkResults = await Promise.all(
+      chunks.map(async (idChunk) => {
+        const query = buildQuery(idChunk);
+        const data = await this.request<Record<string, T>>(query);
+        return idChunk.map((_, i) => data[`${prefix}${i}`]);
+      }),
+    );
     return chunkResults.flat();
   }
 

@@ -351,6 +351,7 @@ interface AniListClientOptions {
   cacheAdapter?: CacheAdapter; // Custom adapter (e.g. RedisCache)
   rateLimit?: RateLimitOptions;
   hooks?: AniListHooks;
+  signal?: AbortSignal;     // Cancel all requests (optional)
 }
 ```
 
