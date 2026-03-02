@@ -23,7 +23,9 @@ import type {
   MediaType,
   PageInfo,
   PagedResult,
+  RateLimitInfo,
   Recommendation,
+  ResponseMeta,
   SearchCharacterOptions,
   SearchMediaOptions,
   SearchStaffOptions,
@@ -35,6 +37,7 @@ import type {
   Studio,
   Thread,
   User,
+  UserFavorites,
   WeeklySchedule,
 } from "../types";
 import { chunk, clampPerPage, normalizeQuery, validateId, validateIds } from "../utils";
@@ -75,6 +78,8 @@ export class AniListClient {
   private readonly hooks: AniListHooks;
   private readonly signal?: AbortSignal;
   private readonly inFlight = new Map<string, Promise<unknown>>();
+  private _rateLimitInfo?: RateLimitInfo;
+  private _lastRequestMeta?: ResponseMeta;
 
   constructor(options: AniListClientOptions = {}) {
     this.apiUrl = options.apiUrl ?? DEFAULT_API_URL;
@@ -91,6 +96,22 @@ export class AniListClient {
     this.signal = options.signal;
   }
 
+  /**
+   * The current rate limit information from the last API response.
+   * Updated after every non-cached request.
+   */
+  get rateLimitInfo(): RateLimitInfo | undefined {
+    return this._rateLimitInfo;
+  }
+
+  /**
+   * Metadata about the last request (duration, cache status, rate limit info).
+   * Useful for debugging and monitoring.
+   */
+  get lastRequestMeta(): ResponseMeta | undefined {
+    return this._lastRequestMeta;
+  }
+
   // ── Core infrastructure (internal) ──
 
   /** @internal */
@@ -100,6 +121,8 @@ export class AniListClient {
     const cached = await this.cacheAdapter.get<T>(cacheKey);
     if (cached !== undefined) {
       this.hooks.onCacheHit?.(cacheKey);
+      const meta: ResponseMeta = { durationMs: 0, fromCache: true };
+      this._lastRequestMeta = meta;
       this.hooks.onResponse?.(query, 0, true);
       return cached;
     }
@@ -143,9 +166,25 @@ export class AniListClient {
       throw new AniListError(message, res.status, json.errors ?? []);
     }
 
+    // Parse rate limit headers
+    const rlLimit = res.headers.get("X-RateLimit-Limit");
+    const rlRemaining = res.headers.get("X-RateLimit-Remaining");
+    const rlReset = res.headers.get("X-RateLimit-Reset");
+    if (rlLimit && rlRemaining && rlReset) {
+      this._rateLimitInfo = {
+        limit: Number.parseInt(rlLimit, 10),
+        remaining: Number.parseInt(rlRemaining, 10),
+        reset: Number.parseInt(rlReset, 10),
+      };
+    }
+
+    const durationMs = Date.now() - start;
     const data = json.data as T;
     await this.cacheAdapter.set(cacheKey, data);
-    this.hooks.onResponse?.(query, Date.now() - start, false);
+
+    const meta: ResponseMeta = { durationMs, fromCache: false, rateLimitInfo: this._rateLimitInfo };
+    this._lastRequestMeta = meta;
+    this.hooks.onResponse?.(query, durationMs, false, this._rateLimitInfo);
     return data;
   }
 
@@ -274,6 +313,22 @@ export class AniListClient {
   /** Get a user's anime or manga list. */
   async getUserMediaList(options: GetUserMediaListOptions): Promise<PagedResult<MediaListEntry>> {
     return userMethods.getUserMediaList(this, options);
+  }
+
+  /**
+   * Fetch a user's favorite anime, manga, characters, staff, and studios.
+   *
+   * @param idOrName - AniList user ID (number) or username (string)
+   * @returns The user's favorites grouped by category
+   *
+   * @example
+   * ```typescript
+   * const favs = await client.getUserFavorites("AniList");
+   * favs.anime.forEach(a => console.log(a.title.romaji));
+   * ```
+   */
+  async getUserFavorites(idOrName: number | string): Promise<UserFavorites> {
+    return userMethods.getUserFavorites(this, idOrName);
   }
 
   // ── Studios ──

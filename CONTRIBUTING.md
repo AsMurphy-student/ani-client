@@ -99,7 +99,7 @@ src/
 │   ├── media.ts     # Media methods (getMedia, searchMedia, getTrending, ...)
 │   ├── character.ts # Character methods
 │   ├── staff.ts     # Staff methods
-│   ├── user.ts      # User methods (getUser, searchUsers, getUserMediaList)
+│   ├── user.ts      # User methods (getUser, searchUsers, getUserMediaList, getUserFavorites)
 │   ├── studio.ts    # Studio methods
 │   └── thread.ts    # Thread methods (getThread, getRecentThreads)
 ├── queries/         # GraphQL queries

@@ -48,3 +48,42 @@ export interface SearchUserOptions {
   page?: number;
   perPage?: number;
 }
+
+// ── Favorites ──
+
+export interface FavoriteMediaNode {
+  id: number;
+  title: { romaji: string | null; english: string | null; native: string | null; userPreferred: string | null };
+  coverImage: { large: string | null; medium: string | null };
+  type: string | null;
+  format: string | null;
+  siteUrl: string | null;
+}
+
+export interface FavoriteCharacterNode {
+  id: number;
+  name: { full: string | null; native: string | null };
+  image: { large: string | null; medium: string | null };
+  siteUrl: string | null;
+}
+
+export interface FavoriteStaffNode {
+  id: number;
+  name: { full: string | null; native: string | null };
+  image: { large: string | null; medium: string | null };
+  siteUrl: string | null;
+}
+
+export interface FavoriteStudioNode {
+  id: number;
+  name: string;
+  siteUrl: string | null;
+}
+
+export interface UserFavorites {
+  anime: FavoriteMediaNode[];
+  manga: FavoriteMediaNode[];
+  characters: FavoriteCharacterNode[];
+  staff: FavoriteStaffNode[];
+  studios: FavoriteStudioNode[];
+}

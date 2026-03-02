@@ -170,6 +170,23 @@ const list = await client.getUserMediaList({
 list.results.forEach((entry) => console.log(`${entry.media.title.romaji} — ${entry.score}/100`));
 ```
 
+### `getUserFavorites(idOrName)`
+
+Fetch a user's favorite anime, manga, characters, staff, and studios.
+
+```typescript
+const favs = await client.getUserFavorites("AniList");
+
+// Anime favorites
+favs.anime.forEach((a) => console.log(a.title.romaji));
+
+// Character favorites
+favs.characters.forEach((c) => console.log(c.name.full));
+
+// Studio favorites
+favs.studios.forEach((s) => console.log(s.name));
+```
+
 ## Forum Threads
 
 Access AniList forum threads — fetch individual threads or browse recent activity.

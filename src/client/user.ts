@@ -1,6 +1,20 @@
-import { QUERY_USER_BY_ID, QUERY_USER_BY_NAME, QUERY_USER_MEDIA_LIST, QUERY_USER_SEARCH } from "../queries";
+import {
+  QUERY_USER_BY_ID,
+  QUERY_USER_BY_NAME,
+  QUERY_USER_FAVORITES_BY_ID,
+  QUERY_USER_FAVORITES_BY_NAME,
+  QUERY_USER_MEDIA_LIST,
+  QUERY_USER_SEARCH,
+} from "../queries";
 
-import type { GetUserMediaListOptions, MediaListEntry, PagedResult, SearchUserOptions, User } from "../types";
+import type {
+  GetUserMediaListOptions,
+  MediaListEntry,
+  PagedResult,
+  SearchUserOptions,
+  User,
+  UserFavorites,
+} from "../types";
 
 import { AniListError } from "../errors";
 import { clampPerPage, validateId } from "../utils";
@@ -41,4 +55,36 @@ export async function getUserMediaList(
     },
     "mediaList",
   );
+}
+
+interface RawFavourites {
+  anime?: { nodes: UserFavorites["anime"] };
+  manga?: { nodes: UserFavorites["manga"] };
+  characters?: { nodes: UserFavorites["characters"] };
+  staff?: { nodes: UserFavorites["staff"] };
+  studios?: { nodes: UserFavorites["studios"] };
+}
+
+export async function getUserFavorites(client: ClientBase, idOrName: number | string): Promise<UserFavorites> {
+  if (typeof idOrName === "number") {
+    validateId(idOrName, "userId");
+    const data = await client.request<{ User: { favourites: RawFavourites } }>(QUERY_USER_FAVORITES_BY_ID, {
+      id: idOrName,
+    });
+    return mapFavorites(data.User.favourites);
+  }
+  const data = await client.request<{ User: { favourites: RawFavourites } }>(QUERY_USER_FAVORITES_BY_NAME, {
+    name: idOrName,
+  });
+  return mapFavorites(data.User.favourites);
+}
+
+function mapFavorites(fav: RawFavourites): UserFavorites {
+  return {
+    anime: fav.anime?.nodes ?? [],
+    manga: fav.manga?.nodes ?? [],
+    characters: fav.characters?.nodes ?? [],
+    staff: fav.staff?.nodes ?? [],
+    studios: fav.studios?.nodes ?? [],
+  };
 }

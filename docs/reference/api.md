@@ -199,6 +199,22 @@ Get a user's anime or manga list. Requires `userId` or `userName` and `type`.
 
 **Returns:** `Promise<PagedResult<MediaListEntry>>`
 
+### `getUserFavorites(idOrName)`
+
+Fetch a user's favorite anime, manga, characters, staff, and studios.
+
+| Param | Type | Description |
+| --- | --- | --- |
+| `idOrName` | `number \| string` | AniList user ID or username |
+
+**Returns:** `Promise<UserFavorites>`
+
+```typescript
+const favs = await client.getUserFavorites("AniList");
+favs.anime.forEach(a => console.log(a.title.romaji));
+favs.characters.forEach(c => console.log(c.name.full));
+```
+
 ---
 
 ## Studios

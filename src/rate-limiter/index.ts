@@ -17,6 +17,7 @@ export class RateLimiter {
   private readonly enabled: boolean;
   private readonly timeoutMs: number;
   private readonly retryOnNetworkError: boolean;
+  private readonly retryStrategy?: (attempt: number, baseDelayMs: number) => number;
 
   /** @internal — sliding window: circular buffer of timestamps */
   private readonly timestamps: number[];
@@ -31,6 +32,7 @@ export class RateLimiter {
     this.enabled = options.enabled ?? true;
     this.timeoutMs = options.timeoutMs ?? 30_000;
     this.retryOnNetworkError = options.retryOnNetworkError ?? true;
+    this.retryStrategy = options.retryStrategy;
     this.timestamps = new Array<number>(this.maxRequests).fill(0);
   }
 
@@ -116,8 +118,11 @@ export class RateLimiter {
     throw lastError;
   }
 
-  /** @internal — Exponential backoff with jitter, capped at 30s */
+  /** @internal — Exponential backoff with jitter, capped at 30s (or custom strategy) */
   private exponentialDelay(attempt: number): number {
+    if (this.retryStrategy) {
+      return this.retryStrategy(attempt, this.retryDelayMs);
+    }
     const base = this.retryDelayMs * 2 ** attempt;
     const jitter = Math.random() * 1000;
     return Math.min(base + jitter, 30_000);

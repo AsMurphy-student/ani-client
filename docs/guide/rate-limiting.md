@@ -43,3 +43,46 @@ const [a, b] = await Promise.all([
   client.getMedia(1), // -> Bound & throttled to `a` signature
 ]);
 ```
+
+## Custom Retry Strategy
+
+Override the default exponential backoff with your own delay calculation:
+
+```typescript
+const client = new AniListClient({
+  rateLimit: {
+    // Linear backoff: 1s, 2s, 3s, ...
+    retryStrategy: (attempt) => (attempt + 1) * 1000,
+
+    // Or fixed delay
+    retryStrategy: (attempt, baseDelay) => baseDelay,
+  },
+});
+```
+
+The function receives the attempt number (0-based) and the base delay (`retryDelayMs`), and should return the delay in milliseconds.
+
+## Rate Limit Headers
+
+After every non-cached request, you can check the current rate limit status from the API:
+
+```typescript
+await client.getMedia(1);
+
+const info = client.rateLimitInfo;
+if (info) {
+  console.log(`${info.remaining}/${info.limit} requests remaining`);
+  console.log(`Resets at ${new Date(info.reset * 1000)}`);
+}
+```
+
+## Response Metadata
+
+Track timing and cache status for every request:
+
+```typescript
+await client.getMedia(1);
+
+const meta = client.lastRequestMeta;
+console.log(`Duration: ${meta?.durationMs}ms, from cache: ${meta?.fromCache}`);
+```

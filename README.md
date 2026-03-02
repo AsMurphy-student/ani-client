@@ -56,6 +56,43 @@ const results = await client.searchMedia({
 console.log(results.results.map((m) => m.title.english));
 ```
 
+### Fetch user favorites
+
+```ts
+const favs = await client.getUserFavorites("AniList");
+
+favs.anime.forEach((a) => console.log(a.title.romaji));
+favs.characters.forEach((c) => console.log(c.name.full));
+```
+
+### Monitor rate limits
+
+```ts
+const client = new AniListClient({
+  rateLimit: {
+    retryStrategy: (attempt) => (attempt + 1) * 1000, // linear backoff
+  },
+});
+
+await client.getMedia(1);
+
+const info = client.rateLimitInfo;
+console.log(`${info?.remaining}/${info?.limit} requests remaining`);
+
+const meta = client.lastRequestMeta;
+console.log(`${meta?.durationMs}ms, cache: ${meta?.fromCache}`);
+```
+
+### Cancel requests
+
+```ts
+const controller = new AbortController();
+const client = new AniListClient({ signal: controller.signal });
+
+setTimeout(() => controller.abort(), 5_000);
+await client.getMedia(1); // aborted after 5s
+```
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, coding standards, and how to submit changes.
