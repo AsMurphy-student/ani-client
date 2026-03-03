@@ -12,7 +12,7 @@ head:
 
 # Changelog
 
-## [1.6.2] — 2026-03-03
+## [1.6.1] — 2026-03-03
 
 ### Breaking Changes
 - **`cacheSize` is now a method** — `client.cacheSize` is now `client.cacheSize()`, consistently returning `Promise<number>` regardless of cache adapter. Update any direct property access to a method call.
