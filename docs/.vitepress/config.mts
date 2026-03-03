@@ -2,8 +2,7 @@ import { defineConfig } from "vitepress";
 
 const siteUrl = "https://ani-client.js.org";
 const siteTitle = "ani-client";
-const siteDescription =
-  "A simple, typed client to fetch anime, manga, character, staff and user data from AniList.";
+const siteDescription = "A simple, typed client to fetch anime, manga, character, staff and user data from AniList.";
 const ogImage = `${siteUrl}/assets/logo.png`;
 
 export default defineConfig({
@@ -14,16 +13,16 @@ export default defineConfig({
   sitemap: { hostname: siteUrl },
 
   head: [
-    // Favicon
     ["link", { rel: "icon", href: "/assets/favicon.ico", type: "image/x-icon" }],
     ["link", { rel: "apple-touch-icon", href: "/assets/logo.png" }],
 
-    // Primary meta
     ["meta", { name: "theme-color", content: "#3451b2" }],
     ["meta", { name: "author", content: "gonzyui" }],
-    ["meta", { name: "keywords", content: "anilist, anime, manga, graphql, api, client, typescript, javascript, node.js" }],
+    [
+      "meta",
+      { name: "keywords", content: "anilist, anime, manga, graphql, api, client, typescript, javascript, node.js" },
+    ],
 
-    // Open Graph
     ["meta", { property: "og:type", content: "website" }],
     ["meta", { property: "og:title", content: siteTitle }],
     ["meta", { property: "og:description", content: siteDescription }],
@@ -35,7 +34,6 @@ export default defineConfig({
     ["meta", { property: "og:site_name", content: siteTitle }],
     ["meta", { property: "og:locale", content: "en_US" }],
 
-    // Twitter Card
     ["meta", { name: "twitter:card", content: "summary_large_image" }],
     ["meta", { name: "twitter:title", content: siteTitle }],
     ["meta", { name: "twitter:description", content: siteDescription }],
