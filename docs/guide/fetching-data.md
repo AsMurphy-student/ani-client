@@ -1,3 +1,15 @@
+---
+title: Fetching Data
+description: "Fetch anime, manga, characters, staff, users, and forum threads from AniList using ani-client's typed helper methods."
+head:
+  - - meta
+    - property: og:title
+      content: Fetching Data — ani-client
+  - - meta
+    - property: og:description
+      content: Complete guide to fetching anime, manga, characters, staff, users, and forum threads from AniList with ani-client.
+---
+
 # Fetching Data
 
 `ani-client` provides fully typed module helpers for every dominant facet of the AniList schema. 

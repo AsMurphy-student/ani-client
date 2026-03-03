@@ -1,3 +1,15 @@
+---
+title: What is ani-client?
+description: "Learn what ani-client is: a simple, typed, zero-dependency client for the AniList GraphQL API with built-in caching, rate limiting, and request deduplication."
+head:
+  - - meta
+    - property: og:title
+      content: What is ani-client? — Introduction
+  - - meta
+    - property: og:description
+      content: Learn what ani-client is and why you should use it for fetching anime, manga, characters, staff and user data from AniList.
+---
+
 # What is ani-client?
 
 `ani-client` is a simple, highly optimized, and fully typed client designed to fetch anime, manga, characters, staff, and user data from the [AniList GraphQL API](https://anilist.co).

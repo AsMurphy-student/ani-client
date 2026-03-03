@@ -1,3 +1,15 @@
+---
+title: Getting Started
+description: "Install ani-client and make your first AniList API request in minutes. Learn how to configure caching, rate limiting, hooks, and request cancellation."
+head:
+  - - meta
+    - property: og:title
+      content: Getting Started — ani-client
+  - - meta
+    - property: og:description
+      content: Install ani-client and make your first AniList API request in minutes with full configuration options.
+---
+
 # Getting Started
 
 Once you've installed `ani-client`, fetching data from AniList is simpler than ever! Let's get right into it by creating an instance.

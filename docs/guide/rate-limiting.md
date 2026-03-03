@@ -1,3 +1,15 @@
+---
+title: Rate Limiting & Retries
+description: "Handle AniList rate limits transparently with exponential backoff, jitter, request deduplication, custom retry strategies, and response metadata."
+head:
+  - - meta
+    - property: og:title
+      content: Rate Limiting & Retries — ani-client
+  - - meta
+    - property: og:description
+      content: Transparent rate limit handling with exponential backoff, deduplication, and custom retry strategies.
+---
+
 # Rate Limiting
 
 The client respects AniList's rate limit (**90 req/min**) with a conservative native baseline default constraint of **85 req/min**. 

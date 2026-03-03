@@ -1,3 +1,15 @@
+---
+title: Caching
+description: "Configure in-memory LRU caching or plug in a Redis adapter for distributed caching. Supports pattern-based invalidation and TTL control."
+head:
+  - - meta
+    - property: og:title
+      content: Caching — ani-client
+  - - meta
+    - property: og:description
+      content: Built-in LRU memory cache and Redis adapter for distributed caching with ani-client.
+---
+
 # Caching
 
 `ani-client` ships with caching strategies designed to aggressively cut network latency and enforce duplicate request pooling.

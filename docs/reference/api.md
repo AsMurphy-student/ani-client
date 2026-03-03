@@ -1,3 +1,15 @@
+---
+title: API Reference
+description: "Complete reference for every public method on AniListClient — media, characters, staff, users, studios, threads, batch queries, cache management, and more."
+head:
+  - - meta
+    - property: og:title
+      content: API Reference — ani-client
+  - - meta
+    - property: og:description
+      content: Full API reference for all AniListClient methods with signatures, parameters, and usage examples.
+---
+
 # API Reference
 
 Complete reference for every public method on `AniListClient`.

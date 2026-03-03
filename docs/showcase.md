@@ -1,3 +1,15 @@
+---
+title: Showcase
+description: "Discover projects, applications, and tools built with ani-client. Submit your own project via Pull Request!"
+head:
+  - - meta
+    - property: og:title
+      content: Showcase — ani-client
+  - - meta
+    - property: og:description
+      content: Projects and applications built with ani-client — submit your own via PR!
+---
+
 # Showcase
 
 Discover amazing projects, applications, and tools built using `ani-client`!
