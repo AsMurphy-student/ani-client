@@ -1,5 +1,27 @@
 ---
 layout: home
+title: ani-client – Typed AniList Client for Node.js & TypeScript
+titleTemplate: ":title"
+description: "Fetch anime, manga, characters, staff and user data from AniList effortlessly. Zero dependencies, built-in caching, rate limiting, and full TypeScript support."
+head:
+  - - meta
+    - property: og:title
+      content: ani-client – Typed AniList Client for Node.js & TypeScript
+  - - meta
+    - property: og:description
+      content: Fetch anime, manga, characters, staff and user data from AniList effortlessly. Zero dependencies, built-in caching, rate limiting, and full TypeScript support.
+  - - meta
+    - property: og:image
+      content: https://ani-client.js.org/assets/logo.png
+  - - meta
+    - property: og:url
+      content: https://ani-client.js.org/
+  - - meta
+    - name: twitter:title
+      content: ani-client – Typed AniList Client for Node.js & TypeScript
+  - - meta
+    - name: twitter:description
+      content: Fetch anime, manga, characters, staff and user data from AniList effortlessly. Zero dependencies, built-in caching, rate limiting, and full TypeScript support.
 
 hero:
   name: "ani-client"
