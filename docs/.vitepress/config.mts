@@ -3,7 +3,7 @@ import { defineConfig } from "vitepress";
 const siteUrl = "https://ani-client.js.org";
 const siteTitle = "ani-client";
 const siteDescription = "A simple, typed client to fetch anime, manga, character, staff and user data from AniList.";
-const ogImage = `${siteUrl}/assets/logo.png`;
+const ogImage = `${siteUrl}/assets/image.png`;
 
 export default defineConfig({
   title: siteTitle,
