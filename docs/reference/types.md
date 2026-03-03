@@ -416,6 +416,7 @@ interface CacheAdapter {
 | `onCacheHit` | `(key) => void` | Response served from cache |
 | `onRateLimit` | `(retryAfterMs) => void` | HTTP 429 received |
 | `onRetry` | `(attempt, reason, delayMs) => void` | Request retried |
+| `onError` | `(error, query, variables) => void` | Request failed (network or API error) |
 | `onResponse` | `(query, durationMs, fromCache, rateLimitInfo?) => void` | Request completed |
 
 ---

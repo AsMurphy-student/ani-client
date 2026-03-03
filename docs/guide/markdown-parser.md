@@ -46,4 +46,14 @@ The function also handles a standard subset of Markdown commonly used in AniList
 -   **Italic**: `_text_` or `*text*`
 -   **Strikethrough**: `~~text~~`
 -   **Links**: `[Text](https://...)`
--   **Paragraphs**: Two consecutive line breaks are converted to `<p>`, and single line breaks to `<br/>`.
+-   **Headings**: `#` through `######` (h1–h6)
+-   **Unordered lists**: Lines starting with `-` or `*`
+-   **Ordered lists**: Lines starting with `1.`, `2.`, etc.
+-   **Inline code**: `` `code` ``
+-   **Fenced code blocks**: ` ```code``` `
+-   **Paragraphs**: Two consecutive line breaks are converted to `<p>`, and single line breaks to `<br/>`
+
+::: warning Security
+This function escapes all HTML entities (`<`, `>`, `&`, `"`, `'`) to prevent **XSS attacks**. However, the output is still raw HTML. Consumers should still use a Content Security Policy and consider additional sanitization when rendering user-generated content in a browser.
+:::
+

@@ -422,23 +422,23 @@ describe("AniListClient (integration)", () => {
   describe("Cache", () => {
     it("cache returns same result without extra API call", async () => {
       const first = await client.getMedia(1);
-      const cacheAfterFirst = client.cacheSize;
+      const cacheAfterFirst = await client.cacheSize();
       const second = await client.getMedia(1);
       expect(first.id).toBe(second.id);
       expect(cacheAfterFirst).toBeGreaterThan(0);
-      expect(client.cacheSize).toBe(cacheAfterFirst);
+      expect(await client.cacheSize()).toBe(cacheAfterFirst);
     });
 
     it("clearCache() empties the cache", async () => {
-      expect(client.cacheSize).toBeGreaterThan(0);
+      expect(await client.cacheSize()).toBeGreaterThan(0);
       await client.clearCache();
-      expect(client.cacheSize).toBe(0);
+      expect(await client.cacheSize()).toBe(0);
     });
 
     it("cache disabled returns fresh data each time", async () => {
       const noCacheClient = new AniListClient({ cache: { enabled: false } });
       await noCacheClient.getMedia(1);
-      expect(noCacheClient.cacheSize).toBe(0);
+      expect(await noCacheClient.cacheSize()).toBe(0);
     });
   });
 
@@ -448,9 +448,9 @@ describe("AniListClient (integration)", () => {
     it("destroy() clears cache and in-flight requests", async () => {
       const c = new AniListClient();
       await c.getMedia(1);
-      expect(c.cacheSize).toBeGreaterThan(0);
+      expect(await c.cacheSize()).toBeGreaterThan(0);
       await c.destroy();
-      expect(c.cacheSize).toBe(0);
+      expect(await c.cacheSize()).toBe(0);
     });
   });
 });

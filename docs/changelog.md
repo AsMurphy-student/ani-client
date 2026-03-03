@@ -12,6 +12,41 @@ head:
 
 # Changelog
 
+## [1.6.2] — 2026-03-03
+
+### Breaking Changes
+- **`cacheSize` is now a method** — `client.cacheSize` is now `client.cacheSize()`, consistently returning `Promise<number>` regardless of cache adapter. Update any direct property access to a method call.
+
+### Security
+- **Markdown XSS prevention** — `parseAniListMarkdown()` now escapes all HTML entities (`<`, `>`, `&`, `"`, `'`) before processing, preventing cross-site scripting when rendering user-generated descriptions.
+
+### Added
+- **`onError` hook** — New lifecycle hook fires on both network and API errors, providing a single observability point for all failures without wrapping every call in try/catch.
+- **Markdown headings** — `parseAniListMarkdown()` now supports `#` through `######` (h1–h6) headings.
+- **Markdown lists** — Unordered (`-`, `*`) and ordered (`1.`, `2.`) lists are now parsed into `<ul>`/`<ol>` elements.
+- **Markdown code** — Inline `` `code` `` and fenced ` ```code``` ` blocks are now supported.
+- **`User-Agent` header** — All outgoing requests now include `User-Agent: ani-client/{version}` for better API identification.
+- **`typecheck` script** — New `pnpm run typecheck` script in `package.json`.
+
+### Fixed
+- **AbortSignal conflict** — User-provided `signal` and internal timeout signals are now combined via `AbortSignal.any()` instead of one overwriting the other.
+- **Error wrapping** — Non-`AniListError` exceptions (network errors, JSON parse failures) in `executeRequest` are now wrapped in `AniListError` for consistent error handling.
+- **Batch query relations** — `getMediaBatch()` now includes relation data, matching the behavior of `getMedia()`.
+- **Timezone sensitivity** — `getWeeklySchedule()` now uses UTC-based date calculations for consistent results across timezones.
+- **Rate-limiter cleanup** — `destroy()` now cancels all pending rate-limiter sleep timers via a new `dispose()` method, preventing event loop leaks.
+- **Version injection** — Library version is now read from `package.json` at build time (via tsup `define`) instead of being hardcoded.
+
+### CI/CD
+- **npm provenance** — `npm publish` now includes the `--provenance` flag for supply chain attestation.
+- **Vitest deprecation** — Renamed `test.workspace` to `test.projects` in vitest config.
+- **CI typecheck** — Type checking step now uses `pnpm run typecheck` instead of raw `npx tsc --noEmit`.
+
+### Docs
+- **`onError` hook** — Documented in Event Hooks guide, API Reference, and Types & Enums.
+- **Markdown parser** — Updated guide with headings, lists, code blocks, and security warning.
+- **`cacheSize()`** — Updated all references from property to async method.
+- **`destroy()`** — Updated description to include rate-limiter timer cleanup.
+
 ## [1.6.0] — 2026-03-02
 
 ### Added

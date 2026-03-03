@@ -41,7 +41,6 @@ export class MemoryCache implements CacheAdapter {
       this.store.delete(key);
       return undefined;
     }
-    // LRU: promote to most-recently-used by re-inserting at the end
     this.store.delete(key);
     this.store.set(key, entry);
     return entry.data as T;
@@ -51,10 +50,8 @@ export class MemoryCache implements CacheAdapter {
   set<T>(key: string, data: T): void {
     if (!this.enabled) return;
 
-    // Remove first so re-insert places it at the end (MRU position)
     this.store.delete(key);
 
-    // Evict least-recently-used entry if at capacity
     if (this.maxSize > 0 && this.store.size >= this.maxSize) {
       const firstKey = this.store.keys().next().value;
       if (firstKey !== undefined) this.store.delete(firstKey);

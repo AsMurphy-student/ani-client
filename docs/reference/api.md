@@ -306,7 +306,7 @@ Get all available media tags on AniList.
 
 ### `parseAniListMarkdown(text)`
 
-Parses AniList's custom markdown dialect into standard HTML. It supports spoiler tags, images, webm, youtube, and standard formatting.
+Parses AniList's custom markdown dialect into standard HTML. Supports spoiler tags, images, webm, youtube, headings, lists, code blocks, and standard formatting. All HTML entities are escaped to prevent XSS attacks.
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -374,9 +374,16 @@ Remove cache entries matching a pattern.
 
 **Returns:** `Promise<number>` (entries removed)
 
-### `cacheSize`
+### `cacheSize()`
 
-Number of entries currently cached. May return a `Promise<number>` for async adapters.
+Returns the number of entries currently cached. Always returns `Promise<number>` for consistency across sync and async cache adapters.
+
+**Returns:** `Promise<number>`
+
+```typescript
+const size = await client.cacheSize();
+console.log(`${size} entries cached`);
+```
 
 ---
 
@@ -384,7 +391,7 @@ Number of entries currently cached. May return a `Promise<number>` for async ada
 
 ### `destroy()`
 
-Clean up resources held by the client. Clears the in-memory cache and aborts pending in-flight requests.
+Clean up resources held by the client. Clears the in-memory cache, aborts pending in-flight requests, and cancels all rate-limiter timers to prevent event loop leaks.
 
 ```typescript
 await client.destroy();

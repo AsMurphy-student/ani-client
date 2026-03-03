@@ -97,6 +97,8 @@ export interface AniListHooks {
   onRetry?: (attempt: number, reason: string, delayMs: number) => void;
   /** Called when a request completes. */
   onResponse?: (query: string, durationMs: number, fromCache: boolean, rateLimitInfo?: RateLimitInfo) => void;
+  /** Called when a request fails with an error. */
+  onError?: (error: Error, query: string, variables: Record<string, unknown>) => void;
 }
 
 /** Rate limit information parsed from AniList API response headers. */

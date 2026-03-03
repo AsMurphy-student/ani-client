@@ -1,6 +1,6 @@
 {
   "name": "ani-client",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "A simple and typed client to fetch anime, manga, characters and user data from AniList",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -23,6 +23,7 @@
     "test": "vitest run",
     "test:unit": "vitest run --project unit",
     "test:integration": "vitest run --project integration",
+    "typecheck": "tsc --noEmit",
     "prepublishOnly": "pnpm run build",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",

@@ -1,6 +1,3 @@
-// Re-export all queries from domain modules for backward compatibility.
-// Consumers import from "../queries" unchanged.
-
 export {
   QUERY_MEDIA_BY_ID,
   QUERY_MEDIA_SEARCH,

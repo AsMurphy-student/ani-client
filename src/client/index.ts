@@ -43,7 +43,6 @@ import type {
 import { chunk, clampPerPage, normalizeQuery, validateId, validateIds } from "../utils";
 
 import * as characterMethods from "./character";
-// ── Domain method imports ──
 import * as mediaMethods from "./media";
 import * as staffMethods from "./staff";
 import * as studioMethods from "./studio";
@@ -51,6 +50,10 @@ import * as threadMethods from "./thread";
 import * as userMethods from "./user";
 
 const DEFAULT_API_URL = "https://graphql.anilist.co";
+
+declare const __VERSION__: string;
+/** Injected at build time by tsup — falls back to `"dev"` in test/dev environments. */
+const LIB_VERSION = typeof __VERSION__ !== "undefined" ? __VERSION__ : "dev";
 
 /**
  * Lightweight AniList GraphQL client with built-in caching and rate limiting.
@@ -86,6 +89,7 @@ export class AniListClient {
     this.headers = {
       "Content-Type": "application/json",
       Accept: "application/json",
+      "User-Agent": `ani-client/${LIB_VERSION}`,
     };
     if (options.token) {
       this.headers.Authorization = `Bearer ${options.token}`;
@@ -111,8 +115,6 @@ export class AniListClient {
   get lastRequestMeta(): ResponseMeta | undefined {
     return this._lastRequestMeta;
   }
-
-  // ── Core infrastructure (internal) ──
 
   /** @internal */
   async request<T>(query: string, variables: Record<string, unknown> = {}): Promise<T> {
@@ -147,26 +149,37 @@ export class AniListClient {
 
     const minifiedQuery = normalizeQuery(query);
 
-    const res = await this.rateLimiter.fetchWithRetry(
-      this.apiUrl,
-      {
-        method: "POST",
-        headers: this.headers,
-        body: JSON.stringify({ query: minifiedQuery, variables }),
-        signal: this.signal,
-      },
-      { onRetry: this.hooks.onRetry, onRateLimit: this.hooks.onRateLimit },
-    );
+    let res: Response;
+    try {
+      res = await this.rateLimiter.fetchWithRetry(
+        this.apiUrl,
+        {
+          method: "POST",
+          headers: this.headers,
+          body: JSON.stringify({ query: minifiedQuery, variables }),
+          signal: this.signal,
+        },
+        { onRetry: this.hooks.onRetry, onRateLimit: this.hooks.onRateLimit },
+      );
+    } catch (err) {
+      const error =
+        err instanceof AniListError
+          ? err
+          : new AniListError((err as Error).message ?? "Network request failed", 0, [err]);
+      this.hooks.onError?.(error, query, variables);
+      throw error;
+    }
 
     const json = (await res.json()) as { data?: T; errors?: unknown[] };
 
     if (!res.ok || json.errors) {
       const message =
         (json.errors as Array<{ message?: string }>)?.[0]?.message ?? `AniList API error (HTTP ${res.status})`;
-      throw new AniListError(message, res.status, json.errors ?? []);
+      const error = new AniListError(message, res.status, json.errors ?? []);
+      this.hooks.onError?.(error, query, variables);
+      throw error;
     }
 
-    // Parse rate limit headers
     const rlLimit = res.headers.get("X-RateLimit-Limit");
     const rlRemaining = res.headers.get("X-RateLimit-Remaining");
     const rlReset = res.headers.get("X-RateLimit-Reset");
@@ -197,8 +210,6 @@ export class AniListClient {
     }
     return { pageInfo: data.Page.pageInfo, results: results as T[] };
   }
-
-  // ── Media ──
 
   /**
    * Fetch a single media entry by its AniList ID.
@@ -270,8 +281,6 @@ export class AniListClient {
     return mediaMethods.getMediaBySeason(this, options);
   }
 
-  // ── Characters ──
-
   /** Fetch a character by AniList ID. Pass `{ voiceActors: true }` to include VA data. */
   async getCharacter(id: number, include?: CharacterIncludeOptions): Promise<Character> {
     return characterMethods.getCharacter(this, id, include);
@@ -282,8 +291,6 @@ export class AniListClient {
     return characterMethods.searchCharacters(this, options);
   }
 
-  // ── Staff ──
-
   /** Fetch a staff member by AniList ID. Pass `{ media: true }` or `{ media: { perPage } }` for media credits. */
   async getStaff(id: number, include?: StaffIncludeOptions): Promise<Staff> {
     return staffMethods.getStaff(this, id, include);
@@ -293,8 +300,6 @@ export class AniListClient {
   async searchStaff(options: SearchStaffOptions = {}): Promise<PagedResult<Staff>> {
     return staffMethods.searchStaff(this, options);
   }
-
-  // ── Users ──
 
   /**
    * Fetch a user by AniList ID or username.
@@ -331,8 +336,6 @@ export class AniListClient {
     return userMethods.getUserFavorites(this, idOrName);
   }
 
-  // ── Studios ──
-
   /** Fetch a studio by its AniList ID. */
   async getStudio(id: number): Promise<Studio> {
     return studioMethods.getStudio(this, id);
@@ -342,10 +345,6 @@ export class AniListClient {
   async searchStudios(options: SearchStudioOptions = {}): Promise<PagedResult<Studio>> {
     return studioMethods.searchStudios(this, options);
   }
-
-  // ── Metadata ──
-
-  // ── Threads ──
 
   /** Fetch a forum thread by its AniList ID. */
   async getThread(id: number): Promise<Thread> {
@@ -369,14 +368,10 @@ export class AniListClient {
     return data.MediaTagCollection;
   }
 
-  // ── Raw query ──
-
   /** Execute an arbitrary GraphQL query against the AniList API. */
   async raw<T>(query: string, variables?: Record<string, unknown>): Promise<T> {
     return this.request<T>(query, variables ?? {});
   }
-
-  // ── Pagination ──
 
   /**
    * Auto-paginating async iterator. Yields individual items across all pages.
@@ -400,8 +395,6 @@ export class AniListClient {
       page++;
     }
   }
-
-  // ── Batch queries ──
 
   /** Fetch multiple media entries in a single API request. */
   async getMediaBatch(ids: number[]): Promise<Media[]> {
@@ -440,15 +433,13 @@ export class AniListClient {
     return chunkResults.flat();
   }
 
-  // ── Cache management ──
-
   /** Clear the entire response cache. */
   async clearCache(): Promise<void> {
     await this.cacheAdapter.clear();
   }
 
   /** Number of entries currently in the cache. */
-  get cacheSize(): number | Promise<number> {
+  async cacheSize(): Promise<number> {
     return this.cacheAdapter.size;
   }
 
@@ -473,5 +464,6 @@ export class AniListClient {
   async destroy(): Promise<void> {
     await this.cacheAdapter.clear();
     this.inFlight.clear();
+    this.rateLimiter.dispose();
   }
 }

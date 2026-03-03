@@ -23,6 +23,8 @@ export class RateLimiter {
   private readonly timestamps: number[];
   private head = 0;
   private count = 0;
+  /** @internal — active sleep timers for cleanup */
+  private readonly activeTimers = new Set<ReturnType<typeof setTimeout>>();
 
   constructor(options: RateLimitOptions = {}) {
     this.maxRequests = options.maxRequests ?? 85;
@@ -44,22 +46,18 @@ export class RateLimiter {
 
     if (this.count >= this.maxRequests) {
       const oldest = this.timestamps[this.head];
-      const now = Date.now();
-      const elapsed = now - oldest;
+      const elapsed = Date.now() - oldest;
       if (elapsed < this.windowMs) {
         const waitMs = this.windowMs - elapsed + 50;
         await this.sleep(waitMs);
       }
-      // The oldest slot is now expired; we'll overwrite it below
     }
 
-    // Record this request in the circular buffer
     const now = Date.now();
     if (this.count < this.maxRequests) {
       this.timestamps[(this.head + this.count) % this.maxRequests] = now;
       this.count++;
     } else {
-      // Overwrite the oldest entry
       this.timestamps[this.head] = now;
       this.head = (this.head + 1) % this.maxRequests;
     }
@@ -135,15 +133,35 @@ export class RateLimiter {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), this.timeoutMs);
 
+    const signals = [controller.signal, init.signal].filter(Boolean) as AbortSignal[];
+    const combinedSignal = signals.length > 1 ? AbortSignal.any(signals) : signals[0];
+
     try {
-      return await fetch(url, { ...init, signal: controller.signal });
+      return await fetch(url, { ...init, signal: combinedSignal });
     } finally {
       clearTimeout(timer);
     }
   }
 
   private sleep(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+    return new Promise((resolve) => {
+      const timer = setTimeout(() => {
+        this.activeTimers.delete(timer);
+        resolve();
+      }, ms);
+      this.activeTimers.add(timer);
+    });
+  }
+
+  /** Cancel all pending sleep timers and reset internal state. */
+  dispose(): void {
+    for (const timer of this.activeTimers) {
+      clearTimeout(timer);
+    }
+    this.activeTimers.clear();
+    this.head = 0;
+    this.count = 0;
+    this.timestamps.fill(0);
   }
 }
 

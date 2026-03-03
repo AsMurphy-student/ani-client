@@ -171,11 +171,11 @@ describe("AniListClient", () => {
     const client = new AniListClient();
 
     await client.getMedia(1);
-    expect(client.cacheSize).toBeGreaterThan(0);
+    expect(await client.cacheSize()).toBeGreaterThan(0);
 
     const removed = await client.invalidateCache(/./);
     expect(removed).toBeGreaterThan(0);
-    expect(client.cacheSize).toBe(0);
+    expect(await client.cacheSize()).toBe(0);
   });
 
   it("clearCache empties the cache", async () => {
@@ -183,10 +183,10 @@ describe("AniListClient", () => {
     const client = new AniListClient();
 
     await client.getMedia(1);
-    expect(client.cacheSize).toBeGreaterThan(0);
+    expect(await client.cacheSize()).toBeGreaterThan(0);
 
     await client.clearCache();
-    expect(client.cacheSize).toBe(0);
+    expect(await client.cacheSize()).toBe(0);
   });
 
   // ── Custom cache adapter ──

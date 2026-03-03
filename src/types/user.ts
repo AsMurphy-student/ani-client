@@ -49,8 +49,6 @@ export interface SearchUserOptions {
   perPage?: number;
 }
 
-// ── Favorites ──
-
 export interface FavoriteMediaNode {
   id: number;
   title: { romaji: string | null; english: string | null; native: string | null; userPreferred: string | null };

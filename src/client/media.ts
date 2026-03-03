@@ -30,8 +30,6 @@ import type {
 import { clampPerPage, validateId } from "../utils";
 import type { ClientBase } from "./base";
 
-// ── Media methods ──
-
 export async function getMedia(client: ClientBase, id: number, include?: MediaIncludeOptions): Promise<Media> {
   validateId(id, "mediaId");
   const query = buildMediaByIdQuery(include);
@@ -180,17 +178,13 @@ export async function getWeeklySchedule(client: ClientBase, date: Date = new Dat
     Sunday: [],
   };
 
-  // Get Monday 00:00:00 of the week
-  const startOfWeek = new Date(date);
-  const day = startOfWeek.getDay(); // 0 is Sunday, 1 is Monday...
-  const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1);
-  startOfWeek.setDate(diff);
-  startOfWeek.setHours(0, 0, 0, 0);
+  const utcDay = date.getUTCDay();
+  const diff = utcDay === 0 ? -6 : 1 - utcDay;
+  const startOfWeek = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + diff, 0, 0, 0));
 
-  // Get Sunday 23:59:59 of the week
   const endOfWeek = new Date(startOfWeek);
-  endOfWeek.setDate(startOfWeek.getDate() + 6);
-  endOfWeek.setHours(23, 59, 59, 999);
+  endOfWeek.setUTCDate(startOfWeek.getUTCDate() + 6);
+  endOfWeek.setUTCHours(23, 59, 59, 999);
 
   const startTimestamp = Math.floor(startOfWeek.getTime() / 1000);
   const endTimestamp = Math.floor(endOfWeek.getTime() / 1000);
@@ -208,7 +202,7 @@ export async function getWeeklySchedule(client: ClientBase, date: Date = new Dat
 
   for await (const episode of iterator) {
     const epDate = new Date(episode.airingAt * 1000);
-    const dayName = names[epDate.getDay()];
+    const dayName = names[epDate.getUTCDay()];
     schedule[dayName].push(episode);
   }
 

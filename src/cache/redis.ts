@@ -125,7 +125,7 @@ export class RedisCache implements CacheAdapter {
       if (keys.length === 0) return 0;
       return this.client.del(...keys);
     }
-    // RegExp: collect all keys and filter
+
     const allKeys = await this.collectKeys(`${this.prefix}*`);
     const matching = allKeys.filter((k) => pattern.test(k.slice(this.prefix.length)));
     if (matching.length === 0) return 0;

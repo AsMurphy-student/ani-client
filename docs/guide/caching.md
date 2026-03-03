@@ -60,7 +60,7 @@ const deletedMatches = await client.invalidateCache("Media");
 const deletedRegex = await client.invalidateCache(/getMedia\|.*id.*1/);
 
 // Poll remaining nodes
-console.log(await client.cacheSize);
+console.log(await client.cacheSize());
 ```
 
 ::: tip

@@ -2,14 +2,13 @@ import type { MediaIncludeOptions } from "../types";
 import {
   CHARACTER_FIELDS,
   CHARACTER_FIELDS_COMPACT,
+  MEDIA_FIELDS,
   MEDIA_FIELDS_BASE,
   RELATIONS_FIELDS,
   STAFF_FIELDS,
   VOICE_ACTOR_FIELDS_COMPACT,
 } from "./fragments";
 import { QUERY_MEDIA_BY_ID } from "./media";
-
-// ── Dynamic media query builder ──
 
 /**
  * Build a `Media(id: $id)` query that optionally includes characters, staff,
@@ -24,12 +23,10 @@ export function buildMediaByIdQuery(include?: MediaIncludeOptions): string {
 
   const extra: string[] = [];
 
-  // Relations — included by default (backward compat), opt-out with `relations: false`
   if (include.relations !== false) {
     extra.push(RELATIONS_FIELDS);
   }
 
-  // Characters
   if (include.characters) {
     const opts = typeof include.characters === "object" ? include.characters : {};
     const perPage = opts.perPage ?? 25;
@@ -50,7 +47,6 @@ export function buildMediaByIdQuery(include?: MediaIncludeOptions): string {
     }`);
   }
 
-  // Staff
   if (include.staff) {
     const opts = typeof include.staff === "object" ? include.staff : {};
     const perPage = opts.perPage ?? 25;
@@ -66,7 +62,6 @@ export function buildMediaByIdQuery(include?: MediaIncludeOptions): string {
     }`);
   }
 
-  // Recommendations
   if (include.recommendations) {
     const perPage = typeof include.recommendations === "object" ? (include.recommendations.perPage ?? 10) : 10;
     extra.push(`
@@ -87,7 +82,6 @@ export function buildMediaByIdQuery(include?: MediaIncludeOptions): string {
     }`);
   }
 
-  // Streaming episodes
   if (include.streamingEpisodes) {
     extra.push(`
     streamingEpisodes {
@@ -98,7 +92,6 @@ export function buildMediaByIdQuery(include?: MediaIncludeOptions): string {
     }`);
   }
 
-  // External links
   if (include.externalLinks) {
     extra.push(`
     externalLinks {
@@ -111,7 +104,6 @@ export function buildMediaByIdQuery(include?: MediaIncludeOptions): string {
     }`);
   }
 
-  // Stats (score & status distribution)
   if (include.stats) {
     extra.push(`
     stats {
@@ -129,15 +121,13 @@ query ($id: Int!) {
 }`;
 }
 
-// ── Batch query builders ──
-
 /** @internal Build a batched GraphQL query using aliases. */
 function buildBatchQuery(ids: number[], typeName: string, fields: string, prefix: string): string {
   const aliases = ids.map((id, i) => `${prefix}${i}: ${typeName}(id: ${id}) { ${fields} }`).join("\n  ");
   return `query {\n  ${aliases}\n}`;
 }
 
-export const buildBatchMediaQuery = (ids: number[]): string => buildBatchQuery(ids, "Media", MEDIA_FIELDS_BASE, "m");
+export const buildBatchMediaQuery = (ids: number[]): string => buildBatchQuery(ids, "Media", MEDIA_FIELDS, "m");
 
 export const buildBatchCharacterQuery = (ids: number[]): string =>
   buildBatchQuery(ids, "Character", CHARACTER_FIELDS, "c");
