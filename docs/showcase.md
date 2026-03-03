@@ -8,7 +8,7 @@ If you are using `ani-client` in your own project, feel free to open a Pull Requ
 
 <div class="showcase-grid">
   <!-- ani-client-web -->
-  <a href="https://github.com/gonzyui/pulls" target="_blank" rel="noopener noreferrer" class="showcase-card">
+  <a href="https://github.com/gonzyui/ani-client/pulls" target="_blank" rel="noopener noreferrer" class="showcase-card">
     <div class="card-header">
       <div class="card-title-row">
         <h3>Want your projects to appear ?</h3>
