@@ -1,3 +1,15 @@
+---
+title: Batch Queries
+description: "Fetch multiple anime, manga, characters, or staff in a single GraphQL request with automatic chunking and input validation."
+head:
+  - - meta
+    - property: og:title
+      content: Batch Queries — ani-client
+  - - meta
+    - property: og:description
+      content: Fetch multiple AniList entities in a single request with automatic chunking up to 50 IDs per call.
+---
+
 # Batch Queries
 
 Fetch multiple IDs traversing identical endpoint entities in a single GraphQL request! Under the hood, AniList restricts nodes per fetch, so `ani-client` uses dynamic internal chunking up to 50 IDs per **parallel** call.

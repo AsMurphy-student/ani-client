@@ -20,7 +20,11 @@ export default defineConfig({
     ["meta", { name: "author", content: "gonzyui" }],
     [
       "meta",
-      { name: "keywords", content: "anilist, anime, manga, graphql, api, client, typescript, javascript, node.js" },
+      {
+        name: "keywords",
+        content:
+          "anilist, anime, manga, graphql, api, client, typescript, javascript, node.js, ani-client, gonzyui, gonzyuidev, anilist-wrapper, wrapper",
+      },
     ],
 
     ["meta", { property: "og:type", content: "website" }],
@@ -34,7 +38,7 @@ export default defineConfig({
     ["meta", { property: "og:site_name", content: siteTitle }],
     ["meta", { property: "og:locale", content: "en_US" }],
 
-    ["meta", { name: "twitter:card", content: "summary_large_image" }],
+    ["meta", { name: "twitter:card", content: "summary" }],
     ["meta", { name: "twitter:title", content: siteTitle }],
     ["meta", { name: "twitter:description", content: siteDescription }],
     ["meta", { name: "twitter:image", content: ogImage }],

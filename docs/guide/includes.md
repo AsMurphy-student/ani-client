@@ -1,3 +1,15 @@
+---
+title: Relations & Includes
+description: "Use include options to hydrate media responses with characters, staff, voice actors, streaming episodes, external links, stats, and recommendations."
+head:
+  - - meta
+    - property: og:title
+      content: Relations & Includes — ani-client
+  - - meta
+    - property: og:description
+      content: Learn how to include characters, staff, voice actors, and more in your AniList media queries with ani-client.
+---
+
 # Relations & Includes
 
 You can opt-in to fetch heavily nested entity layers simply by dropping in a secondary `{ include: true }` parameter on Supported queries.

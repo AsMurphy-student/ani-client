@@ -1,3 +1,15 @@
+---
+title: Types & Enums
+description: "All TypeScript types, interfaces, and enums exported by ani-client — MediaType, MediaFormat, MediaSort, AniListClientOptions, CacheAdapter, and more."
+head:
+  - - meta
+    - property: og:title
+      content: Types & Enums — ani-client
+  - - meta
+    - property: og:description
+      content: Complete TypeScript type reference for ani-client — enums, core interfaces, search options, and configuration types.
+---
+
 # Types & Enums
 
 All public types and enums exported by `ani-client`. Import them directly from the package root:

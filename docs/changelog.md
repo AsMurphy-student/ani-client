@@ -1,3 +1,15 @@
+---
+title: Changelog
+description: "Full release history for ani-client — new features, breaking changes, bug fixes, and documentation updates for every version."
+head:
+  - - meta
+    - property: og:title
+      content: Changelog — ani-client
+  - - meta
+    - property: og:description
+      content: Complete release history for ani-client with detailed changelogs for every version.
+---
+
 # Changelog
 
 ## [1.6.0] — 2026-03-02

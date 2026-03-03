@@ -1,3 +1,15 @@
+---
+title: Markdown Parser
+description: "Convert AniList's custom markdown syntax (spoilers, images, YouTube embeds, centered text) into standard HTML with parseAniListMarkdown."
+head:
+  - - meta
+    - property: og:title
+      content: Markdown Parser — ani-client
+  - - meta
+    - property: og:description
+      content: Parse AniList's custom markdown dialect into HTML — supports spoilers, images, YouTube, WebM, and standard formatting.
+---
+
 # Markdown Parser Utility
 
 AniList uses a custom dialect of Markdown for platform-specific formatting, for example to hide spoilers, center text, or embed media like YouTube and WebM videos. `ani-client` provides the `parseAniListMarkdown` function to convert this specific syntax into HTML that can be rendered by any web browser.
