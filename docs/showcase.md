@@ -8,22 +8,22 @@ If you are using `ani-client` in your own project, feel free to open a Pull Requ
 
 <div class="showcase-grid">
   <!-- ani-client-web -->
-  <a href="https://gonzyuidev.xyz/projects/aniclient-template" target="_blank" rel="noopener noreferrer" class="showcase-card">
+  <a href="https://github.com/gonzyui/pulls" target="_blank" rel="noopener noreferrer" class="showcase-card">
     <div class="card-header">
       <div class="card-title-row">
-        <h3>ani-client template</h3>
-        <span class="version-badge">v1.4.4</span>
+        <h3>Want your projects to appear ?</h3>
+        <span class="version-badge">1.6.0 ?</span>
       </div>
     </div>
     <div class="card-body">
-      <p>A web showcase built around the ani-client fetching package to demonstrate its power in web environments.</p>
+      <p>Open a pull request to get your projects listed here!</p>
     </div>
     <div class="card-footer">
       <div class="author">
         <img src="https://github.com/gonzyui.png" alt="gonzyui" class="author-avatar" />
         <span>By <strong>@gonzyui</strong></span>
       </div>
-      <span class="visit-link">Visit &rarr;</span>
+      <span class="visit-link">Open a PR &rarr;</span>
     </div>
   </a>
 </div>
