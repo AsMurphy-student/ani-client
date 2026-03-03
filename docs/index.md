@@ -12,7 +12,7 @@ head:
       content: Fetch anime, manga, characters, staff and user data from AniList effortlessly. Zero dependencies, built-in caching, rate limiting, and full TypeScript support.
   - - meta
     - property: og:image
-      content: https://ani-client.js.org/assets/logo.png
+      content: https://ani-client.js.org/assets/image.png
   - - meta
     - property: og:url
       content: https://ani-client.js.org/
