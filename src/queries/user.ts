@@ -1,3 +1,4 @@
+import { clampPerPage } from "../utils";
 import { MEDIA_LIST_FIELDS, USER_FAVORITES_FIELDS, USER_FIELDS } from "./fragments";
 
 export const QUERY_USER_BY_ID = `
@@ -51,3 +52,65 @@ query ($name: String!) {
     ${USER_FAVORITES_FIELDS}
   }
 }`;
+
+/**
+ * Build a User Favorites query with customisable perPage per category.
+ * @internal
+ */
+export function buildUserFavoritesQuery(idOrName: "id" | "name", perPage = 25): string {
+  const pp = clampPerPage(perPage);
+  const varDecl = idOrName === "id" ? "$id: Int!" : "$name: String!";
+  const selector = idOrName === "id" ? "id: $id" : "name: $name";
+  return `
+query (${varDecl}) {
+  User(${selector}) {
+    id
+    name
+    favourites {
+      anime(perPage: ${pp}) {
+        nodes {
+          id
+          title { romaji english native userPreferred }
+          coverImage { large medium }
+          type
+          format
+          siteUrl
+        }
+      }
+      manga(perPage: ${pp}) {
+        nodes {
+          id
+          title { romaji english native userPreferred }
+          coverImage { large medium }
+          type
+          format
+          siteUrl
+        }
+      }
+      characters(perPage: ${pp}) {
+        nodes {
+          id
+          name { full native }
+          image { large medium }
+          siteUrl
+        }
+      }
+      staff(perPage: ${pp}) {
+        nodes {
+          id
+          name { full native }
+          image { large medium }
+          siteUrl
+        }
+      }
+      studios(perPage: ${pp}) {
+        nodes {
+          id
+          name
+          siteUrl
+        }
+      }
+    }
+  }
+}`;
+}

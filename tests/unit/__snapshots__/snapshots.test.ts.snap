@@ -1,0 +1,1058 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`query snapshots > QUERY_AIRING_SCHEDULE matches snapshot 1`] = `
+"
+query ($airingAt_greater: Int, $airingAt_lesser: Int, $sort: [AiringSort], $page: Int, $perPage: Int) {
+  Page(page: $page, perPage: $perPage) {
+    pageInfo { total perPage currentPage lastPage hasNextPage }
+    airingSchedules(airingAt_greater: $airingAt_greater, airingAt_lesser: $airingAt_lesser, sort: $sort) {
+      id
+      airingAt
+      timeUntilAiring
+      episode
+      mediaId
+      media {
+        
+  id
+  idMal
+  title { romaji english native userPreferred }
+  type
+  format
+  status
+  description(asHtml: false)
+  startDate { year month day }
+  endDate { year month day }
+  season
+  seasonYear
+  episodes
+  duration
+  chapters
+  volumes
+  countryOfOrigin
+  isLicensed
+  source
+  hashtag
+  trailer { id site thumbnail }
+  coverImage { extraLarge large medium color }
+  bannerImage
+  genres
+  synonyms
+  averageScore
+  meanScore
+  popularity
+  favourites
+  trending
+  tags { id name description category rank isMediaSpoiler }
+  studios { nodes { id name isAnimationStudio siteUrl } }
+  isAdult
+  siteUrl
+  nextAiringEpisode {
+    id
+    airingAt
+    episode
+    mediaId
+    timeUntilAiring
+  }
+
+      }
+    }
+  }
+}"
+`;
+
+exports[`query snapshots > QUERY_MEDIA_BY_MAL_ID matches snapshot 1`] = `
+"
+query ($idMal: Int!, $type: MediaType) {
+  Media(idMal: $idMal, type: $type) {
+    
+  
+  id
+  idMal
+  title { romaji english native userPreferred }
+  type
+  format
+  status
+  description(asHtml: false)
+  startDate { year month day }
+  endDate { year month day }
+  season
+  seasonYear
+  episodes
+  duration
+  chapters
+  volumes
+  countryOfOrigin
+  isLicensed
+  source
+  hashtag
+  trailer { id site thumbnail }
+  coverImage { extraLarge large medium color }
+  bannerImage
+  genres
+  synonyms
+  averageScore
+  meanScore
+  popularity
+  favourites
+  trending
+  tags { id name description category rank isMediaSpoiler }
+  studios { nodes { id name isAnimationStudio siteUrl } }
+  isAdult
+  siteUrl
+  nextAiringEpisode {
+    id
+    airingAt
+    episode
+    mediaId
+    timeUntilAiring
+  }
+
+  
+  relations {
+    edges {
+      relationType(version: 2)
+      node {
+        id
+        title { romaji english native userPreferred }
+        type
+        format
+        status
+        coverImage { large medium }
+        siteUrl
+      }
+    }
+  }
+
+
+  }
+}"
+`;
+
+exports[`query snapshots > QUERY_MEDIA_SEARCH matches snapshot 1`] = `
+"
+query (
+  $search: String,
+  $type: MediaType,
+  $format: MediaFormat,
+  $status: MediaStatus,
+  $season: MediaSeason,
+  $seasonYear: Int,
+  $genre: String,
+  $tag: String,
+  $genre_in: [String],
+  $tag_in: [String],
+  $genre_not_in: [String],
+  $tag_not_in: [String],
+  $isAdult: Boolean,
+  $sort: [MediaSort],
+  $page: Int,
+  $perPage: Int
+) {
+  Page(page: $page, perPage: $perPage) {
+    pageInfo { total perPage currentPage lastPage hasNextPage }
+    media(
+      search: $search,
+      type: $type,
+      format: $format,
+      status: $status,
+      season: $season,
+      seasonYear: $seasonYear,
+      genre: $genre,
+      tag: $tag,
+      genre_in: $genre_in,
+      tag_in: $tag_in,
+      genre_not_in: $genre_not_in,
+      tag_not_in: $tag_not_in,
+      isAdult: $isAdult,
+      sort: $sort
+    ) {
+      
+  id
+  idMal
+  title { romaji english native userPreferred }
+  type
+  format
+  status
+  description(asHtml: false)
+  startDate { year month day }
+  endDate { year month day }
+  season
+  seasonYear
+  episodes
+  duration
+  chapters
+  volumes
+  countryOfOrigin
+  isLicensed
+  source
+  hashtag
+  trailer { id site thumbnail }
+  coverImage { extraLarge large medium color }
+  bannerImage
+  genres
+  synonyms
+  averageScore
+  meanScore
+  popularity
+  favourites
+  trending
+  tags { id name description category rank isMediaSpoiler }
+  studios { nodes { id name isAnimationStudio siteUrl } }
+  isAdult
+  siteUrl
+  nextAiringEpisode {
+    id
+    airingAt
+    episode
+    mediaId
+    timeUntilAiring
+  }
+
+    }
+  }
+}"
+`;
+
+exports[`query snapshots > QUERY_STUDIO_SEARCH matches snapshot 1`] = `
+"
+query ($search: String, $sort: [StudioSort], $page: Int, $perPage: Int) {
+  Page(page: $page, perPage: $perPage) {
+    pageInfo { total perPage currentPage lastPage hasNextPage }
+    studios(search: $search, sort: $sort) {
+      
+  id
+  name
+  isAnimationStudio
+  siteUrl
+  favourites
+  media(page: 1, perPage: 25, sort: POPULARITY_DESC) {
+    pageInfo { total perPage currentPage lastPage hasNextPage }
+    nodes {
+      id
+      title { romaji english native userPreferred }
+      type
+      format
+      coverImage { large medium }
+      siteUrl
+    }
+  }
+
+    }
+  }
+}"
+`;
+
+exports[`query snapshots > QUERY_TRENDING matches snapshot 1`] = `
+"
+query ($type: MediaType, $page: Int, $perPage: Int) {
+  Page(page: $page, perPage: $perPage) {
+    pageInfo { total perPage currentPage lastPage hasNextPage }
+    media(type: $type, sort: TRENDING_DESC) {
+      
+  id
+  idMal
+  title { romaji english native userPreferred }
+  type
+  format
+  status
+  description(asHtml: false)
+  startDate { year month day }
+  endDate { year month day }
+  season
+  seasonYear
+  episodes
+  duration
+  chapters
+  volumes
+  countryOfOrigin
+  isLicensed
+  source
+  hashtag
+  trailer { id site thumbnail }
+  coverImage { extraLarge large medium color }
+  bannerImage
+  genres
+  synonyms
+  averageScore
+  meanScore
+  popularity
+  favourites
+  trending
+  tags { id name description category rank isMediaSpoiler }
+  studios { nodes { id name isAnimationStudio siteUrl } }
+  isAdult
+  siteUrl
+  nextAiringEpisode {
+    id
+    airingAt
+    episode
+    mediaId
+    timeUntilAiring
+  }
+
+    }
+  }
+}"
+`;
+
+exports[`query snapshots > buildBatchCharacterQuery matches snapshot 1`] = `
+"query {
+  c0: Character(id: 1) { 
+  
+  id
+  name { first middle last full native alternative }
+  image { large medium }
+  description(asHtml: false)
+  gender
+  dateOfBirth { year month day }
+  age
+  bloodType
+  favourites
+  siteUrl
+
+  
+  media(perPage: 10) {
+    nodes {
+      id
+      title { romaji english native userPreferred }
+      type
+      coverImage { large medium }
+      siteUrl
+    }
+  }
+
+ }
+  c1: Character(id: 40) { 
+  
+  id
+  name { first middle last full native alternative }
+  image { large medium }
+  description(asHtml: false)
+  gender
+  dateOfBirth { year month day }
+  age
+  bloodType
+  favourites
+  siteUrl
+
+  
+  media(perPage: 10) {
+    nodes {
+      id
+      title { romaji english native userPreferred }
+      type
+      coverImage { large medium }
+      siteUrl
+    }
+  }
+
+ }
+  c2: Character(id: 100) { 
+  
+  id
+  name { first middle last full native alternative }
+  image { large medium }
+  description(asHtml: false)
+  gender
+  dateOfBirth { year month day }
+  age
+  bloodType
+  favourites
+  siteUrl
+
+  
+  media(perPage: 10) {
+    nodes {
+      id
+      title { romaji english native userPreferred }
+      type
+      coverImage { large medium }
+      siteUrl
+    }
+  }
+
+ }
+}"
+`;
+
+exports[`query snapshots > buildBatchMediaQuery matches snapshot 1`] = `
+"query {
+  m0: Media(id: 1) { 
+  
+  id
+  idMal
+  title { romaji english native userPreferred }
+  type
+  format
+  status
+  description(asHtml: false)
+  startDate { year month day }
+  endDate { year month day }
+  season
+  seasonYear
+  episodes
+  duration
+  chapters
+  volumes
+  countryOfOrigin
+  isLicensed
+  source
+  hashtag
+  trailer { id site thumbnail }
+  coverImage { extraLarge large medium color }
+  bannerImage
+  genres
+  synonyms
+  averageScore
+  meanScore
+  popularity
+  favourites
+  trending
+  tags { id name description category rank isMediaSpoiler }
+  studios { nodes { id name isAnimationStudio siteUrl } }
+  isAdult
+  siteUrl
+  nextAiringEpisode {
+    id
+    airingAt
+    episode
+    mediaId
+    timeUntilAiring
+  }
+
+  
+  relations {
+    edges {
+      relationType(version: 2)
+      node {
+        id
+        title { romaji english native userPreferred }
+        type
+        format
+        status
+        coverImage { large medium }
+        siteUrl
+      }
+    }
+  }
+
+ }
+  m1: Media(id: 20) { 
+  
+  id
+  idMal
+  title { romaji english native userPreferred }
+  type
+  format
+  status
+  description(asHtml: false)
+  startDate { year month day }
+  endDate { year month day }
+  season
+  seasonYear
+  episodes
+  duration
+  chapters
+  volumes
+  countryOfOrigin
+  isLicensed
+  source
+  hashtag
+  trailer { id site thumbnail }
+  coverImage { extraLarge large medium color }
+  bannerImage
+  genres
+  synonyms
+  averageScore
+  meanScore
+  popularity
+  favourites
+  trending
+  tags { id name description category rank isMediaSpoiler }
+  studios { nodes { id name isAnimationStudio siteUrl } }
+  isAdult
+  siteUrl
+  nextAiringEpisode {
+    id
+    airingAt
+    episode
+    mediaId
+    timeUntilAiring
+  }
+
+  
+  relations {
+    edges {
+      relationType(version: 2)
+      node {
+        id
+        title { romaji english native userPreferred }
+        type
+        format
+        status
+        coverImage { large medium }
+        siteUrl
+      }
+    }
+  }
+
+ }
+  m2: Media(id: 5735) { 
+  
+  id
+  idMal
+  title { romaji english native userPreferred }
+  type
+  format
+  status
+  description(asHtml: false)
+  startDate { year month day }
+  endDate { year month day }
+  season
+  seasonYear
+  episodes
+  duration
+  chapters
+  volumes
+  countryOfOrigin
+  isLicensed
+  source
+  hashtag
+  trailer { id site thumbnail }
+  coverImage { extraLarge large medium color }
+  bannerImage
+  genres
+  synonyms
+  averageScore
+  meanScore
+  popularity
+  favourites
+  trending
+  tags { id name description category rank isMediaSpoiler }
+  studios { nodes { id name isAnimationStudio siteUrl } }
+  isAdult
+  siteUrl
+  nextAiringEpisode {
+    id
+    airingAt
+    episode
+    mediaId
+    timeUntilAiring
+  }
+
+  
+  relations {
+    edges {
+      relationType(version: 2)
+      node {
+        id
+        title { romaji english native userPreferred }
+        type
+        format
+        status
+        coverImage { large medium }
+        siteUrl
+      }
+    }
+  }
+
+ }
+}"
+`;
+
+exports[`query snapshots > buildBatchStaffQuery matches snapshot 1`] = `
+"query {
+  s0: Staff(id: 95001) { 
+  id
+  name { first middle last full native }
+  language
+  image { large medium }
+  description(asHtml: false)
+  primaryOccupations
+  gender
+  dateOfBirth { year month day }
+  dateOfDeath { year month day }
+  age
+  yearsActive
+  homeTown
+  bloodType
+  favourites
+  siteUrl
+ }
+  s1: Staff(id: 95002) { 
+  id
+  name { first middle last full native }
+  language
+  image { large medium }
+  description(asHtml: false)
+  primaryOccupations
+  gender
+  dateOfBirth { year month day }
+  dateOfDeath { year month day }
+  age
+  yearsActive
+  homeTown
+  bloodType
+  favourites
+  siteUrl
+ }
+}"
+`;
+
+exports[`query snapshots > buildMediaByIdQuery with all includes matches snapshot 1`] = `
+"
+query ($id: Int!) {
+  Media(id: $id) {
+    
+  id
+  idMal
+  title { romaji english native userPreferred }
+  type
+  format
+  status
+  description(asHtml: false)
+  startDate { year month day }
+  endDate { year month day }
+  season
+  seasonYear
+  episodes
+  duration
+  chapters
+  volumes
+  countryOfOrigin
+  isLicensed
+  source
+  hashtag
+  trailer { id site thumbnail }
+  coverImage { extraLarge large medium color }
+  bannerImage
+  genres
+  synonyms
+  averageScore
+  meanScore
+  popularity
+  favourites
+  trending
+  tags { id name description category rank isMediaSpoiler }
+  studios { nodes { id name isAnimationStudio siteUrl } }
+  isAdult
+  siteUrl
+  nextAiringEpisode {
+    id
+    airingAt
+    episode
+    mediaId
+    timeUntilAiring
+  }
+
+    
+  relations {
+    edges {
+      relationType(version: 2)
+      node {
+        id
+        title { romaji english native userPreferred }
+        type
+        format
+        status
+        coverImage { large medium }
+        siteUrl
+      }
+    }
+  }
+
+
+    characters(perPage: 25, sort: [ROLE, RELEVANCE, ID]) {
+      edges {
+        role
+        node {
+          
+  id
+  name { first middle last full native alternative }
+  image { large medium }
+  description(asHtml: false)
+  gender
+  dateOfBirth { year month day }
+  age
+  bloodType
+  favourites
+  siteUrl
+
+        }
+            voiceActors {
+              
+  id
+  name { first middle last full native userPreferred }
+  languageV2
+  image { large medium }
+  gender
+  primaryOccupations
+  siteUrl
+
+            }
+      }
+    }
+
+    staff(perPage: 10, sort: [RELEVANCE, ID]) {
+      edges {
+        role
+        node {
+          
+  id
+  name { first middle last full native }
+  language
+  image { large medium }
+  description(asHtml: false)
+  primaryOccupations
+  gender
+  dateOfBirth { year month day }
+  dateOfDeath { year month day }
+  age
+  yearsActive
+  homeTown
+  bloodType
+  favourites
+  siteUrl
+
+        }
+      }
+    }
+
+    recommendations(perPage: 5, sort: [RATING_DESC]) {
+      nodes {
+        id
+        rating
+        mediaRecommendation {
+          id
+          title { romaji english native userPreferred }
+          type
+          format
+          coverImage { large medium }
+          averageScore
+          siteUrl
+        }
+      }
+    }
+
+    streamingEpisodes {
+      title
+      thumbnail
+      url
+      site
+    }
+
+    externalLinks {
+      id
+      url
+      site
+      type
+      icon
+      color
+    }
+
+    stats {
+      scoreDistribution { score amount }
+      statusDistribution { status amount }
+    }
+  }
+}"
+`;
+
+exports[`query snapshots > buildMediaByIdQuery with relations: false matches snapshot 1`] = `
+"
+query ($id: Int!) {
+  Media(id: $id) {
+    
+  id
+  idMal
+  title { romaji english native userPreferred }
+  type
+  format
+  status
+  description(asHtml: false)
+  startDate { year month day }
+  endDate { year month day }
+  season
+  seasonYear
+  episodes
+  duration
+  chapters
+  volumes
+  countryOfOrigin
+  isLicensed
+  source
+  hashtag
+  trailer { id site thumbnail }
+  coverImage { extraLarge large medium color }
+  bannerImage
+  genres
+  synonyms
+  averageScore
+  meanScore
+  popularity
+  favourites
+  trending
+  tags { id name description category rank isMediaSpoiler }
+  studios { nodes { id name isAnimationStudio siteUrl } }
+  isAdult
+  siteUrl
+  nextAiringEpisode {
+    id
+    airingAt
+    episode
+    mediaId
+    timeUntilAiring
+  }
+
+    
+  }
+}"
+`;
+
+exports[`query snapshots > buildMediaByIdQuery() default matches snapshot 1`] = `
+"
+query ($id: Int!) {
+  Media(id: $id) {
+    
+  
+  id
+  idMal
+  title { romaji english native userPreferred }
+  type
+  format
+  status
+  description(asHtml: false)
+  startDate { year month day }
+  endDate { year month day }
+  season
+  seasonYear
+  episodes
+  duration
+  chapters
+  volumes
+  countryOfOrigin
+  isLicensed
+  source
+  hashtag
+  trailer { id site thumbnail }
+  coverImage { extraLarge large medium color }
+  bannerImage
+  genres
+  synonyms
+  averageScore
+  meanScore
+  popularity
+  favourites
+  trending
+  tags { id name description category rank isMediaSpoiler }
+  studios { nodes { id name isAnimationStudio siteUrl } }
+  isAdult
+  siteUrl
+  nextAiringEpisode {
+    id
+    airingAt
+    episode
+    mediaId
+    timeUntilAiring
+  }
+
+  
+  relations {
+    edges {
+      relationType(version: 2)
+      node {
+        id
+        title { romaji english native userPreferred }
+        type
+        format
+        status
+        coverImage { large medium }
+        siteUrl
+      }
+    }
+  }
+
+
+  }
+}"
+`;
+
+exports[`query snapshots > buildStudioByIdQuery() default matches snapshot 1`] = `
+"
+query ($id: Int!) {
+  Studio(id: $id) {
+    
+  id
+  name
+  isAnimationStudio
+  siteUrl
+  favourites
+  media(page: 1, perPage: 25, sort: POPULARITY_DESC) {
+    pageInfo { total perPage currentPage lastPage hasNextPage }
+    nodes {
+      id
+      title { romaji english native userPreferred }
+      type
+      format
+      coverImage { large medium }
+      siteUrl
+    }
+  }
+
+  }
+}"
+`;
+
+exports[`query snapshots > buildStudioByIdQuery(50) matches snapshot 1`] = `
+"
+query ($id: Int!) {
+  Studio(id: $id) {
+    id
+    name
+    isAnimationStudio
+    siteUrl
+    favourites
+    media(page: 1, perPage: 50, sort: POPULARITY_DESC) {
+      pageInfo { total perPage currentPage lastPage hasNextPage }
+      nodes {
+        
+  id
+  idMal
+  title { romaji english native userPreferred }
+  type
+  format
+  status
+  coverImage { large medium color }
+  bannerImage
+  genres
+  averageScore
+  popularity
+  favourites
+  isAdult
+  siteUrl
+  season
+  seasonYear
+  episodes
+  chapters
+  nextAiringEpisode {
+    id
+    airingAt
+    episode
+    timeUntilAiring
+  }
+
+      }
+    }
+  }
+}"
+`;
+
+exports[`query snapshots > buildUserFavoritesQuery('id', 25) matches snapshot 1`] = `
+"
+query ($id: Int!) {
+  User(id: $id) {
+    id
+    name
+    favourites {
+      anime(perPage: 25) {
+        nodes {
+          id
+          title { romaji english native userPreferred }
+          coverImage { large medium }
+          type
+          format
+          siteUrl
+        }
+      }
+      manga(perPage: 25) {
+        nodes {
+          id
+          title { romaji english native userPreferred }
+          coverImage { large medium }
+          type
+          format
+          siteUrl
+        }
+      }
+      characters(perPage: 25) {
+        nodes {
+          id
+          name { full native }
+          image { large medium }
+          siteUrl
+        }
+      }
+      staff(perPage: 25) {
+        nodes {
+          id
+          name { full native }
+          image { large medium }
+          siteUrl
+        }
+      }
+      studios(perPage: 25) {
+        nodes {
+          id
+          name
+          siteUrl
+        }
+      }
+    }
+  }
+}"
+`;
+
+exports[`query snapshots > buildUserFavoritesQuery('name', 50) matches snapshot 1`] = `
+"
+query ($name: String!) {
+  User(name: $name) {
+    id
+    name
+    favourites {
+      anime(perPage: 50) {
+        nodes {
+          id
+          title { romaji english native userPreferred }
+          coverImage { large medium }
+          type
+          format
+          siteUrl
+        }
+      }
+      manga(perPage: 50) {
+        nodes {
+          id
+          title { romaji english native userPreferred }
+          coverImage { large medium }
+          type
+          format
+          siteUrl
+        }
+      }
+      characters(perPage: 50) {
+        nodes {
+          id
+          name { full native }
+          image { large medium }
+          siteUrl
+        }
+      }
+      staff(perPage: 50) {
+        nodes {
+          id
+          name { full native }
+          image { large medium }
+          siteUrl
+        }
+      }
+      studios(perPage: 50) {
+        nodes {
+          id
+          name
+          siteUrl
+        }
+      }
+    }
+  }
+}"
+`;

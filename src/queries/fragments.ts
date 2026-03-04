@@ -1,3 +1,34 @@
+/**
+ * Lightweight media fields — minimal payload for list/search contexts.
+ * Does NOT include tags, studios, trailer, synonyms, or nextAiringEpisode.
+ */
+export const MEDIA_FIELDS_LIGHT = `
+  id
+  idMal
+  title { romaji english native userPreferred }
+  type
+  format
+  status
+  coverImage { large medium color }
+  bannerImage
+  genres
+  averageScore
+  popularity
+  favourites
+  isAdult
+  siteUrl
+  season
+  seasonYear
+  episodes
+  chapters
+  nextAiringEpisode {
+    id
+    airingAt
+    episode
+    timeUntilAiring
+  }
+`;
+
 /** Core media fields — always returned. Does NOT include relations (opt-in via include). */
 export const MEDIA_FIELDS_BASE = `
   id

@@ -33,3 +33,12 @@ export interface SearchStudioOptions {
   page?: number;
   perPage?: number;
 }
+
+/**
+ * Options for controlling embedded media when fetching a single studio.
+ * Pass `{ media: { perPage: 50 } }` to fetch more media per studio.
+ */
+export interface StudioIncludeOptions {
+  /** Customize the number of media returned. `true` = 25 (default), or `{ perPage }`. */
+  media?: boolean | { perPage?: number };
+}

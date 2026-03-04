@@ -1,6 +1,7 @@
 import {
   QUERY_AIRING_SCHEDULE,
   QUERY_MEDIA_BY_ID,
+  QUERY_MEDIA_BY_MAL_ID,
   QUERY_MEDIA_BY_SEASON,
   QUERY_MEDIA_SEARCH,
   QUERY_PLANNING,
@@ -34,6 +35,15 @@ export async function getMedia(client: ClientBase, id: number, include?: MediaIn
   validateId(id, "mediaId");
   const query = buildMediaByIdQuery(include);
   const data = await client.request<{ Media: Media }>(query, { id });
+  return data.Media;
+}
+
+export async function getMediaByMalId(client: ClientBase, malId: number, type?: MediaType): Promise<Media> {
+  validateId(malId, "malId");
+  const data = await client.request<{ Media: Media }>(QUERY_MEDIA_BY_MAL_ID, {
+    idMal: malId,
+    type,
+  });
   return data.Media;
 }
 
@@ -211,7 +221,7 @@ export async function getWeeklySchedule(client: ClientBase, date: Date = new Dat
   for await (const episode of iterator) {
     const epDate = new Date(episode.airingAt * 1000);
     const dayName = names[epDate.getUTCDay()];
-    schedule[dayName].push(episode);
+    if (dayName) schedule[dayName].push(episode);
   }
 
   return schedule;

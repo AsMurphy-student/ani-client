@@ -55,6 +55,12 @@ export interface CacheOptions {
   maxSize?: number;
   /** Set to false to disable caching entirely */
   enabled?: boolean;
+  /**
+   * Stale-while-revalidate grace period in milliseconds (default: 0 = disabled).
+   * When set, expired entries are still returned within the grace window,
+   * allowing the caller to refresh in the background.
+   */
+  staleWhileRevalidateMs?: number;
 }
 
 /** Rate limiter configuration options. */
@@ -121,6 +127,17 @@ export interface ResponseMeta {
   rateLimitInfo?: RateLimitInfo;
 }
 
+/**
+ * Minimal logger interface for structured log output.
+ * Compatible with `console`, `pino`, `winston`, etc.
+ */
+export interface Logger {
+  debug(message: string, ...args: unknown[]): void;
+  info(message: string, ...args: unknown[]): void;
+  warn(message: string, ...args: unknown[]): void;
+  error(message: string, ...args: unknown[]): void;
+}
+
 export interface AniListClientOptions {
   /** Optional AniList OAuth token for authenticated requests */
   token?: string;
@@ -136,4 +153,15 @@ export interface AniListClientOptions {
   hooks?: AniListHooks;
   /** Optional AbortSignal to cancel all requests made by this client */
   signal?: AbortSignal;
+  /**
+   * Optional logger for structured log output.
+   * Accepts any object with `debug`, `info`, `warn`, `error` methods.
+   * Compatible with `console`, `pino`, `winston`, etc.
+   *
+   * @example
+   * ```ts
+   * const client = new AniListClient({ logger: console });
+   * ```
+   */
+  logger?: Logger;
 }
