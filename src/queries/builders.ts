@@ -1,4 +1,5 @@
 import type { MediaIncludeOptions } from "../types";
+import { clampPerPage } from "../utils";
 import {
   CHARACTER_FIELDS,
   CHARACTER_FIELDS_COMPACT,
@@ -29,7 +30,7 @@ export function buildMediaByIdQuery(include?: MediaIncludeOptions): string {
 
   if (include.characters) {
     const opts = typeof include.characters === "object" ? include.characters : {};
-    const perPage = opts.perPage ?? 25;
+    const perPage = clampPerPage(opts.perPage ?? 25);
     const sortClause = opts.sort !== false ? ", sort: [ROLE, RELEVANCE, ID]" : "";
     const voiceActorBlock = opts.voiceActors
       ? `\n            voiceActors {
@@ -49,7 +50,7 @@ export function buildMediaByIdQuery(include?: MediaIncludeOptions): string {
 
   if (include.staff) {
     const opts = typeof include.staff === "object" ? include.staff : {};
-    const perPage = opts.perPage ?? 25;
+    const perPage = clampPerPage(opts.perPage ?? 25);
     const sortClause = opts.sort !== false ? ", sort: [RELEVANCE, ID]" : "";
     extra.push(`
     staff(perPage: ${perPage}${sortClause}) {
@@ -63,7 +64,7 @@ export function buildMediaByIdQuery(include?: MediaIncludeOptions): string {
   }
 
   if (include.recommendations) {
-    const perPage = typeof include.recommendations === "object" ? (include.recommendations.perPage ?? 10) : 10;
+    const perPage = clampPerPage(typeof include.recommendations === "object" ? (include.recommendations.perPage ?? 10) : 10);
     extra.push(`
     recommendations(perPage: ${perPage}, sort: [RATING_DESC]) {
       nodes {

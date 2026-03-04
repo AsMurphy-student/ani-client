@@ -139,6 +139,17 @@ All values also have a `_DESC` counterpart where applicable.
 | `IS_STICKY` | Show sticky threads first |
 | `SEARCH_MATCH` | Sort by relevance to search query |
 
+### StudioSort
+
+All values also have a `_DESC` counterpart where applicable.
+
+| Value | Description |
+| --- | --- |
+| `ID` | Sort by studio ID |
+| `NAME` | Sort by name |
+| `SEARCH_MATCH` | Sort by relevance to search query |
+| `FAVOURITES` | Sort by number of favourites |
+
 ### AiringSort
 
 All values also have a `_DESC` counterpart.
@@ -182,7 +193,16 @@ The main anime/manga object. Key fields:
 | `status` | `MediaStatus \| null` | RELEASING, FINISHED, etc. |
 | `description` | `string \| null` | Synopsis |
 | `source` | `MediaSource \| null` | Adaptation source (ORIGINAL, MANGA, etc.) |
-| `episodes` | `number \| null` | Episode count (anime) |
+### StatusDistribution
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `status` | `MediaListStatus` | The list status |
+| `amount` | `number` | Number of users with this status |
+
+::: info Type change in v1.7.0
+`status` was previously typed as `MediaListStatus \| string`. The `\| string` escape hatch has been removed for stricter type safety.
+:::| `episodes` | `number \| null` | Episode count (anime) |
 | `chapters` | `number \| null` | Chapter count (manga) |
 | `coverImage` | `MediaCoverImage` | Cover art URLs |
 | `bannerImage` | `string \| null` | Banner URL |
@@ -452,3 +472,16 @@ Returned by `getUserFavorites()`. Contains arrays of lightweight nodes for each 
 | `characters` | `FavoriteCharacterNode[]` | Favorite characters (id, name, image, siteUrl) |
 | `staff` | `FavoriteStaffNode[]` | Favorite staff (id, name, image, siteUrl) |
 | `studios` | `FavoriteStudioNode[]` | Favorite studios (id, name, siteUrl) |
+
+::: info Type change in v1.7.0
+`FavoriteMediaNode.type` is now `MediaType | null` (was `string | null`) and `FavoriteMediaNode.format` is now `MediaFormat | null` (was `string | null`). The `title` and `coverImage` fields now reference shared `MediaTitle` and `MediaCoverImage` types.
+:::
+
+### SearchStudioOptions
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `query` | `string` | Search term |
+| `sort` | `StudioSort[]` | Sort order |
+| `page` | `number` | Page number |
+| `perPage` | `number` | Results per page (max 50) |

@@ -8,10 +8,10 @@ query ($id: Int!) {
 }`;
 
 export const QUERY_STUDIO_SEARCH = `
-query ($search: String, $page: Int, $perPage: Int) {
+query ($search: String, $sort: [StudioSort], $page: Int, $perPage: Int) {
   Page(page: $page, perPage: $perPage) {
     pageInfo { total perPage currentPage lastPage hasNextPage }
-    studios(search: $search) {
+    studios(search: $search, sort: $sort) {
       ${STUDIO_FIELDS}
     }
   }

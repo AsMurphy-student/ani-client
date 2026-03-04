@@ -189,7 +189,7 @@ export interface ScoreDistribution {
 }
 
 export interface StatusDistribution {
-  status: MediaListStatus | string;
+  status: MediaListStatus;
   amount: number;
 }
 

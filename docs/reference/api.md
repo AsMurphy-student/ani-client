@@ -128,11 +128,15 @@ Get recently aired anime episodes (default: last 24 hours).
 
 **Returns:** `Promise<PagedResult<AiringSchedule>>`
 
-### `getAiredChapters(options?)`
+### `getRecentlyUpdatedManga(options?)`
 
 Get currently releasing manga sorted by most recently updated.
 
 **Returns:** `Promise<PagedResult<Media>>`
+
+::: warning Deprecation
+`getAiredChapters()` is deprecated. Use `getRecentlyUpdatedManga()` instead — the old name is kept as an alias and will be removed in v2.
+:::
 
 ### `getRecommendations(mediaId, options?)`
 
@@ -241,7 +245,20 @@ Fetch a studio by AniList ID, including its most popular productions.
 
 Search for studios by name.
 
+| Param | Type |
+| --- | --- |
+| `options` | `SearchStudioOptions` (query?, sort?, page?, perPage?) |
+
 **Returns:** `Promise<PagedResult<Studio>>`
+
+```typescript
+import { StudioSort } from "ani-client";
+
+const studios = await client.searchStudios({
+  query: "MAPPA",
+  sort: [StudioSort.FAVOURITES_DESC],
+});
+```
 
 ---
 

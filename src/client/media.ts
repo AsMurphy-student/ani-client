@@ -100,7 +100,12 @@ export async function getAiredEpisodes(
   );
 }
 
-export async function getAiredChapters(
+/**
+ * @deprecated Use `getRecentlyUpdatedManga` instead. This alias will be removed in v2.
+ */
+export const getAiredChapters = getRecentlyUpdatedManga;
+
+export async function getRecentlyUpdatedManga(
   client: ClientBase,
   options: GetRecentChaptersOptions = {},
 ): Promise<PagedResult<Media>> {
@@ -132,6 +137,7 @@ export async function getRecommendations(
   mediaId: number,
   options: Omit<GetRecommendationsOptions, "mediaId"> = {},
 ): Promise<PagedResult<Recommendation>> {
+  validateId(mediaId, "mediaId");
   const data = await client.request<{
     Media: {
       recommendations: {
@@ -189,13 +195,15 @@ export async function getWeeklySchedule(client: ClientBase, date: Date = new Dat
   const startTimestamp = Math.floor(startOfWeek.getTime() / 1000);
   const endTimestamp = Math.floor(endOfWeek.getTime() / 1000);
 
-  const iterator = client.paginate((page) =>
-    getAiredEpisodes(client, {
-      airingAtGreater: startTimestamp,
-      airingAtLesser: endTimestamp,
-      page,
-      perPage: 50,
-    }),
+  const iterator = client.paginate(
+    (page) =>
+      getAiredEpisodes(client, {
+        airingAtGreater: startTimestamp,
+        airingAtLesser: endTimestamp,
+        page,
+        perPage: 50,
+      }),
+    20,
   );
 
   const names: DayOfWeek[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];

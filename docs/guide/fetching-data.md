@@ -86,9 +86,22 @@ const top = await client.getTopRated(MediaType.MANGA, 1, 10);
 top.results.forEach((m) => console.log(`${m.title.romaji} — ${m.averageScore}/100`));
 ```
 
+### `getRecentlyUpdatedManga(options?)`
+
+Get currently releasing manga sorted by most recently updated.
+
+```typescript
+const manga = await client.getRecentlyUpdatedManga({ perPage: 10 });
+manga.results.forEach((m) => console.log(m.title.romaji));
+```
+
+::: warning Deprecation
+`getAiredChapters()` is deprecated. Use `getRecentlyUpdatedManga()` instead.
+:::
+
 ### `getWeeklySchedule(date?)`
 
-Fetches the airing schedule for the entire week of the specified date (defaults to the current week) and groups the episodes by day of the week (Monday to Sunday).
+Fetches the airing schedule for the entire week of the specified date (defaults to the current week) and groups the episodes by day of the week (Monday to Sunday). Limited to 20 pages of results.
 
 ```typescript
 const schedule = await client.getWeeklySchedule();
