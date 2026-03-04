@@ -12,6 +12,33 @@ head:
 
 # Changelog
 
+## [1.7.0] — 2026-03-04
+
+### Breaking Changes
+- **`StatusDistribution.status` type narrowed** — Changed from `MediaListStatus | string` to `MediaListStatus`. If you were relying on the `| string` escape hatch, cast explicitly.
+- **`VoiceActor` refactored** — Now extends `Pick<Staff, ...>` instead of being a standalone interface. The shape is identical at runtime, but TypeScript code referencing structural differences may need adjustment.
+- **`ThreadMediaCategory` refactored** — `title` is now `MediaTitle`, `type` is now `MediaType`, and `coverImage` uses `Pick<MediaCoverImage, "large" | "medium">` instead of inline types.
+- **`FavoriteMediaNode` refactored** — `type` is now `MediaType | null` (was `string | null`), `format` is now `MediaFormat | null` (was `string | null`), `title` is now `MediaTitle`, `coverImage` uses `Pick<MediaCoverImage, "large" | "medium">`.
+
+### Security
+- **Markdown XSS hardening** — `parseAniListMarkdown()` now validates all URLs in `img()`, `img<width>()`, `webm()`, and `[link]()` syntax against an `https?://` allowlist. `youtube()` IDs are validated against `[\w-]+`. URLs with `javascript:`, `data:`, or other dangerous protocols are now silently stripped, preventing XSS via user-generated content.
+
+### Added
+- **`StudioSort` enum** — New enum (`ID`, `NAME`, `SEARCH_MATCH`, `FAVOURITES` + `_DESC` variants) for studio search sorting.
+- **`SearchStudioOptions.sort`** — Studio search now accepts a `sort` parameter, aligning with all other entity search options.
+- **`getRecentlyUpdatedManga(options?)`** — New method replacing the misleadingly-named `getAiredChapters()`. Returns currently releasing manga sorted by most recently updated.
+
+### Changed
+- **`THREAD_FIELDS` moved to fragments** — Thread GraphQL fragment moved from `queries/thread.ts` to `queries/fragments.ts` for consistency with all other fragments.
+- **`getWeeklySchedule` bounded to 20 pages** — The auto-paginator now stops after 20 pages maximum, preventing runaway API calls during weeks with many airings.
+- **`buildMediaByIdQuery` perPage validation** — Character, staff, and recommendation `perPage` values in the query builder are now validated via `clampPerPage()` before GraphQL string interpolation, preventing invalid queries from `NaN` or `Infinity`.
+- **`getRecommendations` validates `mediaId`** — Now calls `validateId(mediaId)` before sending the request.
+- **`getUserMediaList` validates `userId`** — Now calls `validateId(userId)` when `userId` is provided.
+- **`searchStudios` destructuring** — Refactored to use consistent destructuring pattern matching other search methods.
+
+### Deprecated
+- **`getAiredChapters()`** — Renamed to `getRecentlyUpdatedManga()`. The old name is kept as a deprecated alias and will be removed in v2.
+
 ## [1.6.1] — 2026-03-03
 
 ### Breaking Changes

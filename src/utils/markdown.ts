@@ -11,6 +11,11 @@
  * @param text The AniList markdown text to parse
  * @returns The parsed HTML string
  */
+/** @internal Check that a URL uses a safe protocol (http/https). */
+function isSafeUrl(url: string): boolean {
+  return /^https?:\/\//i.test(url);
+}
+
 export function parseAniListMarkdown(text: string): string {
   if (!text) return "";
 
@@ -33,16 +38,22 @@ export function parseAniListMarkdown(text: string): string {
 
   html = html.replace(/~~~(.*?)~~~/gs, '<div class="anilist-center">$1</div>');
 
-  html = html.replace(/img(\d+)\((.*?)\)/gi, '<img src="$2" width="$1" alt="" class="anilist-image" />');
-
-  html = html.replace(/img\((.*?)\)/gi, '<img src="$1" alt="" class="anilist-image" />');
-
-  html = html.replace(
-    /youtube\((.*?)\)/gi,
-    '<iframe src="https://www.youtube.com/embed/$1" frameborder="0" allowfullscreen class="anilist-youtube"></iframe>',
+  html = html.replace(/img(\d+)\((.*?)\)/gi, (_match, width: string, url: string) =>
+    isSafeUrl(url) ? `<img src="${url}" width="${width}" alt="" class="anilist-image" />` : "",
   );
 
-  html = html.replace(/webm\((.*?)\)/gi, '<video src="$1" controls class="anilist-webm"></video>');
+  html = html.replace(/img\((.*?)\)/gi, (_match, url: string) =>
+    isSafeUrl(url) ? `<img src="${url}" alt="" class="anilist-image" />` : "",
+  );
+
+  html = html.replace(/youtube\((.*?)\)/gi, (_match, id: string) => {
+    if (!/^[\w-]+$/.test(id)) return "";
+    return `<iframe src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen class="anilist-youtube"></iframe>`;
+  });
+
+  html = html.replace(/webm\((.*?)\)/gi, (_match, url: string) =>
+    isSafeUrl(url) ? `<video src="${url}" controls class="anilist-webm"></video>` : "",
+  );
 
   html = html.replace(/^######\s+(.+)$/gm, "<h6>$1</h6>");
   html = html.replace(/^#####\s+(.+)$/gm, "<h5>$1</h5>");
@@ -59,7 +70,9 @@ export function parseAniListMarkdown(text: string): string {
 
   html = html.replace(/~~(.*?)~~/g, "<del>$1</del>");
 
-  html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+  html = html.replace(/\[(.*?)\]\((.*?)\)/g, (_match, text: string, url: string) =>
+    isSafeUrl(url) ? `<a href="${url}" target="_blank" rel="noopener noreferrer">${text}</a>` : text,
+  );
 
   html = html.replace(/\r\n/g, "\n");
   const lines = html.split("\n");

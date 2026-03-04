@@ -1,3 +1,4 @@
+import type { MediaCoverImage, MediaTitle, MediaType } from "./media";
 import type { UserAvatar } from "./user";
 
 /** Represents a forum thread on AniList. */
@@ -39,17 +40,9 @@ export interface ThreadCategory {
 
 export interface ThreadMediaCategory {
   id: number;
-  title: {
-    romaji: string | null;
-    english: string | null;
-    native: string | null;
-    userPreferred: string | null;
-  };
-  type: string;
-  coverImage: {
-    large: string | null;
-    medium: string | null;
-  } | null;
+  title: MediaTitle;
+  type: MediaType;
+  coverImage: Pick<MediaCoverImage, "large" | "medium"> | null;
   siteUrl: string | null;
 }
 

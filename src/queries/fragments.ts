@@ -293,3 +293,46 @@ export const STUDIO_FIELDS = `
     }
   }
 `;
+
+export const THREAD_FIELDS = `
+  id
+  title
+  body(asHtml: false)
+  userId
+  replyUserId
+  replyCommentId
+  replyCount
+  viewCount
+  isLocked
+  isSticky
+  isSubscribed
+  repliedAt
+  createdAt
+  updatedAt
+  siteUrl
+  user {
+    id
+    name
+    avatar { large medium }
+  }
+  replyUser {
+    id
+    name
+    avatar { large medium }
+  }
+  categories {
+    id
+    name
+  }
+  mediaCategories {
+    id
+    title { romaji english native userPreferred }
+    type
+    coverImage { large medium }
+    siteUrl
+  }
+  likes {
+    id
+    name
+  }
+`;

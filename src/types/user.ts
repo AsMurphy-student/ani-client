@@ -1,3 +1,5 @@
+import type { MediaCoverImage, MediaFormat, MediaTitle, MediaType } from "./media";
+
 export enum UserSort {
   ID = "ID",
   ID_DESC = "ID_DESC",
@@ -51,10 +53,10 @@ export interface SearchUserOptions {
 
 export interface FavoriteMediaNode {
   id: number;
-  title: { romaji: string | null; english: string | null; native: string | null; userPreferred: string | null };
-  coverImage: { large: string | null; medium: string | null };
-  type: string | null;
-  format: string | null;
+  title: MediaTitle;
+  coverImage: Pick<MediaCoverImage, "large" | "medium">;
+  type: MediaType | null;
+  format: MediaFormat | null;
   siteUrl: string | null;
 }
 

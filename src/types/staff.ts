@@ -96,19 +96,7 @@ export interface SearchStaffOptions {
 }
 
 /** Compact voice actor data returned inside character edges. */
-export interface VoiceActor {
-  id: number;
-  name: {
-    first: string | null;
-    middle: string | null;
-    last: string | null;
-    full: string | null;
-    native: string | null;
-    userPreferred: string | null;
-  };
+export interface VoiceActor extends Pick<Staff, "id" | "image" | "gender" | "primaryOccupations" | "siteUrl"> {
+  name: StaffName & { userPreferred: string | null };
   languageV2: string | null;
-  image: StaffImage;
-  gender: string | null;
-  primaryOccupations: string[];
-  siteUrl: string | null;
 }

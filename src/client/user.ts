@@ -42,6 +42,9 @@ export async function getUserMediaList(
   if (!options.userId && !options.userName) {
     throw new AniListError("getUserMediaList requires either userId or userName", 0, []);
   }
+  if (options.userId) {
+    validateId(options.userId, "userId");
+  }
   return client.pagedRequest<MediaListEntry>(
     QUERY_USER_MEDIA_LIST,
     {

@@ -15,12 +15,14 @@ export async function searchStudios(
   client: ClientBase,
   options: SearchStudioOptions = {},
 ): Promise<PagedResult<Studio>> {
+  const { query: search, page = 1, perPage = 20, sort } = options;
   return client.pagedRequest<Studio>(
     QUERY_STUDIO_SEARCH,
     {
-      search: options.query,
-      page: options.page ?? 1,
-      perPage: clampPerPage(options.perPage ?? 20),
+      search,
+      sort,
+      page,
+      perPage: clampPerPage(perPage),
     },
     "studios",
   );

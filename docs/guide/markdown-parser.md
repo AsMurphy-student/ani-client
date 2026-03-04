@@ -54,6 +54,8 @@ The function also handles a standard subset of Markdown commonly used in AniList
 -   **Paragraphs**: Two consecutive line breaks are converted to `<p>`, and single line breaks to `<br/>`
 
 ::: warning Security
-This function escapes all HTML entities (`<`, `>`, `&`, `"`, `'`) to prevent **XSS attacks**. However, the output is still raw HTML. Consumers should still use a Content Security Policy and consider additional sanitization when rendering user-generated content in a browser.
+This function escapes all HTML entities (`<`, `>`, `&`, `"`, `'`) to prevent **XSS attacks**. Additionally, all URLs in `img()`, `webm()`, and `[link]()` syntax are validated against an `https?://` protocol allowlist — URLs using `javascript:`, `data:`, or other dangerous protocols are silently stripped. YouTube embed IDs are validated against `[\w-]+`.
+
+However, the output is still raw HTML. Consumers should still use a Content Security Policy and consider additional sanitization when rendering user-generated content in a browser.
 :::
 

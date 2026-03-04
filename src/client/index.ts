@@ -253,9 +253,20 @@ export class AniListClient {
     return mediaMethods.getAiredEpisodes(this, options);
   }
 
-  /** Get currently releasing manga. */
+  /**
+   * Get currently releasing manga sorted by most recently updated.
+   *
+   * @param options - Pagination parameters
+   */
+  async getRecentlyUpdatedManga(options: GetRecentChaptersOptions = {}): Promise<PagedResult<Media>> {
+    return mediaMethods.getRecentlyUpdatedManga(this, options);
+  }
+
+  /**
+   * @deprecated Use `getRecentlyUpdatedManga` instead. This alias will be removed in v2.
+   */
   async getAiredChapters(options: GetRecentChaptersOptions = {}): Promise<PagedResult<Media>> {
-    return mediaMethods.getAiredChapters(this, options);
+    return this.getRecentlyUpdatedManga(options);
   }
 
   /** Get the detailed schedule for the current week, sorted by day. */

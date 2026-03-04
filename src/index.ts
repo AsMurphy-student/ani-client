@@ -21,6 +21,7 @@ export {
   StaffSort,
   UserSort,
   ThreadSort,
+  StudioSort,
   type CacheAdapter,
   type CacheOptions,
   type RateLimitOptions,
