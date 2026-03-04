@@ -12,15 +12,15 @@ head:
 
 # Fetching Data
 
-`ani-client` provides fully typed module helpers for every dominant facet of the AniList schema. 
+`ani-client` provides typed helper methods for every major section of the AniList schema.
 
 ## Media (Anime / Manga)
 
-The most common use-case for AniList involves fetching explicit Media nodes.
+The most common use-case is fetching media (anime or manga) entries.
 
 ### `getMedia(id, include?)`
 
-Fetch a single anime or manga by its ID. It optionally takes an `include` argument to hydrate relations, actors, links, and streaming data dynamically! Check [Includes](./includes.md) for a deeper look.
+Fetch a single anime or manga by its AniList ID. Optionally pass an `include` argument to hydrate relations, voice actors, streaming links, and more. See [Includes](./includes.md) for details.
 
 ```typescript
 // Includes relations by default
@@ -34,7 +34,7 @@ if (anime.nextAiringEpisode) {
 
 ### `searchMedia(options?)`
 
-Utilized for searching, sorting, and filtering paginated anime or manga entries. Supports single and multi-criteria genre/tag filtering.
+Search, sort, and filter paginated anime or manga entries. Supports single and multi-criteria genre/tag filtering.
 
 ```typescript
 import { MediaType, MediaFormat } from "ani-client";
@@ -62,7 +62,7 @@ results.results.forEach((m) => console.log(m.title.english));
 
 ### `getTrending(type?, page?, perPage?)`
 
-Fetches trending entries algorithmically.
+Fetch currently trending entries.
 
 ```typescript
 const trending = await client.getTrending(MediaType.ANIME);
@@ -114,7 +114,7 @@ schedule.Monday.forEach((episode) => {
 
 ### `getMediaBySeason(options)`
 
-Fetches Anime mapping to an explicit season chart.
+Fetch anime for a specific season and year.
 
 ```typescript
 import { MediaSeason } from "ani-client";
@@ -126,13 +126,28 @@ const winter = await client.getMediaBySeason({
 });
 ```
 
-## Characters & Staff
+### `getMediaByMalId(malId, type?)`
 
-Fetch Characters, voice actors, and directors!
+Fetch a single anime or manga by its **MyAnimeList** ID. Returns `null` when no match is found.
+
+```typescript
+// Lookup by MAL ID
+const fma = await client.getMediaByMalId(5114);
+if (fma) console.log(fma.title.romaji); // "Hagane no Renkinjutsushi: Fullmetal Alchemist"
+
+// Restrict to anime only
+const anime = await client.getMediaByMalId(5114, MediaType.ANIME);
+```
+
+::: tip
+Useful when migrating from MAL or cross-referencing between platforms.
+:::
+
+## Characters & Staff
 
 ### `getCharacter(id, include?)` & `searchCharacters(options?)`
 
-Fetch characters! Supplying `{ voiceActors: true }` instructs `ani-client` to expand the edge nodes to acquire the VAs and language.
+Fetch characters by ID or search by name. Pass `{ voiceActors: true }` to include voice actor data.
 
 ```typescript
 const spike = await client.getCharacter(1, { voiceActors: true });
@@ -146,7 +161,7 @@ spike.media?.edges?.forEach((e) => {
 
 ### `getStaff(id, include?)` & `searchStaff(options?)`
 
-Staff includes the `{ media: true }` include flag to retrieve a paginated node list of the shows/manga a staff member partook in!
+Fetch staff members. Pass `{ media: true }` to include their credited works.
 
 ```typescript
 const staffWithMedia = await client.getStaff(95001, { media: { perPage: 5 } });
@@ -154,11 +169,9 @@ const staffWithMedia = await client.getStaff(95001, { media: { perPage: 5 } });
 
 ## Users & Lists
 
-Fetch raw User profile structures or explicitly pull authenticated user list data over API queries.
-
 ### `getUser(idOrName)`
 
-Fetch a user by ID or username — accepts both `number` and `string`.
+Fetch a user by ID or username.
 
 ```typescript
 const user = await client.getUser(1);          // by ID
@@ -195,7 +208,7 @@ const list = await client.getUserMediaList({
 list.results.forEach((entry) => console.log(`${entry.media.title.romaji} — ${entry.score}/100`));
 ```
 
-### `getUserFavorites(idOrName)`
+### `getUserFavorites(idOrName, options?)`
 
 Fetch a user's favorite anime, manga, characters, staff, and studios.
 
@@ -210,11 +223,12 @@ favs.characters.forEach((c) => console.log(c.name.full));
 
 // Studio favorites
 favs.studios.forEach((s) => console.log(s.name));
+
+// Fetch more results per category (default 25, max 50)
+const allFavs = await client.getUserFavorites("AniList", { perPage: 50 });
 ```
 
 ## Forum Threads
-
-Access AniList forum threads — fetch individual threads or browse recent activity.
 
 ### `getThread(id)`
 

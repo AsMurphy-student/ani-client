@@ -1,5 +1,6 @@
 export {
   QUERY_MEDIA_BY_ID,
+  QUERY_MEDIA_BY_MAL_ID,
   QUERY_MEDIA_SEARCH,
   QUERY_TRENDING,
   QUERY_AIRING_SCHEDULE,
@@ -22,8 +23,9 @@ export {
   QUERY_USER_MEDIA_LIST,
   QUERY_USER_FAVORITES_BY_ID,
   QUERY_USER_FAVORITES_BY_NAME,
+  buildUserFavoritesQuery,
 } from "./user";
-export { QUERY_STUDIO_BY_ID, QUERY_STUDIO_SEARCH } from "./studio";
+export { QUERY_STUDIO_BY_ID, QUERY_STUDIO_SEARCH, buildStudioByIdQuery } from "./studio";
 export { QUERY_GENRES, QUERY_TAGS } from "./metadata";
 export { buildMediaByIdQuery, buildBatchMediaQuery, buildBatchCharacterQuery, buildBatchStaffQuery } from "./builders";
 export { QUERY_THREAD_BY_ID, QUERY_THREAD_SEARCH } from "./thread";

@@ -12,7 +12,7 @@ head:
 
 # Batch Queries
 
-Fetch multiple IDs traversing identical endpoint entities in a single GraphQL request! Under the hood, AniList restricts nodes per fetch, so `ani-client` uses dynamic internal chunking up to 50 IDs per **parallel** call.
+Fetch multiple IDs in a single GraphQL request. `ani-client` automatically chunks large batches into parallel calls of up to 50 IDs each.
 
 | Method | Description |
 | --- | --- |

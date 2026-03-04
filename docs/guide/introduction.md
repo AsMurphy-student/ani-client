@@ -12,21 +12,20 @@ head:
 
 # What is ani-client?
 
-`ani-client` is a simple, highly optimized, and fully typed client designed to fetch anime, manga, characters, staff, and user data from the [AniList GraphQL API](https://anilist.co).
-
-It aims to provide a frictionless developer experience without sacrificing performance or bloat.
+`ani-client` is a fully typed, zero-dependency client for the [AniList GraphQL API](https://anilist.co). It provides a clean, high-level interface for fetching anime, manga, characters, staff, and user data.
 
 ## Why use ani-client?
 
-While writing raw GraphQL queries is an option, `ani-client` abstracts away the boilerplate while providing several enterprise-grade features out of the box:
+Writing raw GraphQL queries works, but `ani-client` removes the boilerplate while providing production-grade features out of the box:
 
-- **Zero runtime dependencies** — relies entirely on the native modern Web `fetch` API.
-- **Universal compatibility** — works perfectly in Node.js (v20+), Bun, Deno, and the Browser.
-- **Strictly typed** — comprehensive TypeScript definitions for every return shape and configuration.
-- **Built-in caching** — ships with a localized LRU memory cache, and an official `RedisCache` adapter.
-- **Rate-limit aware** — transparently catches HTTP 429 Too Many Requests, implements exponential backoff with jitter, and retries automatically.
-- **Request deduplication** — guarantees that multiple identical calls launched concurrently only use a single HTTP request natively yielding across all callers.
-- **Request chunking** — limits massive batch API requests seamlessly into sequential limits.
+- **Zero runtime dependencies** — relies entirely on the native `fetch` API.
+- **Universal** — Node.js ≥ 20, Bun, Deno, and modern browsers.
+- **Strictly typed** — comprehensive TypeScript definitions for every response and configuration option.
+- **Built-in caching** — LRU memory cache with TTL, stale-while-revalidate, and hit/miss stats. Optional `RedisCache` adapter for distributed setups.
+- **Rate-limit handling** — transparent HTTP 429 retry with exponential backoff, jitter, and configurable strategies.
+- **Request deduplication** — concurrent identical calls share a single in-flight HTTP request.
+- **Batch queries** — fetch up to 50 IDs per parallel GraphQL request with automatic chunking.
+- **Observable** — lifecycle hooks and an injectable logger for full request visibility.
 
 ## Installation
 

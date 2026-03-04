@@ -45,7 +45,7 @@ export class RateLimiter {
     if (!this.enabled) return;
 
     if (this.count >= this.maxRequests) {
-      const oldest = this.timestamps[this.head];
+      const oldest = this.timestamps[this.head] as number;
       const elapsed = Date.now() - oldest;
       if (elapsed < this.windowMs) {
         const waitMs = this.windowMs - elapsed + 50;

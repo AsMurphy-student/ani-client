@@ -33,9 +33,11 @@ pnpm build
 | `pnpm lint` | Check code with Biome |
 | `pnpm lint:fix` | Auto-fix lint & formatting issues |
 | `pnpm format` | Format code with Biome |
+| `pnpm typecheck` | Type-check with `tsc --noEmit` |
 | `pnpm test` | Run all tests (unit + integration) |
 | `pnpm test:unit` | Run unit tests only (Vitest) |
 | `pnpm test:integration` | Run integration tests (real API) |
+| `pnpm test:coverage` | Run tests with coverage report |
 
 ### Typical flow
 

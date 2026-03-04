@@ -1,4 +1,4 @@
-import { MEDIA_FIELDS, MEDIA_FIELDS_BASE } from "./fragments";
+import { MEDIA_FIELDS, MEDIA_FIELDS_BASE, MEDIA_FIELDS_LIGHT } from "./fragments";
 
 export const QUERY_MEDIA_BY_ID = `
 query ($id: Int!) {
@@ -103,6 +103,13 @@ query ($season: MediaSeason!, $seasonYear: Int!, $type: MediaType, $sort: [Media
     media(season: $season, seasonYear: $seasonYear, type: $type, sort: $sort) {
       ${MEDIA_FIELDS_BASE}
     }
+  }
+}`;
+
+export const QUERY_MEDIA_BY_MAL_ID = `
+query ($idMal: Int!, $type: MediaType) {
+  Media(idMal: $idMal, type: $type) {
+    ${MEDIA_FIELDS}
   }
 }`;
 

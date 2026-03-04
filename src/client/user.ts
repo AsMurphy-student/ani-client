@@ -5,6 +5,7 @@ import {
   QUERY_USER_FAVORITES_BY_NAME,
   QUERY_USER_MEDIA_LIST,
   QUERY_USER_SEARCH,
+  buildUserFavoritesQuery,
 } from "../queries";
 
 import type {
@@ -14,6 +15,7 @@ import type {
   SearchUserOptions,
   User,
   UserFavorites,
+  UserFavoritesOptions,
 } from "../types";
 
 import { AniListError } from "../errors";
@@ -68,15 +70,22 @@ interface RawFavourites {
   studios?: { nodes: UserFavorites["studios"] };
 }
 
-export async function getUserFavorites(client: ClientBase, idOrName: number | string): Promise<UserFavorites> {
+export async function getUserFavorites(
+  client: ClientBase,
+  idOrName: number | string,
+  options?: UserFavoritesOptions,
+): Promise<UserFavorites> {
+  const useBuilder = options?.perPage !== undefined;
   if (typeof idOrName === "number") {
     validateId(idOrName, "userId");
-    const data = await client.request<{ User: { favourites: RawFavourites } }>(QUERY_USER_FAVORITES_BY_ID, {
+    const query = useBuilder ? buildUserFavoritesQuery("id", options.perPage) : QUERY_USER_FAVORITES_BY_ID;
+    const data = await client.request<{ User: { favourites: RawFavourites } }>(query, {
       id: idOrName,
     });
     return mapFavorites(data.User.favourites);
   }
-  const data = await client.request<{ User: { favourites: RawFavourites } }>(QUERY_USER_FAVORITES_BY_NAME, {
+  const query = useBuilder ? buildUserFavoritesQuery("name", options.perPage) : QUERY_USER_FAVORITES_BY_NAME;
+  const data = await client.request<{ User: { favourites: RawFavourites } }>(query, {
     name: idOrName,
   });
   return mapFavorites(data.User.favourites);

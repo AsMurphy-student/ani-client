@@ -12,7 +12,7 @@ head:
 
 # Caching
 
-`ani-client` ships with caching strategies designed to aggressively cut network latency and enforce duplicate request pooling.
+`ani-client` includes a built-in cache layer to reduce network latency and avoid redundant API calls.
 
 ## Memory Cache (Default)
 
@@ -27,6 +27,33 @@ const client = new AniListClient({
   },
 });
 ```
+
+### Stale-While-Revalidate
+
+Enable `staleWhileRevalidateMs` to keep serving cached data for a grace period after TTL expires while the entry is refreshed in the background. This eliminates cold-cache latency spikes for frequently accessed queries.
+
+```typescript
+const client = new AniListClient({
+  cache: {
+    ttl: 1000 * 60 * 5,                // 5 min TTL
+    staleWhileRevalidateMs: 1000 * 60,  // serve stale for 1 extra min
+  },
+});
+```
+
+### Cache Statistics
+
+The built-in memory cache tracks hit/miss/stale counters. Access them via the `cacheStats` property:
+
+```typescript
+const stats = client.cacheStats;
+console.log(stats);
+// { hits: 42, misses: 8, stales: 2, hitRate: 0.84 }
+```
+
+::: tip
+`cacheStats` is only available with the default memory cache — it returns `undefined` when using a custom `cacheAdapter`.
+:::
 
 ## Redis Cache
 
@@ -45,9 +72,9 @@ const client = new AniListClient({
 });
 ```
 
-## Invalidation 
+## Invalidation
 
-Triggering targeted evictions directly skips memory lifecycle polling when data needs forced rehydration.
+Remove specific cache entries when data needs to be refreshed.
 
 ```typescript
 // Nuke the entire bucket

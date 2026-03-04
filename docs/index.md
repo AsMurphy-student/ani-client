@@ -25,8 +25,8 @@ head:
 
 hero:
   name: "ani-client"
-  text: "A simple, typed client for AniList"
-  tagline: "Fetch anime, manga, characters, staff and user data effortlessly with zero dependencies."
+  text: "Typed AniList client for Node.js"
+  tagline: "Fetch anime, manga, characters, staff, and user data with zero dependencies."
   actions:
     - theme: brand
       text: Get Started
@@ -40,15 +40,15 @@ hero:
 
 features:
   - title: Zero Dependencies
-    details: Uses the native fetch API. Works in Node.js >= 20, Bun, Deno, and modern browsers.
+    details: Uses the native fetch API. Works in Node.js ≥ 20, Bun, Deno, and modern browsers.
   - title: Built-in Caching
-    details: Ships with an in-memory LRU cache and an optional Redis adapter for distributed setups.
+    details: LRU memory cache with TTL, stale-while-revalidate, hit/miss stats, and an optional Redis adapter for distributed setups.
   - title: Rate Limit Aware
-    details: Automatically handles HTTP 429 errors with configurable retries, delays, and network error robustness.
+    details: Handles HTTP 429 transparently with exponential backoff, jitter, configurable retries, and network error resilience.
   - title: Request Deduplication
-    details: Identical concurrent API requests are coalesced into a single network call automatically.
-  - title: Batch Queries
-    details: Fetch multiple IDs simultaneously in a single chunked GraphQL call to save network roundtrips.
-  - title: Event Hooks
-    details: Observe every request, cache hit, retry, and response for complete control and logging.
+    details: Identical concurrent requests are coalesced into a single network call automatically.
+  - title: Batch & Pagination
+    details: Fetch up to 50 IDs in one request with automatic chunking. Auto-paginate with a built-in async iterator.
+  - title: Observable & Extensible
+    details: Lifecycle hooks, injectable logger, per-request AbortSignal, and full TypeScript coverage.
 ---

@@ -384,6 +384,7 @@ interface AniListClientOptions {
   rateLimit?: RateLimitOptions;
   hooks?: AniListHooks;
   signal?: AbortSignal;     // Cancel all requests (optional)
+  logger?: Logger;          // Structured logging (optional)
 }
 ```
 
@@ -394,6 +395,7 @@ interface AniListClientOptions {
 | `ttl` | `number` | `86_400_000` (24h) | Time-to-live in ms |
 | `maxSize` | `number` | `500` | Max cached entries (0 = unlimited) |
 | `enabled` | `boolean` | `true` | Disable caching entirely |
+| `staleWhileRevalidateMs` | `number` | `0` | Serve stale data for this many ms after TTL expires while revalidating in the background |
 
 ### RateLimitOptions
 
@@ -485,3 +487,43 @@ Returned by `getUserFavorites()`. Contains arrays of lightweight nodes for each 
 | `sort` | `StudioSort[]` | Sort order |
 | `page` | `number` | Page number |
 | `perPage` | `number` | Results per page (max 50) |
+
+### StudioIncludeOptions
+
+Passed to `getStudio()` to control the embedded media list.
+
+| Option | Type | Description |
+| --- | --- | --- |
+| `media` | `boolean \| { perPage?: number }` | Include media productions. Pass `true` for default or `{ perPage }` to control page size (max 50) |
+
+### UserFavoritesOptions
+
+Passed to `getUserFavorites()` to control pagination of each favorite category.
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `perPage` | `number` | `25` | Items per category (max 50) |
+
+### Logger
+
+Injectable logger interface. Any object implementing these four methods is accepted (e.g. `console`, pino, winston).
+
+```typescript
+interface Logger {
+  debug(message: string, ...args: unknown[]): void;
+  info(message: string, ...args: unknown[]): void;
+  warn(message: string, ...args: unknown[]): void;
+  error(message: string, ...args: unknown[]): void;
+}
+```
+
+### CacheStats
+
+Returned by `client.cacheStats` for the built-in memory cache.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `hits` | `number` | Number of cache hits |
+| `misses` | `number` | Number of cache misses |
+| `stales` | `number` | Stale entries served via SWR |
+| `hitRate` | `number` | Hit ratio (0–1) — `hits / (hits + misses)` |

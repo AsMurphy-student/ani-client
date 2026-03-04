@@ -24,7 +24,7 @@ If you are using `ani-client` in your own project, feel free to open a Pull Requ
     <div class="card-header">
       <div class="card-title-row">
         <h3>Want your projects to appear ?</h3>
-        <span class="version-badge">1.6.0 ?</span>
+        <span class="version-badge">1.X.X</span>
       </div>
     </div>
     <div class="card-body">

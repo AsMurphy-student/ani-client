@@ -24,6 +24,14 @@ const client = new AniListClient(options?: AniListClientOptions);
 
 See [Types & Enums → AniListClientOptions](./types#anilistclientoptions) for configuration details.
 
+::: tip Logger
+Pass a `logger` option (any object with `debug`, `info`, `warn`, `error` methods) to get structured diagnostic output for every request, cache hit, and error. Works with `console`, [pino](https://github.com/pinojs/pino), or any compatible logger.
+
+```typescript
+const client = new AniListClient({ logger: console });
+```
+:::
+
 ---
 
 ## Media
@@ -138,6 +146,21 @@ Get currently releasing manga sorted by most recently updated.
 `getAiredChapters()` is deprecated. Use `getRecentlyUpdatedManga()` instead — the old name is kept as an alias and will be removed in v2.
 :::
 
+### `getMediaByMalId(malId, type?)`
+
+Fetch a single anime or manga by its **MyAnimeList** ID.
+
+| Param | Type | Description |
+| --- | --- | --- |
+| `malId` | `number` | MyAnimeList media ID |
+| `type` | `MediaType` | Optional — restrict to ANIME or MANGA |
+
+**Returns:** `Promise<Media | null>` — `null` when no match exists.
+
+```typescript
+const anime = await client.getMediaByMalId(5114); // Fullmetal Alchemist: Brotherhood
+```
+
 ### `getRecommendations(mediaId, options?)`
 
 Get user recommendations based on a specific media.
@@ -215,13 +238,14 @@ Get a user's anime or manga list. Requires `userId` or `userName` and `type`.
 
 **Returns:** `Promise<PagedResult<MediaListEntry>>`
 
-### `getUserFavorites(idOrName)`
+### `getUserFavorites(idOrName, options?)`
 
 Fetch a user's favorite anime, manga, characters, staff, and studios.
 
 | Param | Type | Description |
 | --- | --- | --- |
 | `idOrName` | `number \| string` | AniList user ID or username |
+| `options` | `UserFavoritesOptions` | Optional — control `perPage` per category |
 
 **Returns:** `Promise<UserFavorites>`
 
@@ -229,17 +253,33 @@ Fetch a user's favorite anime, manga, characters, staff, and studios.
 const favs = await client.getUserFavorites("AniList");
 favs.anime.forEach(a => console.log(a.title.romaji));
 favs.characters.forEach(c => console.log(c.name.full));
+
+// Fetch more favorites per category (default 25, max 50)
+const allFavs = await client.getUserFavorites("AniList", { perPage: 50 });
 ```
 
 ---
 
 ## Studios
 
-### `getStudio(id)`
+### `getStudio(id, include?)`
 
 Fetch a studio by AniList ID, including its most popular productions.
 
+| Param | Type | Description |
+| --- | --- | --- |
+| `id` | `number` | AniList studio ID |
+| `include` | `StudioIncludeOptions` | Optional — customise the embedded media list |
+
 **Returns:** `Promise<Studio>`
+
+```typescript
+// Default: includes media
+const studio = await client.getStudio(21);
+
+// Control page size of the embedded media list
+const studio = await client.getStudio(21, { media: { perPage: 50 } });
+```
 
 ### `searchStudios(options?)`
 
@@ -376,6 +416,17 @@ for await (const anime of client.paginate(
 
 ## Cache Management
 
+### `cacheStats`
+
+Read-only property with hit/miss/stale counters for the built-in memory cache. Returns `undefined` when a custom `cacheAdapter` is used.
+
+```typescript
+console.log(client.cacheStats);
+// { hits: 42, misses: 8, stales: 2, hitRate: 0.84 }
+```
+
+See [Types → CacheStats](./types#cachestats) for the full shape.
+
 ### `clearCache()`
 
 Clear the entire response cache.
@@ -401,6 +452,37 @@ Returns the number of entries currently cached. Always returns `Promise<number>`
 const size = await client.cacheSize();
 console.log(`${size} entries cached`);
 ```
+
+---
+
+## Per-Request AbortSignal
+
+### `withSignal(signal)`
+
+Returns a **lightweight proxy** of the client that forwards every method call through the given `AbortSignal`. Useful when you need per-request cancellation without rebuilding the client.
+
+| Param | Type | Description |
+| --- | --- | --- |
+| `signal` | `AbortSignal` | Signal to attach to all requests issued via the proxy |
+
+**Returns:** `AniListClient` (proxy)
+
+```typescript
+const controller = new AbortController();
+const scoped = client.withSignal(controller.signal);
+
+setTimeout(() => controller.abort(), 3_000);
+
+try {
+  const anime = await scoped.getMedia(1);
+} catch (err) {
+  if (err.name === "AbortError") console.log("Cancelled!");
+}
+```
+
+::: tip
+The proxy shares the same cache, rate-limiter, and hooks as the parent client — only the signal differs.
+:::
 
 ---
 

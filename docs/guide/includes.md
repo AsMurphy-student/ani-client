@@ -12,9 +12,9 @@ head:
 
 # Relations & Includes
 
-You can opt-in to fetch heavily nested entity layers simply by dropping in a secondary `{ include: true }` parameter on Supported queries.
+Opt-in to fetch additional nested data by passing an `include` parameter to supported methods.
 
-## Include Options
+## Media Include Options
 
 The second parameter of `getMedia()` lets you opt-in to additional data. By default, only `relations` are included for backward compatibility.
 

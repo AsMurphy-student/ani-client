@@ -12,33 +12,31 @@ head:
 
 # Getting Started
 
-Once you've installed `ani-client`, fetching data from AniList is simpler than ever! Let's get right into it by creating an instance.
+Once you've installed `ani-client`, you can start fetching data from AniList in a few lines.
 
 ## Initializing the Client
 
-You need to instantiate the `AniListClient`. By default, it hits the AniList GraphQL endpoint securely and caches requests using a localized LRU memory algorithm.
+Instantiate `AniListClient` to start making requests. By default, it uses the AniList GraphQL endpoint with an LRU memory cache.
 
 ```typescript
 import { AniListClient } from "ani-client";
 
-// The client is ready!
 const client = new AniListClient();
 ```
 
 ## First Request
 
-`ani-client` is entirely asynchronous wrapper built over `fetch`, meaning every public-facing module returns a `Promise`.
+All public methods return a `Promise`.
 
 ```typescript
-// Fetch Cowboy Bebop data (id: 1)
 const bebop = await client.getMedia(1);
 
-console.log(bebop.title.romaji); // Output: "Cowboy Bebop"
+console.log(bebop.title.romaji); // "Cowboy Bebop"
 ```
 
-## Configuring Options
+## Configuration
 
-While defaults are configured conservatively for optimal public AniList consumption, the client exposes full configuration across its Caching, Rate-Limiting, Event hooks & Authentication capabilities.
+The client exposes full configuration for caching, rate limiting, hooks, logging, and authentication.
 
 ```typescript
 import { AniListClient, RedisCache } from "ani-client";
@@ -51,6 +49,7 @@ const client = new AniListClient({
     ttl: 86_400_000, // 24 hours
     maxSize: 500,    // LRU threshold
     enabled: true,
+    staleWhileRevalidateMs: 60_000, // Serve stale for 1 min after TTL
   },
 
   rateLimit: {
@@ -64,6 +63,9 @@ const client = new AniListClient({
     onRequest: (query, variables) => console.log('Firing request!'),
     onRateLimit: (retryAfterMs) => console.warn(`Hold on, wait ${retryAfterMs}ms`),
   },
+
+  // Structured logger (console, pino, winston, etc.)
+  logger: console,
 
   // Cancel all in-flight requests from this client (optional)
   signal: AbortSignal.timeout(30_000),
@@ -91,6 +93,20 @@ try {
     console.log("Request was cancelled!");
   }
 }
+```
+
+### Per-Request Cancellation
+
+Use `withSignal()` to scope an `AbortSignal` to individual requests without rebuilding the client:
+
+```typescript
+const controller = new AbortController();
+
+// All methods called via the proxy use this signal
+const scoped = client.withSignal(controller.signal);
+
+setTimeout(() => controller.abort(), 3_000);
+const anime = await scoped.getMedia(1);
 ```
 
 ::: tip

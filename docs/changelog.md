@@ -12,6 +12,34 @@ head:
 
 # Changelog
 
+## [1.8.0] — 2026-03-04
+
+### Added
+- **`withSignal(signal)`** — Scoped per-request `AbortSignal` support. Returns a lightweight view of the client that uses the given signal for all requests while sharing cache, rate limiter, and hooks with the parent.
+- **Injectable `logger`** — New `logger` option in `AniListClientOptions` accepts any object with `debug`, `info`, `warn`, `error` methods (compatible with `console`, `pino`, `winston`, etc.). Logs cache hits, API requests, completion times, and errors.
+- **`getMediaByMalId(malId, type?)`** — Fetch a media entry by its MyAnimeList ID. Accepts optional `type` to disambiguate when an MAL ID maps to both ANIME and MANGA.
+- **`MEDIA_FIELDS_LIGHT` fragment** — Lightweight media fields for list/search contexts. Omits tags, studios, trailer, synonyms for smaller payloads.
+- **Cache statistics** — `MemoryCache.stats` returns `{ hits, misses, stales, hitRate }`. `resetStats()` resets counters without clearing data.
+- **Stale-while-revalidate** — New `staleWhileRevalidateMs` option in `CacheOptions`. Expired entries are still returned within the grace window, allowing background refresh.
+- **`StudioIncludeOptions`** — `getStudio(id, { media: { perPage: 50 } })` now accepts include options to customize the number of media returned.
+- **`UserFavoritesOptions`** — `getUserFavorites(idOrName, { perPage: 50 })` now accepts options to customize the number of results per favorites category.
+- **`buildStudioByIdQuery(perPage?)`** — Query builder function for studio-by-ID with configurable media perPage.
+- **`buildUserFavoritesQuery(idOrName, perPage?)`** — Query builder function for user favorites with configurable perPage per category.
+- **`test:coverage` script** — New npm script for running tests with coverage reporting.
+- **Snapshot tests** — 15 snapshot tests for all query builders ensuring query stability across changes.
+- **36 new unit tests** — Covering `withSignal`, `logger`, `getMediaByMalId`, cache stats, stale-while-revalidate, studio include, and user favorites options.
+
+### Changed
+- **Target upgraded to ES2022** — TypeScript compilation target and lib updated from ES2020 to ES2022, enabling `Object.hasOwn`, `Array.at()`, `Error.cause`, and top-level `await`.
+- **`noUncheckedIndexedAccess` enabled** — Stricter TypeScript config catches potential `undefined` from array/object indexing at compile time.
+- **GitHub Actions CI improved** — Split into parallel `lint-typecheck`, `test` (matrix Node 20/22), and `build` jobs with concurrency control and artifact upload.
+- **Logger on error paths** — `logger.error` is now called on both network errors and API error responses (not just network failures).
+
+### Internal
+- Non-null assertions added for array indices guarded by length checks (`ids[0]!`) to satisfy `noUncheckedIndexedAccess`.
+- `executeBatch` cast (`as T`) to maintain type safety with strict index access.
+- `MemoryCache.clear()` now also resets statistics counters.
+
 ## [1.7.0] — 2026-03-04
 
 ### Breaking Changes

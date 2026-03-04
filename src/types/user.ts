@@ -87,3 +87,11 @@ export interface UserFavorites {
   staff: FavoriteStaffNode[];
   studios: FavoriteStudioNode[];
 }
+
+/**
+ * Options for controlling the number of results when fetching user favorites.
+ */
+export interface UserFavoritesOptions {
+  /** Number of items per category (default: 25, max: 50). */
+  perPage?: number;
+}

@@ -1,6 +1,6 @@
 export { AniListClient } from "./client";
 export { AniListError } from "./errors";
-export { MemoryCache } from "./cache";
+export { MemoryCache, type CacheStats } from "./cache";
 export { RedisCache, type RedisCacheOptions, type RedisLikeClient } from "./cache/redis";
 export { RateLimiter } from "./rate-limiter";
 export { parseAniListMarkdown } from "./utils";
@@ -26,6 +26,7 @@ export {
   type CacheOptions,
   type RateLimitOptions,
   type AniListHooks,
+  type Logger,
   type Media,
   type MediaTitle,
   type MediaCoverImage,
@@ -92,4 +93,6 @@ export {
   type FavoriteCharacterNode,
   type FavoriteStaffNode,
   type FavoriteStudioNode,
+  type UserFavoritesOptions,
+  type StudioIncludeOptions,
 } from "./types";

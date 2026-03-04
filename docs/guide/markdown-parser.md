@@ -10,13 +10,13 @@ head:
       content: Parse AniList's custom markdown dialect into HTML — supports spoilers, images, YouTube, WebM, and standard formatting.
 ---
 
-# Markdown Parser Utility
+# Markdown Parser
 
-AniList uses a custom dialect of Markdown for platform-specific formatting, for example to hide spoilers, center text, or embed media like YouTube and WebM videos. `ani-client` provides the `parseAniListMarkdown` function to convert this specific syntax into HTML that can be rendered by any web browser.
+AniList uses a custom Markdown dialect for spoilers, centered text, and media embeds. `ani-client` provides `parseAniListMarkdown` to convert this syntax into standard HTML.
 
 ## Usage
 
-You can import the function directly from the package's main entry point:
+Import the function from the package root:
 
 ```ts
 import { parseAniListMarkdown } from "ani-client";
