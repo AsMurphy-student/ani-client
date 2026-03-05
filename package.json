@@ -23,7 +23,7 @@
     "test": "vitest run",
     "test:unit": "vitest run --project unit",
     "test:integration": "vitest run --project integration",
-    "test:coverage": "vitest run --coverage",
+    "test:coverage": "vitest run --project unit --coverage",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "pnpm run build",
     "docs:dev": "vitepress dev docs",
