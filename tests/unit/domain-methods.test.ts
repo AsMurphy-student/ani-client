@@ -3,7 +3,7 @@
  * These cover the methods that were previously only exercised by integration tests.
  */
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { AniListClient, AniListError, MediaSeason, MediaType } from "../../src";
+import { AniListClient, MediaSeason, MediaType } from "../../src";
 
 // ── Helpers ──
 
@@ -550,7 +550,7 @@ describe("User methods", () => {
   it("getUserMediaList throws without userId or userName", async () => {
     const client = newClient();
     // @ts-expect-error testing missing required fields
-    await expect(client.getUserMediaList({})).rejects.toThrow(AniListError);
+    await expect(client.getUserMediaList({})).rejects.toThrow(TypeError);
   });
 
   it("getUserMediaList rejects invalid userId", async () => {

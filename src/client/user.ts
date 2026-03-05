@@ -1,4 +1,3 @@
-import { AniListError } from "../errors";
 import {
   buildUserFavoritesQuery,
   QUERY_USER_BY_ID,
@@ -40,7 +39,7 @@ export async function getUserMediaList(
   options: GetUserMediaListOptions,
 ): Promise<PagedResult<MediaListEntry>> {
   if (!options.userId && !options.userName) {
-    throw new AniListError("getUserMediaList requires either userId or userName", 0, []);
+    throw new TypeError("getUserMediaList requires either userId or userName");
   }
   if (options.userId) {
     validateId(options.userId, "userId");

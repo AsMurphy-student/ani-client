@@ -129,6 +129,7 @@ export interface MediaTag {
   description: string | null;
   category: string | null;
   rank: number | null;
+  isAdult: boolean | null;
   isMediaSpoiler: boolean | null;
 }
 

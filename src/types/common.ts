@@ -1,9 +1,9 @@
 export interface PageInfo {
   total: number | null;
-  perPage: number | null;
-  currentPage: number | null;
-  lastPage: number | null;
-  hasNextPage: boolean | null;
+  perPage: number;
+  currentPage: number;
+  lastPage: number;
+  hasNextPage: boolean;
 }
 
 export interface PagedResult<T> {

@@ -25,8 +25,8 @@ function createMockRedis(): RedisLikeClient & {
       return count;
     }),
     keys: vi.fn(async (pattern: string) => {
-      const prefix = pattern.replace("*", "");
-      return [...store.keys()].filter((k) => k.startsWith(prefix));
+      const regex = new RegExp(`^${pattern.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\\\*/g, ".*")}$`);
+      return [...store.keys()].filter((k) => regex.test(k));
     }),
   };
 }
@@ -122,7 +122,7 @@ describe("RedisCache", () => {
     expect(keys.every((k) => !k.startsWith("ani:"))).toBe(true);
   });
 
-  it("invalidates by string pattern", async () => {
+  it("invalidates by string pattern (substring match)", async () => {
     const redis = createMockRedis();
     const cache = new RedisCache({ client: redis });
 
@@ -130,10 +130,8 @@ describe("RedisCache", () => {
     await cache.set("media:2", { id: 2 });
     await cache.set("character:1", { id: 1 });
 
-    const removed = await cache.invalidate("ani:media:*");
-    // The mock keys filter won't match glob, but our mock uses startsWith
-    // so this tests the code path
-    expect(typeof removed).toBe("number");
+    const removed = await cache.invalidate("media");
+    expect(removed).toBe(2);
   });
 
   it("invalidates by RegExp pattern", async () => {

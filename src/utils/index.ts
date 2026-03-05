@@ -38,6 +38,7 @@ export function clampPerPage(value: number): number {
  * @returns An array of chunks
  */
 export function chunk<T>(arr: T[], size: number): T[][] {
+  if (size < 1) throw new RangeError("chunk size must be >= 1");
   const chunks: T[][] = [];
   for (let i = 0; i < arr.length; i += size) {
     chunks.push(arr.slice(i, i + size));

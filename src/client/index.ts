@@ -183,7 +183,15 @@ export class AniListClient {
       throw error;
     }
 
-    const json = (await res.json()) as { data?: T; errors?: unknown[] };
+    let json: { data?: T; errors?: unknown[] };
+    try {
+      json = (await res.json()) as { data?: T; errors?: unknown[] };
+    } catch {
+      const error = new AniListError(`Non-JSON response from AniList (HTTP ${res.status})`, res.status, []);
+      this.logger?.error("Request failed", { error: error.message, status: error.status });
+      this.hooks.onError?.(error, query, variables);
+      throw error;
+    }
 
     if (!res.ok || json.errors) {
       const message =

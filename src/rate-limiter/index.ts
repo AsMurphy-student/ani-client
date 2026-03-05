@@ -113,7 +113,7 @@ export class RateLimiter {
     }
 
     if (lastResponse) return lastResponse;
-    throw lastError;
+    throw lastError ?? new Error(`Request failed after ${this.maxRetries} retries`);
   }
 
   /** @internal — Exponential backoff with jitter, capped at 30s (or custom strategy) */
