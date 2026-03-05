@@ -1,4 +1,4 @@
-import { MEDIA_FIELDS, MEDIA_FIELDS_BASE, MEDIA_FIELDS_LIGHT } from "./fragments";
+import { MEDIA_FIELDS, MEDIA_FIELDS_BASE } from "./fragments";
 
 export const QUERY_MEDIA_BY_ID = `
 query ($id: Int!) {

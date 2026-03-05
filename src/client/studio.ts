@@ -1,4 +1,4 @@
-import { QUERY_STUDIO_BY_ID, QUERY_STUDIO_SEARCH, buildStudioByIdQuery } from "../queries";
+import { buildStudioByIdQuery, QUERY_STUDIO_BY_ID, QUERY_STUDIO_SEARCH } from "../queries";
 
 import type { PagedResult, SearchStudioOptions, Studio, StudioIncludeOptions } from "../types";
 

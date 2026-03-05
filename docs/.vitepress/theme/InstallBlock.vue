@@ -12,11 +12,11 @@ const active = ref(0);
 const copied = ref(false);
 const currentCmd = computed(() => managers[active.value]?.cmd ?? managers[0].cmd);
 
-function select(index: number) {
+function _select(index: number) {
   active.value = index;
 }
 
-function copy() {
+function _copy() {
   navigator.clipboard.writeText(currentCmd.value);
   copied.value = true;
   setTimeout(() => {

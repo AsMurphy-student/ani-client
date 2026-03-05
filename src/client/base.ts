@@ -1,4 +1,4 @@
-import type { PageInfo, PagedResult } from "../types";
+import type { PagedResult } from "../types";
 
 /**
  * Base interface for the client context shared by all domain method modules.

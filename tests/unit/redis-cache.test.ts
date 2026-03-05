@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { RedisCache } from "../../src/cache/redis";
 import type { RedisLikeClient } from "../../src/cache/redis";
+import { RedisCache } from "../../src/cache/redis";
 
 function createMockRedis(): RedisLikeClient & {
   store: Map<string, { value: string; ttl?: number }>;

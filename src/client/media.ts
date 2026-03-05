@@ -1,6 +1,6 @@
 import {
+  buildMediaByIdQuery,
   QUERY_AIRING_SCHEDULE,
-  QUERY_MEDIA_BY_ID,
   QUERY_MEDIA_BY_MAL_ID,
   QUERY_MEDIA_BY_SEASON,
   QUERY_MEDIA_SEARCH,
@@ -8,10 +8,7 @@ import {
   QUERY_RECENT_CHAPTERS,
   QUERY_RECOMMENDATIONS,
   QUERY_TRENDING,
-  buildMediaByIdQuery,
 } from "../queries";
-
-import { MediaSort, MediaType } from "../types";
 import type {
   AiringSchedule,
   DayOfWeek,
@@ -27,6 +24,7 @@ import type {
   SearchMediaOptions,
   WeeklySchedule,
 } from "../types";
+import { MediaSort, MediaType } from "../types";
 
 import { clampPerPage, validateId } from "../utils";
 import type { ClientBase } from "./base";
