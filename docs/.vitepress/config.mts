@@ -99,6 +99,11 @@ export default defineConfig({
       { icon: "npm", link: "https://www.npmjs.com/package/ani-client" },
     ],
 
+    editLink: {
+      pattern: "https://github.com/gonzyui/ani-client/edit/dev/docs/:path",
+      text: "Edit this page on GitHub",
+    },
+
     search: {
       provider: "local",
     },
