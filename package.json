@@ -47,6 +47,7 @@
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@types/node": "^25.3.2",
+    "@vercel/analytics": "^1.6.1",
     "tsup": "^8.5.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
@@ -54,5 +55,10 @@
     "vitest": "^3.2.4",
     "vue": "^3.5.29"
   },
-  "packageManager": "pnpm@10.30.0"
+  "packageManager": "pnpm@10.30.3",
+  "pnpm": {
+    "overrides": {
+      "esbuild": "^0.25.0"
+    }
+  }
 }
