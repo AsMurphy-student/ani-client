@@ -1,5 +1,5 @@
 import type { Character, CharacterRole } from "./character";
-import type { ExternalLink, FuzzyDate, PageInfo } from "./common";
+import type { ExternalLink, FuzzyDate } from "./common";
 import type { MediaListStatus } from "./lists";
 import type { Staff, VoiceActor } from "./staff";
 import type { StudioConnection } from "./studio";
@@ -129,6 +129,7 @@ export interface MediaTag {
   description: string | null;
   category: string | null;
   rank: number | null;
+  isAdult: boolean | null;
   isMediaSpoiler: boolean | null;
 }
 

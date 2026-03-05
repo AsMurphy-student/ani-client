@@ -1,7 +1,12 @@
 import { MemoryCache } from "../cache";
 import { AniListError } from "../errors";
-import { buildBatchCharacterQuery, buildBatchMediaQuery, buildBatchStaffQuery } from "../queries";
-import { QUERY_GENRES, QUERY_TAGS } from "../queries";
+import {
+  buildBatchCharacterQuery,
+  buildBatchMediaQuery,
+  buildBatchStaffQuery,
+  QUERY_GENRES,
+  QUERY_TAGS,
+} from "../queries";
 import { RateLimiter } from "../rate-limiter";
 import type {
   AiringSchedule,
@@ -22,8 +27,8 @@ import type {
   MediaListEntry,
   MediaTag,
   MediaType,
-  PageInfo,
   PagedResult,
+  PageInfo,
   RateLimitInfo,
   Recommendation,
   ResponseMeta,
@@ -43,7 +48,7 @@ import type {
   UserFavoritesOptions,
   WeeklySchedule,
 } from "../types";
-import { chunk, clampPerPage, normalizeQuery, validateId, validateIds } from "../utils";
+import { chunk, normalizeQuery, validateIds } from "../utils";
 
 import * as characterMethods from "./character";
 import * as mediaMethods from "./media";
@@ -178,7 +183,15 @@ export class AniListClient {
       throw error;
     }
 
-    const json = (await res.json()) as { data?: T; errors?: unknown[] };
+    let json: { data?: T; errors?: unknown[] };
+    try {
+      json = (await res.json()) as { data?: T; errors?: unknown[] };
+    } catch {
+      const error = new AniListError(`Non-JSON response from AniList (HTTP ${res.status})`, res.status, []);
+      this.logger?.error("Request failed", { error: error.message, status: error.status });
+      this.hooks.onError?.(error, query, variables);
+      throw error;
+    }
 
     if (!res.ok || json.errors) {
       const message =

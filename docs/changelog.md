@@ -12,6 +12,25 @@ head:
 
 # Changelog
 
+## [1.8.1] — 2026-03-05
+
+### Fixed
+- **`chunk()` infinite loop** — `chunk(arr, 0)` would hang forever. Now throws a `RangeError` when `size < 1`.
+- **Non-JSON response crash** — `executeRequest` now catches `res.json()` parse failures (e.g. HTML 502/503 responses) and throws a descriptive `AniListError` with the HTTP status code instead of an unhandled `SyntaxError`.
+- **`fetchWithRetry` throw undefined** — After exhausting all retries, the rate limiter could `throw undefined` if no last error was captured. Now throws a meaningful `Error` with a retry count message.
+- **`RedisCache.invalidate()` string semantics** — String patterns now use **substring matching** (e.g. `"Media"` matches all keys containing `"Media"`), consistent with `MemoryCache.invalidate()`. Previously, string patterns were treated as exact Redis glob patterns.
+- **`getUserMediaList` error type** — Validation error when neither `userId` nor `userName` is provided now throws `TypeError` instead of `AniListError` with status 0, matching standard JavaScript conventions for argument validation.
+
+### Changed
+- **`PageInfo` type tightened** — `perPage`, `currentPage`, `lastPage`, and `hasNextPage` are no longer nullable. Only `total` remains `number | null` as some AniList queries don't return a total count.
+- **`MediaTag.isAdult` added** — New `isAdult: boolean | null` field on the `MediaTag` interface, matching the AniList API response.
+
+### Internal
+- Upgraded Biome from v1.9.4 to v2.4.5.
+- Removed dead `_lastFetchCall` helper from test suite.
+- Added 12 new unit tests for all bug fixes (chunk guard, non-JSON response, retry fallback, error types, cache invalidation).
+- Test count: **230 unit tests** across 13 test files.
+
 ## [1.8.0] — 2026-03-04
 
 ### Added

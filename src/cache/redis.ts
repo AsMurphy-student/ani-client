@@ -114,14 +114,17 @@ export class RedisCache implements CacheAdapter {
   }
 
   /**
-   * Remove all entries whose key matches the given glob pattern.
+   * Remove all entries whose key matches the given pattern.
    *
-   * @param pattern — A glob pattern (e.g. `"*Media*"`)
+   * - **String**: treated as a substring match (e.g. `"Media"` removes all keys containing `"Media"`).
+   * - **RegExp**: tested against each key directly.
+   *
+   * @param pattern — A string (substring match) or RegExp.
    * @returns Number of entries removed.
    */
   async invalidate(pattern: string | RegExp): Promise<number> {
     if (typeof pattern === "string") {
-      const keys = await this.collectKeys(`${this.prefix}${pattern}`);
+      const keys = await this.collectKeys(`${this.prefix}*${pattern}*`);
       if (keys.length === 0) return 0;
       return this.client.del(...keys);
     }

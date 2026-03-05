@@ -21,10 +21,10 @@ export default defineConfig({
     coverage: {
       include: ["src/**/*.ts"],
       thresholds: {
-        statements: 75,
-        branches: 70,
-        functions: 65,
-        lines: 75,
+        statements: 90,
+        branches: 85,
+        functions: 90,
+        lines: 90,
       },
     },
   },

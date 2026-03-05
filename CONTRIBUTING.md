@@ -144,7 +144,7 @@ fix: handle null trailer field in media response
 docs: update README caching section
 refactor: extract pagedRequest helper
 test: add unit tests for batch queries
-chore: update biome to 1.9.4
+chore: update biome to 2.x
 ```
 
 ## Pull requests

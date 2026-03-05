@@ -1,4 +1,10 @@
+# Ensure these languages show up in GitHub stats
 *.vue linguist-detectable=true
 *.yml linguist-detectable=true
 *.yaml linguist-detectable=true
 *.md linguist-detectable=true
+
+# Exclude generated/vendored files from language stats
+pnpm-lock.yaml linguist-generated=true
+dist/** linguist-generated=true
+docs/.vitepress/cache/** linguist-generated=true

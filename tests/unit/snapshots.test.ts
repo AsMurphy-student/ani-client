@@ -11,8 +11,7 @@ import {
   QUERY_MEDIA_SEARCH,
   QUERY_TRENDING,
 } from "../../src/queries/media";
-import { buildStudioByIdQuery } from "../../src/queries/studio";
-import { QUERY_STUDIO_SEARCH } from "../../src/queries/studio";
+import { buildStudioByIdQuery, QUERY_STUDIO_SEARCH } from "../../src/queries/studio";
 import { buildUserFavoritesQuery } from "../../src/queries/user";
 
 describe("query snapshots", () => {

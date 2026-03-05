@@ -238,6 +238,8 @@ Get a user's anime or manga list. Requires `userId` or `userName` and `type`.
 
 **Returns:** `Promise<PagedResult<MediaListEntry>>`
 
+**Throws:** `TypeError` if neither `userId` nor `userName` is provided.
+
 ### `getUserFavorites(idOrName, options?)`
 
 Fetch a user's favorite anime, manga, characters, staff, and studios.

@@ -1,13 +1,12 @@
 import {
+  buildUserFavoritesQuery,
   QUERY_USER_BY_ID,
   QUERY_USER_BY_NAME,
   QUERY_USER_FAVORITES_BY_ID,
   QUERY_USER_FAVORITES_BY_NAME,
   QUERY_USER_MEDIA_LIST,
   QUERY_USER_SEARCH,
-  buildUserFavoritesQuery,
 } from "../queries";
-
 import type {
   GetUserMediaListOptions,
   MediaListEntry,
@@ -17,8 +16,6 @@ import type {
   UserFavorites,
   UserFavoritesOptions,
 } from "../types";
-
-import { AniListError } from "../errors";
 import { clampPerPage, validateId } from "../utils";
 import type { ClientBase } from "./base";
 
@@ -42,7 +39,7 @@ export async function getUserMediaList(
   options: GetUserMediaListOptions,
 ): Promise<PagedResult<MediaListEntry>> {
   if (!options.userId && !options.userName) {
-    throw new AniListError("getUserMediaList requires either userId or userName", 0, []);
+    throw new TypeError("getUserMediaList requires either userId or userName");
   }
   if (options.userId) {
     validateId(options.userId, "userId");

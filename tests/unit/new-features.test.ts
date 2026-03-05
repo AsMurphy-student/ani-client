@@ -1,13 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { AniListClient, type Logger, type MediaType, MemoryCache } from "../../src";
 
-function lastFetchCall() {
-  const calls = vi.mocked(fetch).mock.calls;
-  const call = calls[calls.length - 1];
-  if (!call) throw new Error("No fetch call recorded");
-  return call;
-}
-
 function firstFetchCall() {
   const call = vi.mocked(fetch).mock.calls[0];
   if (!call) throw new Error("No fetch call recorded");
