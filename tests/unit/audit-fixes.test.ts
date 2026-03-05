@@ -91,6 +91,20 @@ describe("non-JSON response handling", () => {
       expect((e as AniListError).status).toBe(502);
     }
   });
+
+  it("fires logger.error and onError hook on non-JSON response", async () => {
+    mockFetchHtml("<html>Bad Gateway</html>", 502);
+    const errorSpy = vi.fn();
+    const hookSpy = vi.fn();
+    const client = new AniListClient({
+      logger: { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: errorSpy },
+      hooks: { onError: hookSpy },
+    });
+
+    await expect(client.getMedia(1)).rejects.toThrow(AniListError);
+    expect(errorSpy).toHaveBeenCalledWith("Request failed", expect.objectContaining({ status: 502 }));
+    expect(hookSpy).toHaveBeenCalledWith(expect.any(AniListError), expect.any(String), expect.anything());
+  });
 });
 
 // ── Bug #3: throw undefined after retries ──
