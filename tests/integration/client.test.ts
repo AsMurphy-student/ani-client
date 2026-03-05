@@ -5,7 +5,11 @@
 import { describe, expect, it } from "vitest";
 import { AniListClient, AniListError, MediaListStatus, MediaSeason, MediaType } from "../../src";
 
-const client = new AniListClient();
+const client = new AniListClient({
+  rateLimit: {
+    maxRetries: 6,
+  },
+});
 
 describe("AniListClient (integration)", () => {
   // ── Media ──

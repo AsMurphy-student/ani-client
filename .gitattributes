@@ -1,0 +1,4 @@
+*.vue linguist-detectable=true
+*.yml linguist-detectable=true
+*.yaml linguist-detectable=true
+*.md linguist-detectable=true

@@ -1,10 +1,9 @@
 # ani-client
 
-![ani-client logo](docs/public/assets/logo.png)
-
 [![CI](https://github.com/gonzyui/ani-client/actions/workflows/ci.yml/badge.svg)](https://github.com/gonzyui/ani-client/actions/workflows/ci.yml)
 [![npm version](https://img.shields.io/npm/v/ani-client)](https://www.npmjs.com/package/ani-client)
 [![npm downloads](https://img.shields.io/npm/dm/ani-client)](https://www.npmjs.com/package/ani-client)
+[![codecov](https://codecov.io/gh/gonzyui/ani-client/graph/badge.svg)](https://codecov.io/gh/gonzyui/ani-client)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
