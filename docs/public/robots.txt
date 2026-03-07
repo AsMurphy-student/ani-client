@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ani-client.js.org/sitemap.xml
