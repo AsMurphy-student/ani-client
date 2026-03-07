@@ -32,12 +32,12 @@ function _copy() {
         v-for="(m, i) in managers"
         :key="m.name"
         :class="['tab', { active: active === i }]"
-        @click="select(i)"
+        @click="_select(i)"
       >
         {{ m.name }}
       </button>
     </div>
-    <div class="code-row" @click="copy">
+    <div class="code-row" @click="_copy">
       <span class="prompt">$</span>
       <code>{{ currentCmd }}</code>
       <button class="copy-btn" :title="copied ? 'Copied!' : 'Copy'">
