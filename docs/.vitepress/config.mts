@@ -1,4 +1,5 @@
 import { defineConfig } from "vitepress";
+import pkg from "../../package.json";
 
 const siteUrl = "https://ani-client.js.org";
 const siteTitle = "ani-client";
@@ -6,6 +7,16 @@ const siteDescription = "A simple, typed client to fetch anime, manga, character
 const ogImage = `${siteUrl}/assets/image.png`;
 
 export default defineConfig({
+  transformHead({ pageData }) {
+    const canonicalUrl = `${siteUrl}/${pageData.relativePath}`
+      .replace(/index\.md$/, "")
+      .replace(/\.md$/, "");
+    return [
+      ["link", { rel: "canonical", href: canonicalUrl }],
+      ["meta", { property: "og:url", content: canonicalUrl }],
+    ];
+  },
+  lang: "en-US",
   title: siteTitle,
   description: siteDescription,
   cleanUrls: true,
@@ -23,14 +34,13 @@ export default defineConfig({
       {
         name: "keywords",
         content:
-          "anilist, anime, manga, graphql, api, client, typescript, javascript, node.js, ani-client, gonzyui, gonzyuidev, anilist-wrapper, wrapper",
+          "ani-client, aniclient, anilist, anilist-client, anilist-api, anilist-wrapper, anime, manga, graphql, api, client, wrapper, typescript, javascript, node, node.js, typed"
       },
     ],
 
     ["meta", { property: "og:type", content: "website" }],
     ["meta", { property: "og:title", content: siteTitle }],
     ["meta", { property: "og:description", content: siteDescription }],
-    ["meta", { property: "og:url", content: siteUrl }],
     ["meta", { property: "og:image", content: ogImage }],
     ["meta", { property: "og:image:alt", content: "ani-client logo" }],
     ["meta", { property: "og:image:width", content: "1200" }],
@@ -43,6 +53,27 @@ export default defineConfig({
     ["meta", { name: "twitter:description", content: siteDescription }],
     ["meta", { name: "twitter:image", content: ogImage }],
     ["meta", { name: "twitter:image:alt", content: "ani-client logo" }],
+
+
+    [
+      "script",
+      { type: "application/ld+json" },
+      JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "ani-client",
+        "softwareVersion": pkg.version,
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Node.js",
+        "description": "A typed AniList client for Node.js & TypeScript",
+        "url": "https://ani-client.js.org",
+        "downloadUrl": "https://www.npmjs.com/package/ani-client",
+        "sameAs": "https://github.com/gonzyui/ani-client",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "author": { "@type": "Person", "name": "gonzyui", "url": "https://gonzyuidev.xyz" },
+        "license": "https://opensource.org/licenses/MIT"
+      })
+    ]
   ],
 
   themeConfig: {
