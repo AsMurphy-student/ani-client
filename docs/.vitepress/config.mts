@@ -12,6 +12,9 @@ export default defineConfig({
     return [
       ["link", { rel: "canonical", href: canonicalUrl }],
       ["meta", { property: "og:url", content: canonicalUrl }],
+      ["meta", { property: "og:image", content: ogImage }],
+      ["meta", { name: "twitter:image", content: ogImage }],
+      ["meta", { name: "twitter:image:alt", content: "ani-client logo" }],
     ];
   },
   lang: "en-US",
