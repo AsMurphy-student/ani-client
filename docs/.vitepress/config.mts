@@ -25,6 +25,7 @@ export default defineConfig({
   sitemap: { hostname: siteUrl },
 
   head: [
+    ["meta", { name: "google-site-verification", content: "nZEH3l3JtkpXj8ejMHKCOSNynDudM2N06p_QVyMlBds" }],
     ["link", { rel: "icon", href: "/assets/favicon.ico", type: "image/x-icon" }],
     ["link", { rel: "apple-touch-icon", href: "/assets/logo.png" }],
 
