@@ -41,7 +41,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm test:coverage
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         if: ${{ matrix.node-version == 20 || matrix.node-version == '20' }}
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
