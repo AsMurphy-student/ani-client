@@ -11,6 +11,8 @@
 
 ✨ **Showcase**: [See who's using ani-client](https://ani-client.js.org/showcase)
 
+**Support server** [Discord server](https://discord.gg/3P7twDurUD)
+
 ## Highlights
 
 - **Zero dependencies** — uses the native `fetch` API
