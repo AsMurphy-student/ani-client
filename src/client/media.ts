@@ -46,12 +46,24 @@ export async function getMediaByMalId(client: ClientBase, malId: number, type?: 
 }
 
 export async function searchMedia(client: ClientBase, options: SearchMediaOptions = {}): Promise<PagedResult<Media>> {
-  const { query: search, page = 1, perPage = 20, genres, tags, genresExclude, tagsExclude, ...filters } = options;
+  const {
+    query: search,
+    page = 1,
+    perPage = 20,
+    genres,
+    tags,
+    genresExclude,
+    tagsExclude,
+    format,
+    ...filters
+  } = options;
   return client.pagedRequest<Media>(
     QUERY_MEDIA_SEARCH,
     {
       search,
       ...filters,
+      format: Array.isArray(format) ? undefined : format,
+      format_in: Array.isArray(format) ? format : undefined,
       genre_in: genres,
       tag_in: tags,
       genre_not_in: genresExclude,

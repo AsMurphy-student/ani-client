@@ -60,7 +60,7 @@ Search for anime or manga with filters. Supports single and multi-criteria genre
 | --- | --- |
 | `options` | `SearchMediaOptions` |
 
-**Key options:** `query`, `type`, `format`, `status`, `season`, `genre`, `tag`, `genres`, `tags`, `genresExclude`, `tagsExclude`, `isAdult`, `sort`, `page`, `perPage`
+**Key options:** `query`, `countryOfOrigin`, `type`, `format`, `status`, `season`, `genre`, `tag`, `genres`, `tags`, `genresExclude`, `tagsExclude`, `isAdult`, `sort`, `page`, `perPage`
 
 **Returns:** `Promise<PagedResult<Media>>`
 

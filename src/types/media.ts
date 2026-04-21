@@ -259,8 +259,9 @@ export interface Media {
 
 export interface SearchMediaOptions {
   query?: string;
+  countryOfOrigin?: string;
   type?: MediaType;
-  format?: MediaFormat;
+  format?: MediaFormat | MediaFormat[];
   status?: MediaStatus;
   season?: MediaSeason;
   seasonYear?: number;
