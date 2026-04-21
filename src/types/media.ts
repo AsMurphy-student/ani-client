@@ -259,6 +259,7 @@ export interface Media {
 
 export interface SearchMediaOptions {
   query?: string;
+  countryOfOrigin?: string;
   type?: MediaType;
   format?: MediaFormat | MediaFormat[];
   status?: MediaStatus;

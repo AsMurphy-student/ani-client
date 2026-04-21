@@ -314,6 +314,7 @@ Represents an animation studio. Fields `favourites` and `media` are populated wh
 | Option | Type | Description |
 | --- | --- | --- |
 | `query` | `string` | Search term |
+| `countryOfOrigin` | `string` | Filter by country code (e.g., "JP", "KR") |
 | `type` | `MediaType` | ANIME or MANGA |
 | `format` | `MediaFormat \| MediaFormat[]` | TV, MOVIE, etc. |
 | `status` | `MediaStatus` | RELEASING, FINISHED, etc. |

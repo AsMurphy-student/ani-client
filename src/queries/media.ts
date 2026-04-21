@@ -10,6 +10,7 @@ query ($id: Int!) {
 export const QUERY_MEDIA_SEARCH = `
 query (
   $search: String,
+  $countryOfOrigin: CountryCode,
   $type: MediaType,
   $format: MediaFormat,
   $format_in: [MediaFormat],
@@ -31,6 +32,7 @@ query (
     pageInfo { total perPage currentPage lastPage hasNextPage }
     media(
       search: $search,
+      countryOfOrigin: $countryOfOrigin,
       type: $type,
       format: $format,
       format_in: $format_in,

@@ -12,6 +12,12 @@ head:
 
 # Changelog
 
+## [1.9.0] — 2026-04-21
+
+### Added
+- **Array support for `format` filter** — The `format` option in `SearchMediaOptions` now accepts an array of `MediaFormat` (`MediaFormat | MediaFormat[]`), allowing multi-format searches.
+- **`countryOfOrigin` filter** — Added the `countryOfOrigin` string property to `SearchMediaOptions` to filter media by country code (e.g. "JP", "KR", "CN").
+
 ## [1.8.1] — 2026-03-05
 
 ### Fixed
