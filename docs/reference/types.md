@@ -315,7 +315,7 @@ Represents an animation studio. Fields `favourites` and `media` are populated wh
 | --- | --- | --- |
 | `query` | `string` | Search term |
 | `type` | `MediaType` | ANIME or MANGA |
-| `format` | `MediaFormat` | TV, MOVIE, etc. |
+| `format` | `MediaFormat \| MediaFormat[]` | TV, MOVIE, etc. |
 | `status` | `MediaStatus` | RELEASING, FINISHED, etc. |
 | `season` | `MediaSeason` | WINTER, SPRING, etc. |
 | `seasonYear` | `number` | Year of the season |
