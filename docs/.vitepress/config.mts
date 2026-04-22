@@ -142,7 +142,7 @@ export default defineConfig({
 
     footer: {
       message: "Released under the MIT License.",
-      copyright: "Copyright © <a href='https://github.com/gonzyui'>gonzyui</a>",
+      copyright: "Copyright © <a href='https://gonzyuidev.xyz/'>gonzyui</a>",
     },
   },
 });
