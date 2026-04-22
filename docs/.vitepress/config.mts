@@ -129,6 +129,7 @@ export default defineConfig({
     socialLinks: [
       { icon: "github", link: "https://github.com/gonzyui/ani-client" },
       { icon: "npm", link: "https://www.npmjs.com/package/ani-client" },
+      { icon: "discord", link: "https://discord.gg/3P7twDurUD" },
     ],
 
     editLink: {
@@ -142,7 +143,7 @@ export default defineConfig({
 
     footer: {
       message: "Released under the MIT License.",
-      copyright: "Copyright © <a href='https://github.com/gonzyui'>gonzyui</a>",
+      copyright: "Copyright © <a href='https://gonzyuidev.xyz/'>gonzyui</a>",
     },
   },
 });
