@@ -3,6 +3,7 @@ import type { Theme } from "vitepress";
 import DefaultTheme from "vitepress/theme";
 import { h } from "vue";
 import InstallBlock from "./InstallBlock.vue";
+import ShowcaseGrid from "./ShowcaseGrid.vue";
 
 export default {
   extends: DefaultTheme,
@@ -11,7 +12,8 @@ export default {
       "home-hero-image": () => h(InstallBlock),
     });
   },
-  enhanceApp() {
+  enhanceApp({ app }) {
+    app.component("ShowcaseGrid", ShowcaseGrid);
     if (typeof window !== "undefined") {
       inject();
     }
