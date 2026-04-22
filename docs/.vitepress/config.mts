@@ -129,6 +129,7 @@ export default defineConfig({
     socialLinks: [
       { icon: "github", link: "https://github.com/gonzyui/ani-client" },
       { icon: "npm", link: "https://www.npmjs.com/package/ani-client" },
+      { icon: "discord", link: "https://discord.gg/3P7twDurUD" },
     ],
 
     editLink: {
