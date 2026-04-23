@@ -112,7 +112,7 @@ Get anime/manga for a specific season + year.
 
 | Param | Type |
 | --- | --- |
-| `options` | `GetSeasonOptions` (season, seasonYear, type?, sort?, page?, perPage?) |
+| `options` | `GetSeasonOptions` (season, seasonYear, type?, isAdult?, sort?, page?, perPage?) |
 
 **Returns:** `Promise<PagedResult<Media>>`
 
