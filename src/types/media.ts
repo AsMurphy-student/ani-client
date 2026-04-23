@@ -345,6 +345,8 @@ export interface GetSeasonOptions {
   seasonYear: number;
   /** Filter by ANIME or MANGA (defaults to ANIME) */
   type?: MediaType;
+  /** Allow or disallow explicit content (defaults to False) */
+  isAdult?: boolean;
   /** Sort order (default: POPULARITY_DESC) */
   sort?: MediaSort[];
   page?: number;
