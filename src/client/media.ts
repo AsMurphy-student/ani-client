@@ -184,7 +184,11 @@ export async function getMediaBySeason(client: ClientBase, options: GetSeasonOpt
   );
 }
 
-export async function getWeeklySchedule(client: ClientBase, date: Date = new Date()): Promise<WeeklySchedule> {
+export async function getWeeklySchedule(
+  client: ClientBase,
+  date: Date = new Date(),
+  isAdult: boolean = false,
+): Promise<WeeklySchedule> {
   const schedule: WeeklySchedule = {
     Monday: [],
     Tuesday: [],
@@ -211,6 +215,7 @@ export async function getWeeklySchedule(client: ClientBase, date: Date = new Dat
       getAiredEpisodes(client, {
         airingAtGreater: startTimestamp,
         airingAtLesser: endTimestamp,
+        isAdult,
         page,
         perPage: 50,
       }),
