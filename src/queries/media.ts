@@ -54,10 +54,10 @@ query (
 }`;
 
 export const QUERY_TRENDING = `
-query ($type: MediaType, $page: Int, $perPage: Int) {
+query ($type: MediaType, $isAdult: Boolean, $page: Int, $perPage: Int) {
   Page(page: $page, perPage: $perPage) {
     pageInfo { total perPage currentPage lastPage hasNextPage }
-    media(type: $type, sort: TRENDING_DESC) {
+    media(type: $type, isAdult: $isAdult, sort: TRENDING_DESC) {
       ${MEDIA_FIELDS_BASE}
     }
   }

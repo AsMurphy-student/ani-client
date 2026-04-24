@@ -12,6 +12,7 @@ import {
 import type {
   AiringSchedule,
   DayOfWeek,
+  GeneralMediaQueryOptions,
   GetAiringOptions,
   GetPlanningOptions,
   GetRecentChaptersOptions,
@@ -75,13 +76,9 @@ export async function searchMedia(client: ClientBase, options: SearchMediaOption
   );
 }
 
-export async function getTrending(
-  client: ClientBase,
-  type: MediaType = MediaType.ANIME,
-  page = 1,
-  perPage = 20,
-): Promise<PagedResult<Media>> {
-  return client.pagedRequest<Media>(QUERY_TRENDING, { type, page, perPage: clampPerPage(perPage) }, "media");
+export async function getTrending(client: ClientBase, options: GeneralMediaQueryOptions): Promise<PagedResult<Media>> {
+  const { type = MediaType.ANIME, isAdult = false, page = 1, perPage = 20 } = options;
+  return client.pagedRequest<Media>(QUERY_TRENDING, { type, isAdult, page, perPage: clampPerPage(perPage) }, "media");
 }
 
 export async function getPopular(
