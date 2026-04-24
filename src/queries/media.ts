@@ -81,10 +81,10 @@ query ($airingAt_greater: Int, $airingAt_lesser: Int, $isAdult: Boolean, $sort: 
 }`;
 
 export const QUERY_RECENT_CHAPTERS = `
-query ($page: Int, $perPage: Int) {
+query ($isAdult: Boolean $page: Int, $perPage: Int) {
   Page(page: $page, perPage: $perPage) {
     pageInfo { total perPage currentPage lastPage hasNextPage }
-    media(type: MANGA, status: RELEASING, sort: UPDATED_AT_DESC) {
+    media(type: MANGA, isAdult: $isAdult status: RELEASING, sort: UPDATED_AT_DESC) {
       ${MEDIA_FIELDS_BASE}
     }
   }

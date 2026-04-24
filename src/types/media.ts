@@ -321,6 +321,8 @@ export interface GetAiringOptions {
 }
 
 export interface GetRecentChaptersOptions {
+  /** Include or Exclude explicit content (default: false) */
+  isAdult?: boolean;
   /** Page number (default: 1) */
   page?: number;
   /** Results per page (default: 20, max 50) */

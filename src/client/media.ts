@@ -122,6 +122,7 @@ export async function getRecentlyUpdatedManga(
   return client.pagedRequest<Media>(
     QUERY_RECENT_CHAPTERS,
     {
+      isAdult: options.isAdult ?? false,
       page: options.page ?? 1,
       perPage: clampPerPage(options.perPage ?? 20),
     },
