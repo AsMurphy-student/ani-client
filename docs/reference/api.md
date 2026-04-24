@@ -158,6 +158,10 @@ Get recently aired anime episodes (default: last 24 hours).
 
 Get currently releasing manga sorted by most recently updated.
 
+| Param | Type |
+| --- | --- |
+| `options` | `GetAiringOptions` (isAdult?, page?, perPage?) |
+
 **Returns:** `Promise<PagedResult<Media>>`
 
 ::: warning Deprecation
