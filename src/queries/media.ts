@@ -64,7 +64,7 @@ query ($type: MediaType, $isAdult: Boolean, $page: Int, $perPage: Int) {
 }`;
 
 export const QUERY_AIRING_SCHEDULE = `
-query ($airingAt_greater: Int, $airingAt_lesser: Int, $sort: [AiringSort], $page: Int, $perPage: Int) {
+query ($airingAt_greater: Int, $airingAt_lesser: Int, $isAdult: Boolean, $sort: [AiringSort], $page: Int, $perPage: Int) {
   Page(page: $page, perPage: $perPage) {
     pageInfo { total perPage currentPage lastPage hasNextPage }
     airingSchedules(airingAt_greater: $airingAt_greater, airingAt_lesser: $airingAt_lesser, sort: $sort) {
@@ -73,7 +73,7 @@ query ($airingAt_greater: Int, $airingAt_lesser: Int, $sort: [AiringSort], $page
       timeUntilAiring
       episode
       mediaId
-      media {
+      media(isAdult: $isAdult) {
         ${MEDIA_FIELDS_BASE}
       }
     }

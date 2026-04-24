@@ -101,6 +101,7 @@ export async function getAiredEpisodes(
     {
       airingAt_greater: options.airingAtGreater ?? now - 24 * 3600,
       airingAt_lesser: options.airingAtLesser ?? now,
+      isAdult: options.isAdult ?? false,
       sort: options.sort,
       page: options.page ?? 1,
       perPage: clampPerPage(options.perPage ?? 20),

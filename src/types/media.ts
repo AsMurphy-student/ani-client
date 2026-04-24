@@ -310,6 +310,8 @@ export interface GetAiringOptions {
   airingAtGreater?: number;
   /** Only show episodes that aired before this UNIX timestamp */
   airingAtLesser?: number;
+  /** Include or Exclude explicit content (default: false) */
+  isAdult?: boolean;
   /** Sort order (default: TIME_DESC) */
   sort?: AiringSort[];
   /** Page number */
