@@ -102,9 +102,15 @@ Get the most popular anime or manga. Convenience wrapper around `searchMedia` wi
 const popular = await client.getPopular(MediaType.ANIME, 1, 10);
 ```
 
-### `getTopRated(type?, page?, perPage?)`
+### `getTopRated(options?)`
 
 Get the highest-rated anime or manga. Convenience wrapper around `searchMedia` with `SCORE_DESC` sort.
+
+| Param | Type |
+| --- | --- |
+| `options` | `GeneralMediaQueryOptions` |
+
+**Key options:** `type`, `isAdult`, `page`, `perPage`
 
 **Returns:** `Promise<PagedResult<Media>>`
 
