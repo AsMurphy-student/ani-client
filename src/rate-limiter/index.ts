@@ -7,6 +7,7 @@
  */
 
 import type { RateLimitOptions } from "../types";
+
 export type { RateLimitOptions };
 
 export class RateLimiter {
