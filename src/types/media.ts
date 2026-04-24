@@ -258,12 +258,19 @@ export interface Media {
 }
 
 export interface SearchMediaOptions {
+  /** Search Term */
   query?: string;
+  /** Filter by country code (e.g., "JP", "KR") */
   countryOfOrigin?: string;
+  /** Filter by Anime or Manga */
   type?: MediaType;
+  /** Filter by format (For multiple formats: [MediaFormat.TV]) */
   format?: MediaFormat | MediaFormat[];
+  /** Filter by status of Media */
   status?: MediaStatus;
+  /** Filter by Season (Winter, Spring, Summer, Fall) */
   season?: MediaSeason;
+  /** Filter by Year */
   seasonYear?: number;
   /** Single genre filter (kept for backward compat) */
   genre?: string;
@@ -277,16 +284,24 @@ export interface SearchMediaOptions {
   genresExclude?: string[];
   /** Exclude media with any of these tags */
   tagsExclude?: string[];
+  /** Include or Exclude explicit content (default: false) */
   isAdult?: boolean;
+  /** Sort order */
   sort?: MediaSort[];
+  /** Page number */
   page?: number;
+  /** Results per page (max 50) */
   perPage?: number;
 }
 
 export interface GeneralMediaQueryOptions {
+  /** Filter by Anime or Manga */
   type?: MediaType;
+  /** Include or Exclude explicit content (default: false) */
   isAdult?: boolean;
+  /** Page number */
   page?: number;
+  /** Results per page (max 50) */
   perPage?: number;
 }
 
@@ -297,7 +312,9 @@ export interface GetAiringOptions {
   airingAtLesser?: number;
   /** Sort order (default: TIME_DESC) */
   sort?: AiringSort[];
+  /** Page number */
   page?: number;
+  /** Results per page (max 50) */
   perPage?: number;
 }
 
@@ -313,7 +330,9 @@ export interface GetPlanningOptions {
   type?: MediaType;
   /** Sort order (default: POPULARITY_DESC) */
   sort?: MediaSort[];
+  /** Page number */
   page?: number;
+  /** Results per page (max 50) */
   perPage?: number;
 }
 
@@ -341,7 +360,9 @@ export interface GetRecommendationsOptions {
   mediaId: number;
   /** Sort order (default: RATING_DESC) */
   sort?: RecommendationSort[];
+  /** Page number */
   page?: number;
+  /** Results per page (max 50) */
   perPage?: number;
 }
 
@@ -356,7 +377,9 @@ export interface GetSeasonOptions {
   isAdult?: boolean;
   /** Sort order (default: POPULARITY_DESC) */
   sort?: MediaSort[];
+  /** Page number */
   page?: number;
+  /** Results per page (max 50) */
   perPage?: number;
 }
 
