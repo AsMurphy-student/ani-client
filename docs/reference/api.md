@@ -140,7 +140,7 @@ Get upcoming (not yet released) media sorted by popularity.
 
 | Param | Type |
 | --- | --- |
-| `options` | `GetPlanningOptions` (type?, sort?, page?, perPage?) |
+| `options` | `GetPlanningOptions` (type?, isAdult?, sort?, page?, perPage?) |
 
 **Returns:** `Promise<PagedResult<Media>>`
 
