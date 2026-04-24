@@ -263,8 +263,8 @@ export class AniListClient {
   }
 
   /** Get the most popular anime or manga. */
-  async getPopular(type?: MediaType, page?: number, perPage?: number): Promise<PagedResult<Media>> {
-    return mediaMethods.getPopular(this, type, page, perPage);
+  async getPopular(options: GeneralMediaQueryOptions = {}): Promise<PagedResult<Media>> {
+    return mediaMethods.getPopular(this, options);
   }
 
   /** Get the highest-rated anime or manga. */
