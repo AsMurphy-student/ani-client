@@ -283,6 +283,13 @@ export interface SearchMediaOptions {
   perPage?: number;
 }
 
+export interface GeneralMediaQueryOptions {
+  type?: MediaType;
+  isAdult?: boolean;
+  page?: number;
+  perPage?: number;
+}
+
 export interface GetAiringOptions {
   /** Only show episodes that aired after this UNIX timestamp */
   airingAtGreater?: number;
