@@ -330,6 +330,8 @@ export interface GetRecentChaptersOptions {
 export interface GetPlanningOptions {
   /** Filter by ANIME or MANGA (returns both if omitted) */
   type?: MediaType;
+  /** Include or Exclude explicit content (default: false) */
+  isAdult?: boolean;
   /** Sort order (default: POPULARITY_DESC) */
   sort?: MediaSort[];
   /** Page number */

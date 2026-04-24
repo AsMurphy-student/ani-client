@@ -91,10 +91,10 @@ query ($page: Int, $perPage: Int) {
 }`;
 
 export const QUERY_PLANNING = `
-query ($type: MediaType, $sort: [MediaSort], $page: Int, $perPage: Int) {
+query ($type: MediaType, $isAdult: Boolean, $sort: [MediaSort], $page: Int, $perPage: Int) {
   Page(page: $page, perPage: $perPage) {
     pageInfo { total perPage currentPage lastPage hasNextPage }
-    media(type: $type, status: NOT_YET_RELEASED, sort: $sort) {
+    media(type: $type, isAdult: $isAdult, status: NOT_YET_RELEASED, sort: $sort) {
       ${MEDIA_FIELDS_BASE}
     }
   }

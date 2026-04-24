@@ -134,6 +134,7 @@ export async function getPlanning(client: ClientBase, options: GetPlanningOption
     QUERY_PLANNING,
     {
       type: options.type,
+      isAdult: options.isAdult ?? false,
       sort: options.sort ?? [MediaSort.POPULARITY_DESC],
       page: options.page ?? 1,
       perPage: clampPerPage(options.perPage ?? 20),
