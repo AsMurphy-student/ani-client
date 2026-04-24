@@ -74,9 +74,15 @@ const result = await client.searchMedia({
 });
 ```
 
-### `getTrending(type?, page?, perPage?)`
+### `getTrending(options?)`
 
 Get currently trending anime or manga.
+
+| Param | Type |
+| --- | --- |
+| `options` | `GeneralMediaQueryOptions` |
+
+**Key options:** `type`, `isAdult`, `page`, `perPage`
 
 **Returns:** `Promise<PagedResult<Media>>`
 
