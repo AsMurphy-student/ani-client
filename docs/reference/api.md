@@ -86,9 +86,15 @@ Get currently trending anime or manga.
 
 **Returns:** `Promise<PagedResult<Media>>`
 
-### `getPopular(type?, page?, perPage?)`
+### `getPopular(options?)`
 
 Get the most popular anime or manga. Convenience wrapper around `searchMedia` with `POPULARITY_DESC` sort.
+
+| Param | Type |
+| --- | --- |
+| `options` | `GeneralMediaQueryOptions` |
+
+**Key options:** `type`, `isAdult`, `page`, `perPage`
 
 **Returns:** `Promise<PagedResult<Media>>`
 
