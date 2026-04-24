@@ -268,8 +268,8 @@ export class AniListClient {
   }
 
   /** Get the highest-rated anime or manga. */
-  async getTopRated(type?: MediaType, page?: number, perPage?: number): Promise<PagedResult<Media>> {
-    return mediaMethods.getTopRated(this, type, page, perPage);
+  async getTopRated(options: GeneralMediaQueryOptions = {}): Promise<PagedResult<Media>> {
+    return mediaMethods.getTopRated(this, options);
   }
 
   /** Get recently aired anime episodes. */

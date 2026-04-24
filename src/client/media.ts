@@ -86,13 +86,9 @@ export async function getPopular(client: ClientBase, options: GeneralMediaQueryO
   return searchMedia(client, { type, isAdult, sort: [MediaSort.POPULARITY_DESC], page, perPage });
 }
 
-export async function getTopRated(
-  client: ClientBase,
-  type: MediaType = MediaType.ANIME,
-  page = 1,
-  perPage = 20,
-): Promise<PagedResult<Media>> {
-  return searchMedia(client, { type, sort: [MediaSort.SCORE_DESC], page, perPage });
+export async function getTopRated(client: ClientBase, options: GeneralMediaQueryOptions): Promise<PagedResult<Media>> {
+  const { type = MediaType.ANIME, isAdult = false, page = 1, perPage = 20 } = options;
+  return searchMedia(client, { type, isAdult, sort: [MediaSort.SCORE_DESC], page, perPage });
 }
 
 export async function getAiredEpisodes(
