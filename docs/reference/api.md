@@ -150,7 +150,7 @@ Get recently aired anime episodes (default: last 24 hours).
 
 | Param | Type |
 | --- | --- |
-| `options` | `GetAiringOptions` (airingAtGreater?, airingAtLesser?, sort?, page?, perPage?) |
+| `options` | `GetAiringOptions` (airingAtGreater?, airingAtLesser?, isAdult?, sort?, page?, perPage?) |
 
 **Returns:** `Promise<PagedResult<AiringSchedule>>`
 
