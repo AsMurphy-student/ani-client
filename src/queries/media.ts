@@ -101,10 +101,24 @@ query ($type: MediaType, $sort: [MediaSort], $page: Int, $perPage: Int) {
 }`;
 
 export const QUERY_MEDIA_BY_SEASON = `
-query ($season: MediaSeason!, $seasonYear: Int!, $type: MediaType, $sort: [MediaSort], $page: Int, $perPage: Int) {
+query (
+  $season: MediaSeason!,
+  $seasonYear: Int!,
+  $type: MediaType,
+  $isAdult: Boolean,
+  $sort: [MediaSort],
+  $page: Int,
+  $perPage: Int
+) {
   Page(page: $page, perPage: $perPage) {
     pageInfo { total perPage currentPage lastPage hasNextPage }
-    media(season: $season, seasonYear: $seasonYear, type: $type, sort: $sort) {
+    media(
+      season: $season,
+      seasonYear: $seasonYear,
+      type: $type,
+      isAdult: $isAdult,
+      sort: $sort
+    ) {
       ${MEDIA_FIELDS_BASE}
     }
   }

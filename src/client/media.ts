@@ -185,6 +185,7 @@ export async function getMediaBySeason(client: ClientBase, options: GetSeasonOpt
       season: options.season,
       seasonYear: options.seasonYear,
       type: options.type,
+      isAdult: options.isAdult ?? false,
       sort: options.sort,
       page: options.page ?? 1,
       perPage: clampPerPage(options.perPage ?? 20),
