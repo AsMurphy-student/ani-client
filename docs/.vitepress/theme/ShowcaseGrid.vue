@@ -1,10 +1,61 @@
+<script setup>
+// biome-ignore lint: ignore
+const projects = [
+  {
+    title: "Seiyuu Tree (声の木)",
+    description:
+      "Visual Seiyuu Relationship Tree. Explore the connections between your favorite anime characters and their legendary Japanese voice actors.",
+    url: "https://seiyuu-tree.vercel.app/",
+    version: "2.0.2",
+    author: "gonzyui",
+    avatar: "https://github.com/gonzyui.png",
+  },
+];
+</script>
+
 <template>
   <div class="showcase-grid">
-    <a href="https://github.com/gonzyui/ani-client/pulls" target="_blank" rel="noopener noreferrer" class="showcase-card">
+    <a
+      v-for="project in projects"
+      :key="project.title"
+      :href="project.url"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="showcase-card"
+    >
+      <div class="card-header">
+        <div class="card-title-row">
+          <h3>{{ project.title }}</h3>
+          <span class="version-badge">{{ project.version }}</span>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <p>{{ project.description }}</p>
+      </div>
+
+      <div class="card-footer">
+        <div class="author">
+          <img :src="project.avatar" :alt="project.author" class="author-avatar" />
+          <span>
+            By <strong>@{{ project.author }}</strong>
+          </span>
+        </div>
+
+        <span class="visit-link">Visit Project →</span>
+      </div>
+    </a>
+
+    <a
+      href="https://github.com/gonzyui/ani-client/pulls"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="showcase-card"
+    >
       <div class="card-header">
         <div class="card-title-row">
           <h3>Want your projects to appear ?</h3>
-          <span class="version-badge">1.X.X</span>
+          <span class="version-badge">2.X.X</span>
         </div>
       </div>
 
@@ -15,7 +66,9 @@
       <div class="card-footer">
         <div class="author">
           <img src="https://github.com/gonzyui.png" alt="gonzyui" class="author-avatar" />
-          <span>By <strong>@gonzyui</strong></span>
+          <span>
+            By <strong>@gonzyui</strong>
+          </span>
         </div>
 
         <span class="visit-link">Open a PR →</span>
