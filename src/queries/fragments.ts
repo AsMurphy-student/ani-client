@@ -95,6 +95,13 @@ export const RELATIONS_FIELDS = `
         averageScore
         studios { nodes { id name isAnimationStudio siteUrl } }
         siteUrl
+        nextAiringEpisode {
+          id
+          airingAt
+          episode
+          mediaId
+          timeUntilAiring
+        }
       }
     }
   }

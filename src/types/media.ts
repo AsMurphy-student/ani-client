@@ -170,6 +170,7 @@ export interface MediaEdge {
     | "averageScore"
     | "studios"
     | "siteUrl"
+    | "nextAiringEpisode"
   >;
 }
 
