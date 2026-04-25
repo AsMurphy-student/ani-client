@@ -2,7 +2,7 @@
 
 exports[`query snapshots > QUERY_AIRING_SCHEDULE matches snapshot 1`] = `
 "
-query ($airingAt_greater: Int, $airingAt_lesser: Int, $sort: [AiringSort], $page: Int, $perPage: Int) {
+query ($airingAt_greater: Int, $airingAt_lesser: Int, $isAdult: Boolean, $sort: [AiringSort], $page: Int, $perPage: Int) {
   Page(page: $page, perPage: $perPage) {
     pageInfo { total perPage currentPage lastPage hasNextPage }
     airingSchedules(airingAt_greater: $airingAt_greater, airingAt_lesser: $airingAt_lesser, sort: $sort) {
@@ -11,7 +11,7 @@ query ($airingAt_greater: Int, $airingAt_lesser: Int, $sort: [AiringSort], $page
       timeUntilAiring
       episode
       mediaId
-      media {
+      media(isAdult: $isAdult) {
         
   id
   idMal
@@ -117,7 +117,17 @@ query ($idMal: Int!, $type: MediaType) {
         type
         format
         status
-        coverImage { large medium }
+        startDate { year month day }
+        endDate { year month day }
+        season
+        seasonYear
+        episodes
+        chapters
+        volumes
+        coverImage { extraLarge large medium color }
+        genres
+        averageScore
+        studios { nodes { id name isAnimationStudio siteUrl } }
         siteUrl
       }
     }
@@ -248,10 +258,10 @@ query ($search: String, $sort: [StudioSort], $page: Int, $perPage: Int) {
 
 exports[`query snapshots > QUERY_TRENDING matches snapshot 1`] = `
 "
-query ($type: MediaType, $page: Int, $perPage: Int) {
+query ($type: MediaType, $isAdult: Boolean, $page: Int, $perPage: Int) {
   Page(page: $page, perPage: $perPage) {
     pageInfo { total perPage currentPage lastPage hasNextPage }
-    media(type: $type, sort: TRENDING_DESC) {
+    media(type: $type, isAdult: $isAdult, sort: TRENDING_DESC) {
       
   id
   idMal
@@ -434,7 +444,17 @@ exports[`query snapshots > buildBatchMediaQuery matches snapshot 1`] = `
         type
         format
         status
-        coverImage { large medium }
+        startDate { year month day }
+        endDate { year month day }
+        season
+        seasonYear
+        episodes
+        chapters
+        volumes
+        coverImage { extraLarge large medium color }
+        genres
+        averageScore
+        studios { nodes { id name isAnimationStudio siteUrl } }
         siteUrl
       }
     }
@@ -494,7 +514,17 @@ exports[`query snapshots > buildBatchMediaQuery matches snapshot 1`] = `
         type
         format
         status
-        coverImage { large medium }
+        startDate { year month day }
+        endDate { year month day }
+        season
+        seasonYear
+        episodes
+        chapters
+        volumes
+        coverImage { extraLarge large medium color }
+        genres
+        averageScore
+        studios { nodes { id name isAnimationStudio siteUrl } }
         siteUrl
       }
     }
@@ -554,7 +584,17 @@ exports[`query snapshots > buildBatchMediaQuery matches snapshot 1`] = `
         type
         format
         status
-        coverImage { large medium }
+        startDate { year month day }
+        endDate { year month day }
+        season
+        seasonYear
+        episodes
+        chapters
+        volumes
+        coverImage { extraLarge large medium color }
+        genres
+        averageScore
+        studios { nodes { id name isAnimationStudio siteUrl } }
         siteUrl
       }
     }
@@ -659,7 +699,17 @@ query ($id: Int!) {
         type
         format
         status
-        coverImage { large medium }
+        startDate { year month day }
+        endDate { year month day }
+        season
+        seasonYear
+        episodes
+        chapters
+        volumes
+        coverImage { extraLarge large medium color }
+        genres
+        averageScore
+        studios { nodes { id name isAnimationStudio siteUrl } }
         siteUrl
       }
     }
@@ -870,7 +920,17 @@ query ($id: Int!) {
         type
         format
         status
-        coverImage { large medium }
+        startDate { year month day }
+        endDate { year month day }
+        season
+        seasonYear
+        episodes
+        chapters
+        volumes
+        coverImage { extraLarge large medium color }
+        genres
+        averageScore
+        studios { nodes { id name isAnimationStudio siteUrl } }
         siteUrl
       }
     }

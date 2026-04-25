@@ -12,6 +12,7 @@ import {
 import type {
   AiringSchedule,
   DayOfWeek,
+  GeneralMediaQueryOptions,
   GetAiringOptions,
   GetPlanningOptions,
   GetRecentChaptersOptions,
@@ -75,31 +76,19 @@ export async function searchMedia(client: ClientBase, options: SearchMediaOption
   );
 }
 
-export async function getTrending(
-  client: ClientBase,
-  type: MediaType = MediaType.ANIME,
-  page = 1,
-  perPage = 20,
-): Promise<PagedResult<Media>> {
-  return client.pagedRequest<Media>(QUERY_TRENDING, { type, page, perPage: clampPerPage(perPage) }, "media");
+export async function getTrending(client: ClientBase, options: GeneralMediaQueryOptions): Promise<PagedResult<Media>> {
+  const { type = MediaType.ANIME, isAdult = false, page = 1, perPage = 20 } = options;
+  return client.pagedRequest<Media>(QUERY_TRENDING, { type, isAdult, page, perPage: clampPerPage(perPage) }, "media");
 }
 
-export async function getPopular(
-  client: ClientBase,
-  type: MediaType = MediaType.ANIME,
-  page = 1,
-  perPage = 20,
-): Promise<PagedResult<Media>> {
-  return searchMedia(client, { type, sort: [MediaSort.POPULARITY_DESC], page, perPage });
+export async function getPopular(client: ClientBase, options: GeneralMediaQueryOptions): Promise<PagedResult<Media>> {
+  const { type = MediaType.ANIME, isAdult = false, page = 1, perPage = 20 } = options;
+  return searchMedia(client, { type, isAdult, sort: [MediaSort.POPULARITY_DESC], page, perPage });
 }
 
-export async function getTopRated(
-  client: ClientBase,
-  type: MediaType = MediaType.ANIME,
-  page = 1,
-  perPage = 20,
-): Promise<PagedResult<Media>> {
-  return searchMedia(client, { type, sort: [MediaSort.SCORE_DESC], page, perPage });
+export async function getTopRated(client: ClientBase, options: GeneralMediaQueryOptions): Promise<PagedResult<Media>> {
+  const { type = MediaType.ANIME, isAdult = false, page = 1, perPage = 20 } = options;
+  return searchMedia(client, { type, isAdult, sort: [MediaSort.SCORE_DESC], page, perPage });
 }
 
 export async function getAiredEpisodes(
@@ -112,6 +101,7 @@ export async function getAiredEpisodes(
     {
       airingAt_greater: options.airingAtGreater ?? now - 24 * 3600,
       airingAt_lesser: options.airingAtLesser ?? now,
+      isAdult: options.isAdult ?? false,
       sort: options.sort,
       page: options.page ?? 1,
       perPage: clampPerPage(options.perPage ?? 20),
@@ -132,6 +122,7 @@ export async function getRecentlyUpdatedManga(
   return client.pagedRequest<Media>(
     QUERY_RECENT_CHAPTERS,
     {
+      isAdult: options.isAdult ?? false,
       page: options.page ?? 1,
       perPage: clampPerPage(options.perPage ?? 20),
     },
@@ -144,6 +135,7 @@ export async function getPlanning(client: ClientBase, options: GetPlanningOption
     QUERY_PLANNING,
     {
       type: options.type,
+      isAdult: options.isAdult ?? false,
       sort: options.sort ?? [MediaSort.POPULARITY_DESC],
       page: options.page ?? 1,
       perPage: clampPerPage(options.perPage ?? 20),
@@ -185,6 +177,7 @@ export async function getMediaBySeason(client: ClientBase, options: GetSeasonOpt
       season: options.season,
       seasonYear: options.seasonYear,
       type: options.type,
+      isAdult: options.isAdult ?? false,
       sort: options.sort,
       page: options.page ?? 1,
       perPage: clampPerPage(options.perPage ?? 20),
@@ -193,7 +186,11 @@ export async function getMediaBySeason(client: ClientBase, options: GetSeasonOpt
   );
 }
 
-export async function getWeeklySchedule(client: ClientBase, date: Date = new Date()): Promise<WeeklySchedule> {
+export async function getWeeklySchedule(
+  client: ClientBase,
+  date: Date = new Date(),
+  isAdult: boolean = false,
+): Promise<WeeklySchedule> {
   const schedule: WeeklySchedule = {
     Monday: [],
     Tuesday: [],
@@ -220,6 +217,7 @@ export async function getWeeklySchedule(client: ClientBase, date: Date = new Dat
       getAiredEpisodes(client, {
         airingAtGreater: startTimestamp,
         airingAtLesser: endTimestamp,
+        isAdult,
         page,
         perPage: 50,
       }),

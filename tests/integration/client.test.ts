@@ -44,18 +44,18 @@ describe("AniListClient (integration)", () => {
     });
 
     it("getTrending(ANIME)", async () => {
-      const result = await client.getTrending(MediaType.ANIME, 1, 5);
+      const result = await client.getTrending({ type: MediaType.ANIME, page: 1, perPage: 5 });
       expect(result.results.length).toBeGreaterThan(0);
       expect(result.pageInfo.hasNextPage).not.toBeNull();
     });
 
     it("getPopular(ANIME)", async () => {
-      const result = await client.getPopular(MediaType.ANIME, 1, 5);
+      const result = await client.getPopular({ type: MediaType.ANIME, page: 1, perPage: 5 });
       expect(result.results.length).toBeGreaterThan(0);
     });
 
     it("getTopRated(ANIME)", async () => {
-      const result = await client.getTopRated(MediaType.ANIME, 1, 5);
+      const result = await client.getTopRated({ type: MediaType.ANIME, page: 1, perPage: 5 });
       expect(result.results.length).toBeGreaterThan(0);
     });
   });
@@ -394,7 +394,10 @@ describe("AniListClient (integration)", () => {
   describe("Paginate", () => {
     it("paginate() iterates across pages", async () => {
       const items: string[] = [];
-      for await (const anime of client.paginate((page) => client.getTrending(MediaType.ANIME, page, 3), 2)) {
+      for await (const anime of client.paginate(
+        (page) => client.getTrending({ type: MediaType.ANIME, page, perPage: 3 }),
+        2,
+      )) {
         items.push(anime.title.romaji ?? "?");
       }
       expect(items.length).toBeGreaterThan(3);

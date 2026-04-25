@@ -12,7 +12,39 @@ head:
 
 # Changelog
 
+## [2.0.0] — 2026-04-25
+
+### Breaking Changes
+- **Positional arguments removed for media discovery** — `getTrending`, `getPopular`, and `getTopRated` now accept an options object instead of positional arguments.
+  - **Old**: `client.getTrending(type, page, perPage)`
+  - **New**: `client.getTrending({ type, isAdult, page, perPage })`
+- **Standardized method signatures** — Several methods have been updated to use a consistent options-based pattern, improving API predictability.
+
+### Added
+- **`isAdult` filter support** — Explicit content filtering is now available across major discovery methods:
+  - `getTrending()`
+  - `getPopular()`
+  - `getTopRated()`
+  - `getMediaBySeason()`
+  - `getWeeklySchedule()`
+  - `getAiredEpisodes()`
+  - `getRecentlyUpdatedManga()`
+  - `getPlanning()`
+- **`GeneralMediaQueryOptions` type** — New unified interface for shared query parameters (type, isAdult, page, perPage).
+- **JSDoc Documentation** — Added comprehensive documentation comments to core types and interfaces for better IDE intellisense and developer experience.
+
+### Fixed
+- **Docs: Showcase hydration** — Resolved a hydration error where the showcase page would fail to load by rendering through a dedicated theme component.
+- **TSConfig** — Fixed linting and configuration errors in `tsconfig.json`.
+
+### Internal
+- **Discord Community** — Added official Discord community link to the documentation.
+- **CI/CD Cleanup** — Removed `.github/dependabot.yml` as dependency management has been moved to a different workflow.
+- **Dependency Updates** — All development dependencies have been updated to their latest versions.
+- **Docs Polish** — Refreshed README content and documentation footer links.
+
 ## [1.9.0] — 2026-04-21
+
 
 ### Added
 - **Array support for `format` filter** — The `format` option in `SearchMediaOptions` now accepts an array of `MediaFormat` (`MediaFormat | MediaFormat[]`), allowing multi-format searches.

@@ -12,7 +12,7 @@ head:
 
 # Rate Limiting
 
-The client respects AniList's rate limit (90 req/min) with a conservative default of **85 req/min**.
+The client respects AniList's rate limit (30 req/min) with a conservative default of **25 req/min**.
 
 When an HTTP 429 response is received, the client pauses and retries automatically using **exponential backoff with jitter**.
 
