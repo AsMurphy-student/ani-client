@@ -117,7 +117,7 @@ query ($idMal: Int!, $type: MediaType) {
         type
         format
         status
-        coverImage { large medium }
+        coverImage { extraLarge large medium }
         siteUrl
       }
     }
@@ -434,7 +434,7 @@ exports[`query snapshots > buildBatchMediaQuery matches snapshot 1`] = `
         type
         format
         status
-        coverImage { large medium }
+        coverImage { extraLarge large medium }
         siteUrl
       }
     }
@@ -494,7 +494,7 @@ exports[`query snapshots > buildBatchMediaQuery matches snapshot 1`] = `
         type
         format
         status
-        coverImage { large medium }
+        coverImage { extraLarge large medium }
         siteUrl
       }
     }
@@ -554,7 +554,7 @@ exports[`query snapshots > buildBatchMediaQuery matches snapshot 1`] = `
         type
         format
         status
-        coverImage { large medium }
+        coverImage { extraLarge large medium }
         siteUrl
       }
     }
@@ -659,7 +659,7 @@ query ($id: Int!) {
         type
         format
         status
-        coverImage { large medium }
+        coverImage { extraLarge large medium }
         siteUrl
       }
     }
@@ -870,7 +870,7 @@ query ($id: Int!) {
         type
         format
         status
-        coverImage { large medium }
+        coverImage { extraLarge large medium }
         siteUrl
       }
     }

@@ -83,7 +83,7 @@ export const RELATIONS_FIELDS = `
         type
         format
         status
-        coverImage { large medium }
+        coverImage { extraLarge large medium }
         siteUrl
       }
     }
