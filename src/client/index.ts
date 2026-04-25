@@ -15,6 +15,7 @@ import type {
   CacheAdapter,
   Character,
   CharacterIncludeOptions,
+  GeneralMediaQueryOptions,
   GetAiringOptions,
   GetPlanningOptions,
   GetRecentChaptersOptions,
@@ -257,18 +258,18 @@ export class AniListClient {
   }
 
   /** Get currently trending anime or manga. */
-  async getTrending(type?: MediaType, page?: number, perPage?: number): Promise<PagedResult<Media>> {
-    return mediaMethods.getTrending(this, type, page, perPage);
+  async getTrending(options: GeneralMediaQueryOptions = {}): Promise<PagedResult<Media>> {
+    return mediaMethods.getTrending(this, options);
   }
 
   /** Get the most popular anime or manga. */
-  async getPopular(type?: MediaType, page?: number, perPage?: number): Promise<PagedResult<Media>> {
-    return mediaMethods.getPopular(this, type, page, perPage);
+  async getPopular(options: GeneralMediaQueryOptions = {}): Promise<PagedResult<Media>> {
+    return mediaMethods.getPopular(this, options);
   }
 
   /** Get the highest-rated anime or manga. */
-  async getTopRated(type?: MediaType, page?: number, perPage?: number): Promise<PagedResult<Media>> {
-    return mediaMethods.getTopRated(this, type, page, perPage);
+  async getTopRated(options: GeneralMediaQueryOptions = {}): Promise<PagedResult<Media>> {
+    return mediaMethods.getTopRated(this, options);
   }
 
   /** Get recently aired anime episodes. */

@@ -54,17 +54,17 @@ query (
 }`;
 
 export const QUERY_TRENDING = `
-query ($type: MediaType, $page: Int, $perPage: Int) {
+query ($type: MediaType, $isAdult: Boolean, $page: Int, $perPage: Int) {
   Page(page: $page, perPage: $perPage) {
     pageInfo { total perPage currentPage lastPage hasNextPage }
-    media(type: $type, sort: TRENDING_DESC) {
+    media(type: $type, isAdult: $isAdult, sort: TRENDING_DESC) {
       ${MEDIA_FIELDS_BASE}
     }
   }
 }`;
 
 export const QUERY_AIRING_SCHEDULE = `
-query ($airingAt_greater: Int, $airingAt_lesser: Int, $sort: [AiringSort], $page: Int, $perPage: Int) {
+query ($airingAt_greater: Int, $airingAt_lesser: Int, $isAdult: Boolean, $sort: [AiringSort], $page: Int, $perPage: Int) {
   Page(page: $page, perPage: $perPage) {
     pageInfo { total perPage currentPage lastPage hasNextPage }
     airingSchedules(airingAt_greater: $airingAt_greater, airingAt_lesser: $airingAt_lesser, sort: $sort) {
@@ -73,7 +73,7 @@ query ($airingAt_greater: Int, $airingAt_lesser: Int, $sort: [AiringSort], $page
       timeUntilAiring
       episode
       mediaId
-      media {
+      media(isAdult: $isAdult) {
         ${MEDIA_FIELDS_BASE}
       }
     }
@@ -81,20 +81,20 @@ query ($airingAt_greater: Int, $airingAt_lesser: Int, $sort: [AiringSort], $page
 }`;
 
 export const QUERY_RECENT_CHAPTERS = `
-query ($page: Int, $perPage: Int) {
+query ($isAdult: Boolean $page: Int, $perPage: Int) {
   Page(page: $page, perPage: $perPage) {
     pageInfo { total perPage currentPage lastPage hasNextPage }
-    media(type: MANGA, status: RELEASING, sort: UPDATED_AT_DESC) {
+    media(type: MANGA, isAdult: $isAdult status: RELEASING, sort: UPDATED_AT_DESC) {
       ${MEDIA_FIELDS_BASE}
     }
   }
 }`;
 
 export const QUERY_PLANNING = `
-query ($type: MediaType, $sort: [MediaSort], $page: Int, $perPage: Int) {
+query ($type: MediaType, $isAdult: Boolean, $sort: [MediaSort], $page: Int, $perPage: Int) {
   Page(page: $page, perPage: $perPage) {
     pageInfo { total perPage currentPage lastPage hasNextPage }
-    media(type: $type, status: NOT_YET_RELEASED, sort: $sort) {
+    media(type: $type, isAdult: $isAdult, status: NOT_YET_RELEASED, sort: $sort) {
       ${MEDIA_FIELDS_BASE}
     }
   }
