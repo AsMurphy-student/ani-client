@@ -1,7 +1,7 @@
 /**
  * Rate limiter with automatic retry for AniList API.
  *
- * AniList allows 90 requests per minute.
+ * AniList allows 30 requests per minute.
  * When a 429 (Too Many Requests) is received, the client
  * waits for the Retry-After header and retries automatically.
  */
@@ -28,7 +28,7 @@ export class RateLimiter {
   private readonly activeTimers = new Set<ReturnType<typeof setTimeout>>();
 
   constructor(options: RateLimitOptions = {}) {
-    this.maxRequests = options.maxRequests ?? 85;
+    this.maxRequests = options.maxRequests ?? 25;
     this.windowMs = options.windowMs ?? 60_000;
     this.maxRetries = options.maxRetries ?? 3;
     this.retryDelayMs = options.retryDelayMs ?? 2_000;
