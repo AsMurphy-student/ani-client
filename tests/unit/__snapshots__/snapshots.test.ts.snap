@@ -117,7 +117,17 @@ query ($idMal: Int!, $type: MediaType) {
         type
         format
         status
-        coverImage { large medium }
+        startDate { year month day }
+        endDate { year month day }
+        season
+        seasonYear
+        episodes
+        chapters
+        volumes
+        coverImage { extraLarge large medium color }
+        genres
+        averageScore
+        studios { nodes { id name isAnimationStudio siteUrl } }
         siteUrl
       }
     }
@@ -434,7 +444,17 @@ exports[`query snapshots > buildBatchMediaQuery matches snapshot 1`] = `
         type
         format
         status
-        coverImage { large medium }
+        startDate { year month day }
+        endDate { year month day }
+        season
+        seasonYear
+        episodes
+        chapters
+        volumes
+        coverImage { extraLarge large medium color }
+        genres
+        averageScore
+        studios { nodes { id name isAnimationStudio siteUrl } }
         siteUrl
       }
     }
@@ -494,7 +514,17 @@ exports[`query snapshots > buildBatchMediaQuery matches snapshot 1`] = `
         type
         format
         status
-        coverImage { large medium }
+        startDate { year month day }
+        endDate { year month day }
+        season
+        seasonYear
+        episodes
+        chapters
+        volumes
+        coverImage { extraLarge large medium color }
+        genres
+        averageScore
+        studios { nodes { id name isAnimationStudio siteUrl } }
         siteUrl
       }
     }
@@ -554,7 +584,17 @@ exports[`query snapshots > buildBatchMediaQuery matches snapshot 1`] = `
         type
         format
         status
-        coverImage { large medium }
+        startDate { year month day }
+        endDate { year month day }
+        season
+        seasonYear
+        episodes
+        chapters
+        volumes
+        coverImage { extraLarge large medium color }
+        genres
+        averageScore
+        studios { nodes { id name isAnimationStudio siteUrl } }
         siteUrl
       }
     }
@@ -659,7 +699,17 @@ query ($id: Int!) {
         type
         format
         status
-        coverImage { large medium }
+        startDate { year month day }
+        endDate { year month day }
+        season
+        seasonYear
+        episodes
+        chapters
+        volumes
+        coverImage { extraLarge large medium color }
+        genres
+        averageScore
+        studios { nodes { id name isAnimationStudio siteUrl } }
         siteUrl
       }
     }
@@ -870,7 +920,17 @@ query ($id: Int!) {
         type
         format
         status
-        coverImage { large medium }
+        startDate { year month day }
+        endDate { year month day }
+        season
+        seasonYear
+        episodes
+        chapters
+        volumes
+        coverImage { extraLarge large medium color }
+        genres
+        averageScore
+        studios { nodes { id name isAnimationStudio siteUrl } }
         siteUrl
       }
     }

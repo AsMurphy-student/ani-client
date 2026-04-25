@@ -83,7 +83,17 @@ export const RELATIONS_FIELDS = `
         type
         format
         status
-        coverImage { large medium }
+        startDate { year month day }
+        endDate { year month day }
+        season
+        seasonYear
+        episodes
+        chapters
+        volumes
+        coverImage { extraLarge large medium color }
+        genres
+        averageScore
+        studios { nodes { id name isAnimationStudio siteUrl } }
         siteUrl
       }
     }
