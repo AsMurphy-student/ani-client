@@ -151,7 +151,26 @@ export enum MediaRelationType {
 
 export interface MediaEdge {
   relationType: MediaRelationType;
-  node: Pick<Media, "id" | "title" | "type" | "format" | "status" | "coverImage" | "siteUrl">;
+  node: Pick<
+    Media,
+    | "id"
+    | "title"
+    | "type"
+    | "format"
+    | "status"
+    | "startDate"
+    | "endDate"
+    | "season"
+    | "seasonYear"
+    | "episodes"
+    | "chapters"
+    | "volumes"
+    | "coverImage"
+    | "genres"
+    | "averageScore"
+    | "studios"
+    | "siteUrl"
+  >;
 }
 
 export interface MediaConnection {
