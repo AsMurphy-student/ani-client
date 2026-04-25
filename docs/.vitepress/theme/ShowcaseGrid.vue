@@ -1,14 +1,16 @@
 <script setup>
+// biome-ignore lint: ignore
 const projects = [
   {
-    title: 'Seiyuu Tree (声の木)',
-    description: 'Visual Seiyuu Relationship Tree. Explore the connections between your favorite anime characters and their legendary Japanese voice actors.',
-    url: 'https://seiyuu-tree.vercel.app/',
-    version: '2.0.2',
-    author: 'gonzyui',
-    avatar: 'https://github.com/gonzyui.png',
+    title: "Seiyuu Tree (声の木)",
+    description:
+      "Visual Seiyuu Relationship Tree. Explore the connections between your favorite anime characters and their legendary Japanese voice actors.",
+    url: "https://seiyuu-tree.vercel.app/",
+    version: "2.0.2",
+    author: "gonzyui",
+    avatar: "https://github.com/gonzyui.png",
   },
-]
+];
 </script>
 
 <template>
