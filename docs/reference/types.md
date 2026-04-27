@@ -327,6 +327,7 @@ Represents an animation studio. Fields `favourites` and `media` are populated wh
 | `genresExclude` | `string[]` | Exclude genres |
 | `tagsExclude` | `string[]` | Exclude tags |
 | `isAdult` | `boolean` | Include/exclude adult content |
+| `idNotIn` | `number[]` | Exclude certain media entries by ID |
 | `sort` | `MediaSort[]` | Sort order |
 | `page` | `number` | Page number |
 | `perPage` | `number` | Results per page (max 50) |
