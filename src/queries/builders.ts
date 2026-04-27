@@ -124,6 +124,51 @@ query ($id: Int!) {
 }`;
 }
 
+export function buildMediaCharactersQuery(
+  options: { perPage?: number; sort?: boolean; voiceActors?: boolean } = {},
+): string {
+  const sortClause = options.sort === false ? "" : ", sort: [ROLE, RELEVANCE, ID]";
+  const voiceActorBlock = options.voiceActors
+    ? `\n            voiceActors {
+              ${VOICE_ACTOR_FIELDS_COMPACT}
+            }`
+    : "";
+
+  return `
+query ($mediaId: Int!, $page: Int, $perPage: Int) {
+  Media(id: $mediaId) {
+    characters(page: $page, perPage: $perPage${sortClause}) {
+      pageInfo { total perPage currentPage lastPage hasNextPage }
+      edges {
+        role
+        node {
+          ${CHARACTER_FIELDS_COMPACT}
+        }${voiceActorBlock}
+      }
+    }
+  }
+}`;
+}
+
+export function buildMediaStaffQuery(options: { perPage?: number; sort?: boolean } = {}): string {
+  const sortClause = options.sort === false ? "" : ", sort: [RELEVANCE, ID]";
+
+  return `
+query ($mediaId: Int!, $page: Int, $perPage: Int) {
+  Media(id: $mediaId) {
+    staff(page: $page, perPage: $perPage${sortClause}) {
+      pageInfo { total perPage currentPage lastPage hasNextPage }
+      edges {
+        role
+        node {
+          ${STAFF_FIELDS}
+        }
+      }
+    }
+  }
+}`;
+}
+
 /** @internal Build a batched GraphQL query using aliases. */
 function buildBatchQuery(ids: number[], typeName: string, fields: string, prefix: string): string {
   const aliases = ids.map((id, i) => `${prefix}${i}: ${typeName}(id: ${id}) { ${fields} }`).join("\n  ");

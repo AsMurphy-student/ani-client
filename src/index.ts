@@ -25,6 +25,8 @@ export {
   type FavoriteStudioNode,
   type FuzzyDate,
   type GetAiringOptions,
+  type GetMediaCharactersOptions,
+  type GetMediaStaffOptions,
   type GetPlanningOptions,
   type GetRecentChaptersOptions,
   type GetRecommendationsOptions,

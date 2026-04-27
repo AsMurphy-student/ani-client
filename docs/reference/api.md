@@ -164,10 +164,6 @@ Get currently releasing manga sorted by most recently updated.
 
 **Returns:** `Promise<PagedResult<Media>>`
 
-::: warning Deprecation
-`getAiredChapters()` is deprecated. Use `getRecentlyUpdatedManga()` instead — the old name is kept as an alias and will be removed in v2.
-:::
-
 ### `getMediaByMalId(malId, type?)`
 
 Fetch a single anime or manga by its **MyAnimeList** ID.
@@ -181,6 +177,43 @@ Fetch a single anime or manga by its **MyAnimeList** ID.
 
 ```typescript
 const anime = await client.getMediaByMalId(5114); // Fullmetal Alchemist: Brotherhood
+```
+
+### `getMediaCharacters(mediaId, options?)`
+
+Fetch paginated characters for a media entry by AniList ID.
+
+| Param | Type | Description |
+| --- | --- | --- |
+| `mediaId` | `number` | AniList media ID |
+| `options` | `GetMediaCharactersOptions` | Pagination and include options |
+
+**Key options:** `page`, `perPage`, `sort`, `voiceActors`
+
+**Returns:** `Promise<PagedResult<MediaCharacterEdge>>`
+
+```typescript
+const characters = await client.getMediaCharacters(1, { page: 1, perPage: 25, voiceActors: true });
+for (const edge of characters.results) {
+  console.log(edge.role, edge.node.name.full);
+}
+```
+
+### `getMediaStaff(mediaId, options?)`
+
+Fetch paginated staff members for a media entry by AniList ID.
+
+| Param | Type | Description |
+| --- | --- | --- |
+| `mediaId` | `number` | AniList media ID |
+| `options` | `GetMediaStaffOptions` | Pagination and sort options |
+
+**Key options:** `page`, `perPage`, `sort`
+
+**Returns:** `Promise<PagedResult<MediaStaffEdge>>`
+
+```typescript
+const staff = await client.getMediaStaff(1, { page: 1, perPage: 25 });
 ```
 
 ### `getRecommendations(mediaId, options?)`

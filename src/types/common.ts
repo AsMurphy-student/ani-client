@@ -65,7 +65,7 @@ export interface CacheOptions {
 
 /** Rate limiter configuration options. */
 export interface RateLimitOptions {
-  /** Max requests per window (default: 85) */
+  /** Max requests per window (default: 25) */
   maxRequests?: number;
   /** Window size in ms (default: 60 000) */
   windowMs?: number;

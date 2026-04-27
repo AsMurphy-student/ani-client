@@ -17,6 +17,8 @@ import type {
   CharacterIncludeOptions,
   GeneralMediaQueryOptions,
   GetAiringOptions,
+  GetMediaCharactersOptions,
+  GetMediaStaffOptions,
   GetPlanningOptions,
   GetRecentChaptersOptions,
   GetRecommendationsOptions,
@@ -24,8 +26,10 @@ import type {
   GetUserMediaListOptions,
   Logger,
   Media,
+  MediaCharacterEdge,
   MediaIncludeOptions,
   MediaListEntry,
+  MediaStaffEdge,
   MediaTag,
   MediaType,
   PagedResult,
@@ -247,6 +251,17 @@ export class AniListClient {
     return mediaMethods.getMedia(this, id, include);
   }
 
+  async getMediaCharacters(
+    mediaId: number,
+    options: GetMediaCharactersOptions = {},
+  ): Promise<PagedResult<MediaCharacterEdge>> {
+    return mediaMethods.getMediaCharacters(this, mediaId, options);
+  }
+
+  async getMediaStaff(mediaId: number, options: GetMediaStaffOptions = {}): Promise<PagedResult<MediaStaffEdge>> {
+    return mediaMethods.getMediaStaff(this, mediaId, options);
+  }
+
   /**
    * Search for anime or manga.
    *
@@ -284,13 +299,6 @@ export class AniListClient {
    */
   async getRecentlyUpdatedManga(options: GetRecentChaptersOptions = {}): Promise<PagedResult<Media>> {
     return mediaMethods.getRecentlyUpdatedManga(this, options);
-  }
-
-  /**
-   * @deprecated Use `getRecentlyUpdatedManga` instead. This alias will be removed in v2.
-   */
-  async getAiredChapters(options: GetRecentChaptersOptions = {}): Promise<PagedResult<Media>> {
-    return this.getRecentlyUpdatedManga(options);
   }
 
   /**
