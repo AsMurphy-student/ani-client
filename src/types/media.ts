@@ -168,6 +168,7 @@ export interface MediaEdge {
     | "coverImage"
     | "genres"
     | "averageScore"
+    | "meanScore"
     | "studios"
     | "siteUrl"
     | "nextAiringEpisode"

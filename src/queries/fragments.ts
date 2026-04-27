@@ -93,6 +93,7 @@ export const RELATIONS_FIELDS = `
         coverImage { extraLarge large medium color }
         genres
         averageScore
+        meanScore
         studios { nodes { id name isAnimationStudio siteUrl } }
         siteUrl
         nextAiringEpisode {
