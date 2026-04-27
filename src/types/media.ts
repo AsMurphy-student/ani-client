@@ -327,6 +327,8 @@ export interface SearchMediaOptions {
   tagsExclude?: string[];
   /** Include or Exclude explicit content (default: false) */
   isAdult?: boolean;
+  /** Exclude certain media entries by ID */
+  idNotIn?: number[];
   /** Sort order */
   sort?: MediaSort[];
   /** Page number */
@@ -340,6 +342,8 @@ export interface GeneralMediaQueryOptions {
   type?: MediaType;
   /** Include or Exclude explicit content (default: false) */
   isAdult?: boolean;
+  /** Exclude certain media entries by ID */
+  idNotIn?: number[];
   /** Page number */
   page?: number;
   /** Results per page (max 50) */
@@ -351,8 +355,8 @@ export interface GetAiringOptions {
   airingAtGreater?: number;
   /** Only show episodes that aired before this UNIX timestamp */
   airingAtLesser?: number;
-  /** Include or Exclude explicit content (default: false) */
-  isAdult?: boolean;
+  /** Exclude certain media entries by ID */
+  idNotIn?: number[];
   /** Sort order (default: TIME_DESC) */
   sort?: AiringSort[];
   /** Page number */
@@ -364,6 +368,8 @@ export interface GetAiringOptions {
 export interface GetRecentChaptersOptions {
   /** Include or Exclude explicit content (default: false) */
   isAdult?: boolean;
+  /** Exclude certain media entries by ID */
+  idNotIn?: number[];
   /** Page number (default: 1) */
   page?: number;
   /** Results per page (default: 20, max 50) */
@@ -375,6 +381,8 @@ export interface GetPlanningOptions {
   type?: MediaType;
   /** Include or Exclude explicit content (default: false) */
   isAdult?: boolean;
+  /** Exclude certain media entries by ID */
+  idNotIn?: number[];
   /** Sort order (default: POPULARITY_DESC) */
   sort?: MediaSort[];
   /** Page number */
@@ -422,6 +430,8 @@ export interface GetSeasonOptions {
   type?: MediaType;
   /** Allow or disallow explicit content (defaults to False) */
   isAdult?: boolean;
+  /** Exclude certain media entries by ID */
+  idNotIn?: number[];
   /** Sort order (default: POPULARITY_DESC) */
   sort?: MediaSort[];
   /** Page number */

@@ -60,7 +60,7 @@ Search for anime or manga with filters. Supports single and multi-criteria genre
 | --- | --- |
 | `options` | `SearchMediaOptions` |
 
-**Key options:** `query`, `countryOfOrigin`, `type`, `format`, `status`, `season`, `genre`, `tag`, `genres`, `tags`, `genresExclude`, `tagsExclude`, `isAdult`, `sort`, `page`, `perPage`
+**Key options:** `query`, `countryOfOrigin`, `type`, `format`, `status`, `season`, `genre`, `tag`, `genres`, `tags`, `genresExclude`, `tagsExclude`, `isAdult`, `idNotIn`, `sort`, `page`, `perPage`
 
 **Returns:** `Promise<PagedResult<Media>>`
 
@@ -82,7 +82,7 @@ Get currently trending anime or manga.
 | --- | --- |
 | `options` | `GeneralMediaQueryOptions` |
 
-**Key options:** `type`, `isAdult`, `page`, `perPage`
+**Key options:** `type`, `isAdult`, `idNotIn`, `page`, `perPage`
 
 **Returns:** `Promise<PagedResult<Media>>`
 
@@ -94,7 +94,7 @@ Get the most popular anime or manga. Convenience wrapper around `searchMedia` wi
 | --- | --- |
 | `options` | `GeneralMediaQueryOptions` |
 
-**Key options:** `type`, `isAdult`, `page`, `perPage`
+**Key options:** `type`, `isAdult`, `idNotIn`, `page`, `perPage`
 
 **Returns:** `Promise<PagedResult<Media>>`
 
@@ -110,7 +110,7 @@ Get the highest-rated anime or manga. Convenience wrapper around `searchMedia` w
 | --- | --- |
 | `options` | `GeneralMediaQueryOptions` |
 
-**Key options:** `type`, `isAdult`, `page`, `perPage`
+**Key options:** `type`, `isAdult`, `idNotIn`, `page`, `perPage`
 
 **Returns:** `Promise<PagedResult<Media>>`
 
@@ -118,7 +118,7 @@ Get the highest-rated anime or manga. Convenience wrapper around `searchMedia` w
 const top = await client.getTopRated(MediaType.MANGA, 1, 10);
 ```
 
-### `getWeeklySchedule(date?, isAdult?)`
+### `getWeeklySchedule(date?)`
 
 Fetches the airing schedule for the entire week of the specified date (defaults to the current week). Returns a `WeeklySchedule` object grouped by day of the week.
 
@@ -130,7 +130,7 @@ Get anime/manga for a specific season + year.
 
 | Param | Type |
 | --- | --- |
-| `options` | `GetSeasonOptions` (season, seasonYear, type?, isAdult?, sort?, page?, perPage?) |
+| `options` | `GetSeasonOptions` (season, seasonYear, type?, isAdult?, idNotIn?, sort?, page?, perPage?) |
 
 **Returns:** `Promise<PagedResult<Media>>`
 
@@ -140,7 +140,7 @@ Get upcoming (not yet released) media sorted by popularity.
 
 | Param | Type |
 | --- | --- |
-| `options` | `GetPlanningOptions` (type?, isAdult?, sort?, page?, perPage?) |
+| `options` | `GetPlanningOptions` (type?, isAdult?, idNotIn?, sort?, page?, perPage?) |
 
 **Returns:** `Promise<PagedResult<Media>>`
 
@@ -150,7 +150,7 @@ Get recently aired anime episodes (default: last 24 hours).
 
 | Param | Type |
 | --- | --- |
-| `options` | `GetAiringOptions` (airingAtGreater?, airingAtLesser?, isAdult?, sort?, page?, perPage?) |
+| `options` | `GetAiringOptions` (airingAtGreater?, airingAtLesser?, isAdult?, idNotIn?, sort?, page?, perPage?) |
 
 **Returns:** `Promise<PagedResult<AiringSchedule>>`
 
@@ -160,7 +160,7 @@ Get currently releasing manga sorted by most recently updated.
 
 | Param | Type |
 | --- | --- |
-| `options` | `GetAiringOptions` (isAdult?, page?, perPage?) |
+| `options` | `GetAiringOptions` (isAdult?, idNotIn?, page?, perPage?) |
 
 **Returns:** `Promise<PagedResult<Media>>`
 
