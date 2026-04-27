@@ -2,6 +2,7 @@ export * from "./character";
 export * from "./common";
 export * from "./lists";
 export * from "./media";
+export * from "./review";
 export * from "./staff";
 export * from "./studio";
 export * from "./thread";

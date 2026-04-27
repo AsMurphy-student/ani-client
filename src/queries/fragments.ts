@@ -93,6 +93,7 @@ export const RELATIONS_FIELDS = `
         coverImage { extraLarge large medium color }
         genres
         averageScore
+        meanScore
         studios { nodes { id name isAnimationStudio siteUrl } }
         siteUrl
         nextAiringEpisode {
@@ -104,6 +105,32 @@ export const RELATIONS_FIELDS = `
         }
       }
     }
+  }
+`;
+
+/** Media Recommendation fields - used for when fetching recommendation for a specific media entry */
+export const MEDIA_RECOMMENDATION_FIELDS = `
+  id
+  rating
+  mediaRecommendation {
+    id
+    title { romaji english native userPreferred }
+    type
+    format
+    coverImage { large medium }
+    averageScore
+    meanScore
+   	episodes
+   	chapters
+   	volumes
+    nextAiringEpisode
+   	season
+   	seasonYear
+   	startDate
+   	endDate
+   	studios
+   	genres
+    siteUrl
   }
 `;
 

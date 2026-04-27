@@ -115,18 +115,22 @@ export async function searchMedia(client: ClientBase, options: SearchMediaOption
 }
 
 export async function getTrending(client: ClientBase, options: GeneralMediaQueryOptions): Promise<PagedResult<Media>> {
-  const { type = MediaType.ANIME, isAdult = false, page = 1, perPage = 20 } = options;
-  return client.pagedRequest<Media>(QUERY_TRENDING, { type, isAdult, page, perPage: clampPerPage(perPage) }, "media");
+  const { type = MediaType.ANIME, isAdult = false, idNotIn = [], page = 1, perPage = 20 } = options;
+  return client.pagedRequest<Media>(
+    QUERY_TRENDING,
+    { type, isAdult, idNotIn, page, perPage: clampPerPage(perPage) },
+    "media",
+  );
 }
 
 export async function getPopular(client: ClientBase, options: GeneralMediaQueryOptions): Promise<PagedResult<Media>> {
-  const { type = MediaType.ANIME, isAdult = false, page = 1, perPage = 20 } = options;
-  return searchMedia(client, { type, isAdult, sort: [MediaSort.POPULARITY_DESC], page, perPage });
+  const { type = MediaType.ANIME, isAdult = false, idNotIn = [], page = 1, perPage = 20 } = options;
+  return searchMedia(client, { type, isAdult, idNotIn, sort: [MediaSort.POPULARITY_DESC], page, perPage });
 }
 
 export async function getTopRated(client: ClientBase, options: GeneralMediaQueryOptions): Promise<PagedResult<Media>> {
-  const { type = MediaType.ANIME, isAdult = false, page = 1, perPage = 20 } = options;
-  return searchMedia(client, { type, isAdult, sort: [MediaSort.SCORE_DESC], page, perPage });
+  const { type = MediaType.ANIME, isAdult = false, idNotIn = [], page = 1, perPage = 20 } = options;
+  return searchMedia(client, { type, isAdult, idNotIn, sort: [MediaSort.SCORE_DESC], page, perPage });
 }
 
 export async function getAiredEpisodes(
@@ -139,7 +143,7 @@ export async function getAiredEpisodes(
     {
       airingAt_greater: options.airingAtGreater ?? now - 24 * 3600,
       airingAt_lesser: options.airingAtLesser ?? now,
-      isAdult: options.isAdult ?? false,
+      idNotIn: options.idNotIn ?? [],
       sort: options.sort,
       page: options.page ?? 1,
       perPage: clampPerPage(options.perPage ?? 20),
@@ -156,6 +160,7 @@ export async function getRecentlyUpdatedManga(
     QUERY_RECENT_CHAPTERS,
     {
       isAdult: options.isAdult ?? false,
+      idNotIn: options.idNotIn ?? [],
       page: options.page ?? 1,
       perPage: clampPerPage(options.perPage ?? 20),
     },
@@ -169,6 +174,7 @@ export async function getPlanning(client: ClientBase, options: GetPlanningOption
     {
       type: options.type,
       isAdult: options.isAdult ?? false,
+      idNotIn: options.idNotIn ?? [],
       sort: options.sort ?? [MediaSort.POPULARITY_DESC],
       page: options.page ?? 1,
       perPage: clampPerPage(options.perPage ?? 20),
@@ -211,6 +217,7 @@ export async function getMediaBySeason(client: ClientBase, options: GetSeasonOpt
       seasonYear: options.seasonYear,
       type: options.type,
       isAdult: options.isAdult ?? false,
+      idNotIn: options.idNotIn ?? [],
       sort: options.sort,
       page: options.page ?? 1,
       perPage: clampPerPage(options.perPage ?? 20),
@@ -222,7 +229,7 @@ export async function getMediaBySeason(client: ClientBase, options: GetSeasonOpt
 export async function getWeeklySchedule(
   client: ClientBase,
   date: Date = new Date(),
-  isAdult: boolean = false,
+  idNotIn?: number[],
 ): Promise<WeeklySchedule> {
   const schedule: WeeklySchedule = {
     Monday: [],
@@ -250,7 +257,7 @@ export async function getWeeklySchedule(
       getAiredEpisodes(client, {
         airingAtGreater: startTimestamp,
         airingAtLesser: endTimestamp,
-        isAdult,
+        idNotIn,
         page,
         perPage: 50,
       }),

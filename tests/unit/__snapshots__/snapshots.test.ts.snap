@@ -2,10 +2,22 @@
 
 exports[`query snapshots > QUERY_AIRING_SCHEDULE matches snapshot 1`] = `
 "
-query ($airingAt_greater: Int, $airingAt_lesser: Int, $isAdult: Boolean, $sort: [AiringSort], $page: Int, $perPage: Int) {
+query (
+  $airingAt_greater: Int,
+  $airingAt_lesser: Int,
+  $sort: [AiringSort],
+  $idNotIn: [Int],
+  $page: Int,
+  $perPage: Int
+) {
   Page(page: $page, perPage: $perPage) {
     pageInfo { total perPage currentPage lastPage hasNextPage }
-    airingSchedules(airingAt_greater: $airingAt_greater, airingAt_lesser: $airingAt_lesser, sort: $sort) {
+    airingSchedules(
+      airingAt_greater: $airingAt_greater,
+      airingAt_lesser: $airingAt_lesser,
+      id_not_in: $idNotIn,
+      sort: $sort
+    ) {
       id
       airingAt
       timeUntilAiring
@@ -127,6 +139,7 @@ query ($idMal: Int!, $type: MediaType) {
         coverImage { extraLarge large medium color }
         genres
         averageScore
+        meanScore
         studios { nodes { id name isAnimationStudio siteUrl } }
         siteUrl
         nextAiringEpisode {
@@ -163,6 +176,7 @@ query (
   $genre_not_in: [String],
   $tag_not_in: [String],
   $isAdult: Boolean,
+  $idNotIn: [Int],
   $sort: [MediaSort],
   $page: Int,
   $perPage: Int
@@ -185,6 +199,7 @@ query (
       genre_not_in: $genre_not_in,
       tag_not_in: $tag_not_in,
       isAdult: $isAdult,
+      id_not_in: $idNotIn,
       sort: $sort
     ) {
       
@@ -265,10 +280,21 @@ query ($search: String, $sort: [StudioSort], $page: Int, $perPage: Int) {
 
 exports[`query snapshots > QUERY_TRENDING matches snapshot 1`] = `
 "
-query ($type: MediaType, $isAdult: Boolean, $page: Int, $perPage: Int) {
+query (
+  $type: MediaType,
+  $isAdult: Boolean,
+  $idNotIn: [Int],
+  $page: Int,
+  $perPage: Int
+) {
   Page(page: $page, perPage: $perPage) {
     pageInfo { total perPage currentPage lastPage hasNextPage }
-    media(type: $type, isAdult: $isAdult, sort: TRENDING_DESC) {
+    media(
+      type: $type,
+      isAdult: $isAdult,
+      id_not_in: $idNotIn,
+      sort: TRENDING_DESC
+    ) {
       
   id
   idMal
@@ -461,6 +487,7 @@ exports[`query snapshots > buildBatchMediaQuery matches snapshot 1`] = `
         coverImage { extraLarge large medium color }
         genres
         averageScore
+        meanScore
         studios { nodes { id name isAnimationStudio siteUrl } }
         siteUrl
         nextAiringEpisode {
@@ -538,6 +565,7 @@ exports[`query snapshots > buildBatchMediaQuery matches snapshot 1`] = `
         coverImage { extraLarge large medium color }
         genres
         averageScore
+        meanScore
         studios { nodes { id name isAnimationStudio siteUrl } }
         siteUrl
         nextAiringEpisode {
@@ -615,6 +643,7 @@ exports[`query snapshots > buildBatchMediaQuery matches snapshot 1`] = `
         coverImage { extraLarge large medium color }
         genres
         averageScore
+        meanScore
         studios { nodes { id name isAnimationStudio siteUrl } }
         siteUrl
         nextAiringEpisode {
@@ -737,6 +766,7 @@ query ($id: Int!) {
         coverImage { extraLarge large medium color }
         genres
         averageScore
+        meanScore
         studios { nodes { id name isAnimationStudio siteUrl } }
         siteUrl
         nextAiringEpisode {
@@ -809,17 +839,30 @@ query ($id: Int!) {
 
     recommendations(perPage: 5, sort: [RATING_DESC]) {
       nodes {
-        id
-        rating
-        mediaRecommendation {
-          id
-          title { romaji english native userPreferred }
-          type
-          format
-          coverImage { large medium }
-          averageScore
-          siteUrl
-        }
+        
+  id
+  rating
+  mediaRecommendation {
+    id
+    title { romaji english native userPreferred }
+    type
+    format
+    coverImage { large medium }
+    averageScore
+    meanScore
+   	episodes
+   	chapters
+   	volumes
+    nextAiringEpisode
+   	season
+   	seasonYear
+   	startDate
+   	endDate
+   	studios
+   	genres
+    siteUrl
+  }
+
       }
     }
 
@@ -965,6 +1008,7 @@ query ($id: Int!) {
         coverImage { extraLarge large medium color }
         genres
         averageScore
+        meanScore
         studios { nodes { id name isAnimationStudio siteUrl } }
         siteUrl
         nextAiringEpisode {

@@ -1,4 +1,4 @@
-import { MEDIA_FIELDS, MEDIA_FIELDS_BASE } from "./fragments";
+import { MEDIA_FIELDS, MEDIA_FIELDS_BASE, MEDIA_RECOMMENDATION_FIELDS } from "./fragments";
 
 export const QUERY_MEDIA_BY_ID = `
 query ($id: Int!) {
@@ -24,6 +24,7 @@ query (
   $genre_not_in: [String],
   $tag_not_in: [String],
   $isAdult: Boolean,
+  $idNotIn: [Int],
   $sort: [MediaSort],
   $page: Int,
   $perPage: Int
@@ -46,6 +47,7 @@ query (
       genre_not_in: $genre_not_in,
       tag_not_in: $tag_not_in,
       isAdult: $isAdult,
+      id_not_in: $idNotIn,
       sort: $sort
     ) {
       ${MEDIA_FIELDS_BASE}
@@ -54,20 +56,43 @@ query (
 }`;
 
 export const QUERY_TRENDING = `
-query ($type: MediaType, $isAdult: Boolean, $page: Int, $perPage: Int) {
+query (
+  $type: MediaType,
+  $isAdult: Boolean,
+  $idNotIn: [Int],
+  $page: Int,
+  $perPage: Int
+) {
   Page(page: $page, perPage: $perPage) {
     pageInfo { total perPage currentPage lastPage hasNextPage }
-    media(type: $type, isAdult: $isAdult, sort: TRENDING_DESC) {
+    media(
+      type: $type,
+      isAdult: $isAdult,
+      id_not_in: $idNotIn,
+      sort: TRENDING_DESC
+    ) {
       ${MEDIA_FIELDS_BASE}
     }
   }
 }`;
 
 export const QUERY_AIRING_SCHEDULE = `
-query ($airingAt_greater: Int, $airingAt_lesser: Int, $isAdult: Boolean, $sort: [AiringSort], $page: Int, $perPage: Int) {
+query (
+  $airingAt_greater: Int,
+  $airingAt_lesser: Int,
+  $sort: [AiringSort],
+  $idNotIn: [Int],
+  $page: Int,
+  $perPage: Int
+) {
   Page(page: $page, perPage: $perPage) {
     pageInfo { total perPage currentPage lastPage hasNextPage }
-    airingSchedules(airingAt_greater: $airingAt_greater, airingAt_lesser: $airingAt_lesser, sort: $sort) {
+    airingSchedules(
+      airingAt_greater: $airingAt_greater,
+      airingAt_lesser: $airingAt_lesser,
+      id_not_in: $idNotIn,
+      sort: $sort
+    ) {
       id
       airingAt
       timeUntilAiring
@@ -81,20 +106,44 @@ query ($airingAt_greater: Int, $airingAt_lesser: Int, $isAdult: Boolean, $sort: 
 }`;
 
 export const QUERY_RECENT_CHAPTERS = `
-query ($isAdult: Boolean $page: Int, $perPage: Int) {
+query (
+  $isAdult: Boolean,
+  $idNotIn: [Int],
+  $page: Int,
+  $perPage: Int
+) {
   Page(page: $page, perPage: $perPage) {
     pageInfo { total perPage currentPage lastPage hasNextPage }
-    media(type: MANGA, isAdult: $isAdult status: RELEASING, sort: UPDATED_AT_DESC) {
+    media(
+      type: MANGA,
+      isAdult: $isAdult,
+      id_not_in: $idNotIn,
+      status: RELEASING,
+      sort: UPDATED_AT_DESC
+    ) {
       ${MEDIA_FIELDS_BASE}
     }
   }
 }`;
 
 export const QUERY_PLANNING = `
-query ($type: MediaType, $isAdult: Boolean, $sort: [MediaSort], $page: Int, $perPage: Int) {
+query (
+  $type: MediaType,
+  $isAdult: Boolean,
+  $idNotIn: [Int],
+  $sort: [MediaSort],
+  $page: Int,
+  $perPage: Int
+) {
   Page(page: $page, perPage: $perPage) {
     pageInfo { total perPage currentPage lastPage hasNextPage }
-    media(type: $type, isAdult: $isAdult, status: NOT_YET_RELEASED, sort: $sort) {
+    media(
+      type: $type,
+      isAdult: $isAdult,
+      id_not_in: $idNotIn,
+      status: NOT_YET_RELEASED,
+      sort: $sort
+    ) {
       ${MEDIA_FIELDS_BASE}
     }
   }
@@ -106,6 +155,7 @@ query (
   $seasonYear: Int!,
   $type: MediaType,
   $isAdult: Boolean,
+  $idNotIn: [Int],
   $sort: [MediaSort],
   $page: Int,
   $perPage: Int
@@ -117,6 +167,7 @@ query (
       seasonYear: $seasonYear,
       type: $type,
       isAdult: $isAdult,
+      id_not_in: $idNotIn,
       sort: $sort
     ) {
       ${MEDIA_FIELDS_BASE}
@@ -137,25 +188,7 @@ query ($mediaId: Int!, $page: Int, $perPage: Int, $sort: [RecommendationSort]) {
     recommendations(page: $page, perPage: $perPage, sort: $sort) {
       pageInfo { total perPage currentPage lastPage hasNextPage }
       nodes {
-        id
-        rating
-        userRating
-        mediaRecommendation {
-          id
-          idMal
-          title { romaji english native userPreferred }
-          type
-          format
-          status
-          coverImage { extraLarge large medium color }
-          bannerImage
-          genres
-          averageScore
-          meanScore
-          popularity
-          favourites
-          siteUrl
-        }
+        ${MEDIA_RECOMMENDATION_FIELDS}
         user {
           id
           name

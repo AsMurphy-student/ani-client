@@ -5,6 +5,7 @@ import {
   CHARACTER_FIELDS_COMPACT,
   MEDIA_FIELDS,
   MEDIA_FIELDS_BASE,
+  MEDIA_RECOMMENDATION_FIELDS,
   RELATIONS_FIELDS,
   STAFF_FIELDS,
   VOICE_ACTOR_FIELDS_COMPACT,
@@ -70,17 +71,7 @@ export function buildMediaByIdQuery(include?: MediaIncludeOptions): string {
     extra.push(`
     recommendations(perPage: ${perPage}, sort: [RATING_DESC]) {
       nodes {
-        id
-        rating
-        mediaRecommendation {
-          id
-          title { romaji english native userPreferred }
-          type
-          format
-          coverImage { large medium }
-          averageScore
-          siteUrl
-        }
+        ${MEDIA_RECOMMENDATION_FIELDS}
       }
     }`);
   }
