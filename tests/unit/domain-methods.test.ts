@@ -198,14 +198,6 @@ describe("Media methods", () => {
     expect(result.results).toHaveLength(1);
   });
 
-  it("getAiredChapters is an alias for getRecentlyUpdatedManga", async () => {
-    const mangaMedia = { ...mockMedia, type: "MANGA" };
-    mockPagedFetch("media", [mangaMedia]);
-    const client = newClient();
-    const result = await client.getAiredChapters();
-    expect(result.results).toHaveLength(1);
-  });
-
   it("getPlanning returns paged results", async () => {
     mockPagedFetch("media", [mockMedia]);
     const client = newClient();

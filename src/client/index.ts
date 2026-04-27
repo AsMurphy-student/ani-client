@@ -302,6 +302,13 @@ export class AniListClient {
   }
 
   /**
+   * @deprecated Use `getRecentlyUpdatedManga()` instead. This alias will be removed in v3.
+   */
+  async getAiredChapters(options: GetRecentChaptersOptions = {}): Promise<PagedResult<Media>> {
+    return this.getRecentlyUpdatedManga(options);
+  }
+
+  /**
    * Fetch a media entry by its MyAnimeList (MAL) ID.
    *
    * @param malId - The MyAnimeList ID
