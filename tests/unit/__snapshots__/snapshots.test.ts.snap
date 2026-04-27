@@ -809,17 +809,30 @@ query ($id: Int!) {
 
     recommendations(perPage: 5, sort: [RATING_DESC]) {
       nodes {
-        id
-        rating
-        mediaRecommendation {
-          id
-          title { romaji english native userPreferred }
-          type
-          format
-          coverImage { large medium }
-          averageScore
-          siteUrl
-        }
+        
+  id
+  rating
+  mediaRecommendation {
+    id
+    title { romaji english native userPreferred }
+    type
+    format
+    coverImage { large medium }
+    averageScore
+    meanScore
+   	episodes
+   	chapters
+   	volumes
+    nextAiringEpisode
+   	season
+   	seasonYear
+   	startDate
+   	endDate
+   	studios
+   	genres
+    siteUrl
+  }
+
       }
     }
 

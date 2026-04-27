@@ -1,4 +1,4 @@
-import { MEDIA_FIELDS, MEDIA_FIELDS_BASE } from "./fragments";
+import { MEDIA_FIELDS, MEDIA_FIELDS_BASE, MEDIA_RECOMMENDATION_FIELDS } from "./fragments";
 
 export const QUERY_MEDIA_BY_ID = `
 query ($id: Int!) {
@@ -137,25 +137,7 @@ query ($mediaId: Int!, $page: Int, $perPage: Int, $sort: [RecommendationSort]) {
     recommendations(page: $page, perPage: $perPage, sort: $sort) {
       pageInfo { total perPage currentPage lastPage hasNextPage }
       nodes {
-        id
-        rating
-        userRating
-        mediaRecommendation {
-          id
-          idMal
-          title { romaji english native userPreferred }
-          type
-          format
-          status
-          coverImage { extraLarge large medium color }
-          bannerImage
-          genres
-          averageScore
-          meanScore
-          popularity
-          favourites
-          siteUrl
-        }
+        ${MEDIA_RECOMMENDATION_FIELDS}
         user {
           id
           name
