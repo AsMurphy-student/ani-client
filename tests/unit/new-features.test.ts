@@ -105,6 +105,120 @@ describe("withSignal", () => {
 
     await expect(scoped.getMedia(1)).rejects.toThrow();
   });
+
+  it("fetches paged characters for a media entry", async () => {
+    globalThis.fetch = vi.fn(() =>
+      Promise.resolve(
+        new Response(
+          JSON.stringify({
+            data: {
+              Media: {
+                characters: {
+                  pageInfo: {
+                    total: 2,
+                    perPage: 1,
+                    currentPage: 1,
+                    lastPage: 2,
+                    hasNextPage: true,
+                  },
+                  edges: [
+                    {
+                      role: "MAIN",
+                      node: {
+                        id: 1,
+                        name: { first: null, middle: null, last: null, full: "MC", native: null, alternative: [] },
+                        image: { large: null, medium: null },
+                        description: null,
+                        gender: null,
+                        dateOfBirth: { year: null, month: null, day: null },
+                        age: null,
+                        bloodType: null,
+                        favourites: null,
+                        siteUrl: null,
+                        voiceActors: [
+                          {
+                            id: 1,
+                            name: { first: null, middle: null, last: null, full: null, native: null, userPreferred: "VA" },
+                            languageV2: "Japanese",
+                            image: { large: null, medium: null },
+                            gender: null,
+                            primaryOccupations: [],
+                            siteUrl: null,
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        ),
+      ),
+    );
+
+    const client = new AniListClient({ cache: { enabled: false }, rateLimit: { enabled: false } });
+    const result = await client.getMediaCharacters(1, { page: 1, perPage: 1, voiceActors: true });
+
+    expect(result.pageInfo.currentPage).toBe(1);
+    expect(result.results).toHaveLength(1);
+    expect(result.results[0]).toMatchObject({ role: "MAIN" });
+    expect(JSON.parse(vi.mocked(fetch).mock.calls[0][1]?.body as string).query).toContain("voiceActors");
+  });
+
+  it("fetches paged staff for a media entry", async () => {
+    globalThis.fetch = vi.fn(() =>
+      Promise.resolve(
+        new Response(
+          JSON.stringify({
+            data: {
+              Media: {
+                staff: {
+                  pageInfo: {
+                    total: 1,
+                    perPage: 1,
+                    currentPage: 1,
+                    lastPage: 1,
+                    hasNextPage: false,
+                  },
+                  edges: [
+                    {
+                      role: "DIRECTOR",
+                      node: {
+                        id: 1,
+                        name: { first: null, middle: null, last: null, full: "Director", native: null },
+                        language: null,
+                        image: { large: null, medium: null },
+                        description: null,
+                        primaryOccupations: [],
+                        gender: null,
+                        dateOfBirth: { year: null, month: null, day: null },
+                        dateOfDeath: null,
+                        age: null,
+                        yearsActive: [],
+                        homeTown: null,
+                        bloodType: null,
+                        favourites: null,
+                        siteUrl: null,
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        ),
+      ),
+    );
+
+    const client = new AniListClient({ cache: { enabled: false }, rateLimit: { enabled: false } });
+    const result = await client.getMediaStaff(1, { page: 1, perPage: 1 });
+
+    expect(result.pageInfo.hasNextPage).toBe(false);
+    expect(result.results[0]).toMatchObject({ role: "DIRECTOR" });
+  });
 });
 
 // ── Logger ──

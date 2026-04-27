@@ -432,6 +432,26 @@ export interface MediaIncludeOptions {
   recommendations?: boolean | { perPage?: number };
 }
 
+export interface GetMediaCharactersOptions {
+  /** Page number */
+  page?: number;
+  /** Results per page (max 50) */
+  perPage?: number;
+  /** Disable default sort order */
+  sort?: boolean;
+  /** Include voice actors for each character edge */
+  voiceActors?: boolean;
+}
+
+export interface GetMediaStaffOptions {
+  /** Page number */
+  page?: number;
+  /** Results per page (max 50) */
+  perPage?: number;
+  /** Disable default sort order */
+  sort?: boolean;
+}
+
 export interface AiringSchedule {
   id: number;
   airingAt: number;

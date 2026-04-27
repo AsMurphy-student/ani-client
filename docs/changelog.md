@@ -12,6 +12,12 @@ head:
 
 # Changelog
 
+## [2.0.3] — 2026-04-27
+
+### Added
+
+- **Paginated media relationships** — Added `getMediaCharacters()` and `getMediaStaff()` for fetching more than 25 characters or staff members on a media entry.
+
 ## [2.0.0] — 2026-04-25
 
 ### Breaking Changes

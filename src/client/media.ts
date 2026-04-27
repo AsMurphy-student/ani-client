@@ -1,5 +1,7 @@
 import {
   buildMediaByIdQuery,
+  buildMediaCharactersQuery,
+  buildMediaStaffQuery,
   QUERY_AIRING_SCHEDULE,
   QUERY_MEDIA_BY_MAL_ID,
   QUERY_MEDIA_BY_SEASON,
@@ -14,12 +16,17 @@ import type {
   DayOfWeek,
   GeneralMediaQueryOptions,
   GetAiringOptions,
+  GetMediaCharactersOptions,
+  GetMediaStaffOptions,
   GetPlanningOptions,
   GetRecentChaptersOptions,
   GetRecommendationsOptions,
   GetSeasonOptions,
   Media,
+  MediaCharacterEdge,
   MediaIncludeOptions,
+  MediaStaffEdge,
+  PageInfo,
   PagedResult,
   Recommendation,
   SearchMediaOptions,
@@ -35,6 +42,36 @@ export async function getMedia(client: ClientBase, id: number, include?: MediaIn
   const query = buildMediaByIdQuery(include);
   const data = await client.request<{ Media: Media }>(query, { id });
   return data.Media;
+}
+
+export async function getMediaCharacters(
+  client: ClientBase,
+  mediaId: number,
+  options: GetMediaCharactersOptions = {},
+): Promise<PagedResult<MediaCharacterEdge>> {
+  validateId(mediaId, "mediaId");
+  const query = buildMediaCharactersQuery(options);
+  const data = await client.request<{ Media: { characters: { pageInfo: PageInfo; edges: MediaCharacterEdge[] } } }>(
+    query,
+    { mediaId, page: options.page ?? 1, perPage: clampPerPage(options.perPage ?? 25) },
+  );
+
+  return { pageInfo: data.Media.characters.pageInfo, results: data.Media.characters.edges };
+}
+
+export async function getMediaStaff(
+  client: ClientBase,
+  mediaId: number,
+  options: GetMediaStaffOptions = {},
+): Promise<PagedResult<MediaStaffEdge>> {
+  validateId(mediaId, "mediaId");
+  const query = buildMediaStaffQuery(options);
+  const data = await client.request<{ Media: { staff: { pageInfo: PageInfo; edges: MediaStaffEdge[] } } }>(
+    query,
+    { mediaId, page: options.page ?? 1, perPage: clampPerPage(options.perPage ?? 25) },
+  );
+
+  return { pageInfo: data.Media.staff.pageInfo, results: data.Media.staff.edges };
 }
 
 export async function getMediaByMalId(client: ClientBase, malId: number, type?: MediaType): Promise<Media> {
@@ -109,11 +146,6 @@ export async function getAiredEpisodes(
     "airingSchedules",
   );
 }
-
-/**
- * @deprecated Use `getRecentlyUpdatedManga` instead. This alias will be removed in v2.
- */
-export const getAiredChapters = getRecentlyUpdatedManga;
 
 export async function getRecentlyUpdatedManga(
   client: ClientBase,

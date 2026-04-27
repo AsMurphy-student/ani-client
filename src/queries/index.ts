@@ -1,4 +1,11 @@
-export { buildBatchCharacterQuery, buildBatchMediaQuery, buildBatchStaffQuery, buildMediaByIdQuery } from "./builders";
+export {
+  buildBatchCharacterQuery,
+  buildBatchMediaQuery,
+  buildBatchStaffQuery,
+  buildMediaByIdQuery,
+  buildMediaCharactersQuery,
+  buildMediaStaffQuery,
+} from "./builders";
 export {
   QUERY_CHARACTER_BY_ID,
   QUERY_CHARACTER_BY_ID_WITH_VA,

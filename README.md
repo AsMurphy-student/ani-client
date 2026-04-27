@@ -22,6 +22,7 @@
 - **Rate-limit protection** with exponential backoff, retries, and custom strategies
 - **Request deduplication** — concurrent identical queries share a single in-flight request
 - **Batch queries** — fetch up to 50 media/characters/staff in one API call
+- **Paginated media relationships** — `getMediaCharacters()` and `getMediaStaff()` support paged results for large casts and staff listings
 - **Auto-pagination** — async iterator that yields items across pages
 - **AbortSignal support** — cancel globally or per-request with `withSignal()`
 - **Injectable logger** — plug in `console`, pino, winston, or any compatible logger
@@ -58,6 +59,10 @@ const results = await client.searchMedia({
 
 // Cross-platform lookup by MyAnimeList ID
 const fma = await client.getMediaByMalId(5114);
+
+// Paginated media relationships
+const characters = await client.getMediaCharacters(1, { page: 1, perPage: 25, voiceActors: true });
+const staff = await client.getMediaStaff(1, { page: 1, perPage: 25 });
 ```
 
 ## Features at a glance
@@ -134,6 +139,8 @@ for await (const anime of client.paginate(
 const user = await client.getUser("AniList");
 const favs = await client.getUserFavorites("AniList", { perPage: 50 });
 const char = await client.getCharacter(1, { voiceActors: true });
+const characters = await client.getMediaCharacters(1, { page: 1, perPage: 25, voiceActors: true });
+const staff = await client.getMediaStaff(1, { page: 1, perPage: 25 });
 const studio = await client.getStudio(21, { media: { perPage: 50 } });
 const schedule = await client.getWeeklySchedule();
 ```

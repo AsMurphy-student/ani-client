@@ -39,6 +39,8 @@ export {
   type MediaEdge,
   MediaFormat,
   type MediaIncludeOptions,
+  type GetMediaCharactersOptions,
+  type GetMediaStaffOptions,
   type MediaListEntry,
   MediaListSort,
   MediaListStatus,
