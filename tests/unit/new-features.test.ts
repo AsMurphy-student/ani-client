@@ -138,7 +138,14 @@ describe("withSignal", () => {
                         voiceActors: [
                           {
                             id: 1,
-                            name: { first: null, middle: null, last: null, full: null, native: null, userPreferred: "VA" },
+                            name: {
+                              first: null,
+                              middle: null,
+                              last: null,
+                              full: null,
+                              native: null,
+                              userPreferred: "VA",
+                            },
                             languageV2: "Japanese",
                             image: { large: null, medium: null },
                             gender: null,

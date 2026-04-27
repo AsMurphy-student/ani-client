@@ -124,12 +124,9 @@ query ($id: Int!) {
 }`;
 }
 
-export function buildMediaCharactersQuery(options: {
-  perPage?: number;
-  sort?: boolean;
-  voiceActors?: boolean;
-} = {}): string {
-  const perPage = clampPerPage(options.perPage ?? 25);
+export function buildMediaCharactersQuery(
+  options: { perPage?: number; sort?: boolean; voiceActors?: boolean } = {},
+): string {
   const sortClause = options.sort === false ? "" : ", sort: [ROLE, RELEVANCE, ID]";
   const voiceActorBlock = options.voiceActors
     ? `\n            voiceActors {
@@ -154,7 +151,6 @@ query ($mediaId: Int!, $page: Int, $perPage: Int) {
 }
 
 export function buildMediaStaffQuery(options: { perPage?: number; sort?: boolean } = {}): string {
-  const perPage = clampPerPage(options.perPage ?? 25);
   const sortClause = options.sort === false ? "" : ", sort: [RELEVANCE, ID]";
 
   return `

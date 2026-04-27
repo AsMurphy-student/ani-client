@@ -26,8 +26,8 @@ import type {
   MediaCharacterEdge,
   MediaIncludeOptions,
   MediaStaffEdge,
-  PageInfo,
   PagedResult,
+  PageInfo,
   Recommendation,
   SearchMediaOptions,
   WeeklySchedule,
@@ -66,10 +66,11 @@ export async function getMediaStaff(
 ): Promise<PagedResult<MediaStaffEdge>> {
   validateId(mediaId, "mediaId");
   const query = buildMediaStaffQuery(options);
-  const data = await client.request<{ Media: { staff: { pageInfo: PageInfo; edges: MediaStaffEdge[] } } }>(
-    query,
-    { mediaId, page: options.page ?? 1, perPage: clampPerPage(options.perPage ?? 25) },
-  );
+  const data = await client.request<{ Media: { staff: { pageInfo: PageInfo; edges: MediaStaffEdge[] } } }>(query, {
+    mediaId,
+    page: options.page ?? 1,
+    perPage: clampPerPage(options.perPage ?? 25),
+  });
 
   return { pageInfo: data.Media.staff.pageInfo, results: data.Media.staff.edges };
 }
