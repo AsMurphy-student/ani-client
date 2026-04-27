@@ -12,6 +12,23 @@ head:
 
 # Changelog
 
+## [2.0.4] — 2026-04-28
+
+### Added
+
+- **`isNotIn` parameter** — Added `isNotIn` option to exclude specific media by ID in search and discovery methods.
+- **Mean score for MediaEdge** — Added mean score field to MediaEdge type for recommendation data.
+- **MEDIA_RECOMMENDATION_FIELDS fragment** — New GraphQL fragment for media recommendation fields.
+
+### Fixed
+
+- **Unit tests** — Fixed failing unit tests.
+- **Linting** — Resolved linting issues.
+
+### Internal
+
+- **Documentation updates** — Updated docs with new parameter information.
+
 ## [2.0.3] — 2026-04-27
 
 ### Added
