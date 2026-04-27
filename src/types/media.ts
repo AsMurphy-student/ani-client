@@ -168,6 +168,7 @@ export interface MediaEdge {
     | "coverImage"
     | "genres"
     | "averageScore"
+    | "meanScore"
     | "studios"
     | "siteUrl"
     | "nextAiringEpisode"
@@ -222,7 +223,27 @@ export interface MediaStats {
 export interface MediaRecommendationNode {
   id: number;
   rating: number | null;
-  mediaRecommendation: Pick<Media, "id" | "title" | "type" | "format" | "coverImage" | "averageScore" | "siteUrl">;
+  mediaRecommendation: Pick<
+    Media,
+    | "id"
+    | "title"
+    | "type"
+    | "format"
+    | "coverImage"
+    | "averageScore"
+    | "meanScore"
+    | "episodes"
+    | "chapters"
+    | "volumes"
+    | "nextAiringEpisode"
+    | "season"
+    | "seasonYear"
+    | "startDate"
+    | "endDate"
+    | "studios"
+    | "genres"
+    | "siteUrl"
+  >;
 }
 
 export interface NextAiringEpisode {
