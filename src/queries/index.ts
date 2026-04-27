@@ -24,6 +24,7 @@ export {
   QUERY_TRENDING,
 } from "./media";
 export { QUERY_GENRES, QUERY_TAGS } from "./metadata";
+export { QUERY_REVIEW_BY_ID, QUERY_REVIEWS } from "./review";
 export { QUERY_STAFF_BY_ID, QUERY_STAFF_BY_ID_WITH_MEDIA, QUERY_STAFF_SEARCH } from "./staff";
 export { buildStudioByIdQuery, QUERY_STUDIO_BY_ID, QUERY_STUDIO_SEARCH } from "./studio";
 export { QUERY_THREAD_BY_ID, QUERY_THREAD_SEARCH } from "./thread";

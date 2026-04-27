@@ -449,6 +449,27 @@ describe("AniListClient (integration)", () => {
     });
   });
 
+  // ── Reviews ──
+
+  describe("Reviews", () => {
+    it("searchReviews() returns reviews", async () => {
+      const result = await client.searchReviews({ perPage: 3 });
+      expect(result.results.length).toBeGreaterThan(0);
+      expect(result.pageInfo.currentPage).toBe(1);
+      expect(typeof result.results[0].summary).toBe("string");
+      expect(typeof result.results[0].body).toBe("string");
+    });
+
+    it("getReview(1) returns a review", async () => {
+      const review = await client.getReview(1);
+      expect(review.id).toBe(1);
+      expect(typeof review.summary).toBe("string");
+      expect(typeof review.body).toBe("string");
+      expect(review.user).toBeDefined();
+      expect(review.media).toBeDefined();
+    });
+  });
+
   // ── Destroy ──
 
   describe("Destroy", () => {

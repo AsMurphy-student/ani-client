@@ -30,15 +30,14 @@ import type {
   MediaIncludeOptions,
   MediaListEntry,
   MediaStaffEdge,
-  MediaTag,
-  MediaType,
   PagedResult,
-  PageInfo,
   RateLimitInfo,
   Recommendation,
   ResponseMeta,
+  Review,
   SearchCharacterOptions,
   SearchMediaOptions,
+  SearchReviewOptions,
   SearchStaffOptions,
   SearchStudioOptions,
   SearchThreadOptions,
@@ -57,6 +56,7 @@ import { chunk, normalizeQuery, validateIds } from "../utils";
 
 import * as characterMethods from "./character";
 import * as mediaMethods from "./media";
+import * as reviewMethods from "./review";
 import * as staffMethods from "./staff";
 import * as studioMethods from "./studio";
 import * as threadMethods from "./thread";
@@ -398,6 +398,25 @@ export class AniListClient {
    */
   async getUserFavorites(idOrName: number | string, options?: UserFavoritesOptions): Promise<UserFavorites> {
     return userMethods.getUserFavorites(this, idOrName, options);
+  }
+
+  /**
+   * Fetch a review by its AniList ID.
+   *
+   * @param id - The AniList review ID
+   */
+  async getReview(id: number): Promise<Review> {
+    return reviewMethods.getReview(this, id);
+  }
+
+  /**
+   * Search for reviews with optional filters.
+   *
+   * @param options - Search and filter options
+   * @returns Paginated results with matching reviews
+   */
+  async searchReviews(options: SearchReviewOptions = {}): Promise<PagedResult<Review>> {
+    return reviewMethods.searchReviews(this, options);
   }
 
   /**

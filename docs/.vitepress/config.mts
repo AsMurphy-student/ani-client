@@ -112,6 +112,7 @@ export default defineConfig({
             { text: "Rate Limiting & Retries", link: "/guide/rate-limiting" },
             { text: "Event Hooks", link: "/guide/event-hooks" },
             { text: "Markdown Parser", link: "/guide/markdown-parser" },
+            { text: "Cookbook", link: "/guide/cookbook" },
           ],
         },
       ],

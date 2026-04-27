@@ -120,6 +120,30 @@ const mockUser = {
   statistics: null,
 };
 
+const mockReview = {
+  id: 1,
+  userId: 1,
+  mediaId: 1,
+  mediaType: "ANIME",
+  summary: "Great anime!",
+  body: "This anime is amazing with great characters and story.",
+  rating: 85,
+  ratingAmount: 10,
+  userRating: "UP_VOTE",
+  score: 8,
+  private: false,
+  siteUrl: "https://anilist.co/review/1",
+  createdAt: 1700000000,
+  updatedAt: 1700000000,
+  user: {
+    id: 1,
+    name: "Reviewer",
+    avatar: { large: null, medium: null },
+    siteUrl: null,
+  },
+  media: mockMedia,
+};
+
 function mockFetch(data: unknown) {
   globalThis.fetch = vi.fn(() =>
     Promise.resolve(
@@ -782,5 +806,50 @@ describe("paginate", () => {
       items.push(item);
     }
     expect(items).toHaveLength(2);
+  });
+});
+
+// ── Review ──
+
+describe("Review methods", () => {
+  const originalFetch = globalThis.fetch;
+  afterEach(() => {
+    globalThis.fetch = originalFetch;
+  });
+
+  it("getReview fetches a review by ID", async () => {
+    mockFetch({ Review: mockReview });
+    const client = newClient();
+    const review = await client.getReview(1);
+    expect(review.id).toBe(1);
+    expect(review.summary).toBe("Great anime!");
+  });
+
+  it("getReview rejects invalid ID", async () => {
+    const client = newClient();
+    await expect(client.getReview(-1)).rejects.toThrow(RangeError);
+    await expect(client.getReview(0)).rejects.toThrow(RangeError);
+  });
+
+  it("searchReviews returns paged results", async () => {
+    mockPagedFetch("reviews", [mockReview]);
+    const client = newClient();
+    const result = await client.searchReviews();
+    expect(result.results).toHaveLength(1);
+    expect(result.results[0].summary).toBe("Great anime!");
+  });
+
+  it("searchReviews with mediaId filter", async () => {
+    mockPagedFetch("reviews", [mockReview]);
+    const client = newClient();
+    const result = await client.searchReviews({ mediaId: 1, page: 1, perPage: 5 });
+    expect(result.results).toHaveLength(1);
+  });
+
+  it("searchReviews with userId filter", async () => {
+    mockPagedFetch("reviews", [mockReview]);
+    const client = newClient();
+    const result = await client.searchReviews({ userId: 1, sort: ["SCORE_DESC"] });
+    expect(result.results).toHaveLength(1);
   });
 });

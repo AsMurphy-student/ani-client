@@ -400,6 +400,54 @@ const mediaThreads = await client.getRecentThreads({ mediaId: 1, perPage: 5 });
 
 ---
 
+## Reviews
+
+### `getReview(id)`
+
+Fetch a single review by its AniList ID.
+
+| Param | Type | Description |
+| --- | --- | --- |
+| `id` | `number` | AniList review ID |
+
+**Returns:** `Promise<Review>`
+
+```typescript
+const review = await client.getReview(12345);
+console.log(review.summary, `— Score: ${review.score}/10`);
+```
+
+### `searchReviews(options?)`
+
+Search for reviews with advanced filtering options.
+
+| Param | Type |
+| --- | --- |
+| `options` | `SearchReviewOptions` |
+
+**Key options:** `mediaId`, `userId`, `mediaType`, `sort`, `ratingGreater`, `ratingLesser`, `page`, `perPage`
+
+**Returns:** `Promise<PagedResult<Review>>`
+
+```typescript
+import { MediaType, ReviewSort } from "ani-client";
+
+// Get reviews for a specific anime
+const animeReviews = await client.searchReviews({
+  mediaId: 1,
+  mediaType: MediaType.ANIME,
+  sort: [ReviewSort.RATING_DESC],
+});
+
+// Find highly-rated reviews
+const topReviews = await client.searchReviews({
+  ratingGreater: 8,
+  sort: [ReviewSort.CREATED_AT_DESC],
+});
+```
+
+---
+
 ## Metadata
 
 ### `getGenres()`

@@ -12,6 +12,27 @@ head:
 
 # Changelog
 
+## [2.1.0] — 2026-04-28
+
+### Added
+
+- **Reviews API** — Complete implementation of AniList reviews functionality:
+  - `getReview(id)` — Fetch individual reviews by ID
+  - `searchReviews(options)` — Search reviews with advanced filtering (media type, rating, sort, etc.)
+  - Full TypeScript types and GraphQL queries for reviews
+  - Comprehensive unit and integration tests
+
+- **Cookbook documentation** — New practical guide with real-world examples:
+  - Basic queries and advanced search patterns
+  - Caching strategies and error handling
+  - Batch operations and pagination techniques
+  - Real-time data fetching and utility patterns
+
+### Internal
+
+- **Test coverage** — Added 5 new unit tests for review functionality
+- **Integration tests** — Added review API integration tests
+
 ## [2.0.4] — 2026-04-28
 
 ### Added
