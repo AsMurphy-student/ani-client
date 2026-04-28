@@ -38,12 +38,13 @@ pnpm build
 | `pnpm test:unit` | Run unit tests only (Vitest) |
 | `pnpm test:integration` | Run integration tests (real API) |
 | `pnpm test:coverage` | Run tests with coverage report |
+| `pnpm docs:dev` | Start the VitePress documentation site locally |
 
 ### Typical flow
 
 1. Create a feature branch from `dev`
 2. Make your changes
-3. Run `pnpm lint` — must pass with zero errors
+3. Run `pnpm lint && pnpm typecheck` — must pass with zero errors
 4. Run `pnpm test:unit` — all unit tests must pass
 5. Run `pnpm build` — must compile cleanly
 6. Commit and open a PR
@@ -156,6 +157,8 @@ chore: update biome to 2.x
 - Fill in the PR description with **what** and **why**
 
 ## Reporting issues
+
+For security vulnerabilities, please read [SECURITY.md](SECURITY.md) before opening a public issue.
 
 When opening an issue, please include:
 
