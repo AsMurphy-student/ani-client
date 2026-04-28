@@ -16,7 +16,7 @@ export class AniListError extends Error {
     type ErrorWithCaptureStackTrace = typeof Error & {
       captureStackTrace(target: object, fn: object): void;
     };
-    if ('captureStackTrace' in Error) {
+    if ("captureStackTrace" in Error) {
       (Error as ErrorWithCaptureStackTrace).captureStackTrace(this, AniListError);
     }
   }
