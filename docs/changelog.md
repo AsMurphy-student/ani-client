@@ -12,6 +12,31 @@ head:
 
 # Changelog
 
+## [2.1.1] — 2026-04-28
+
+### Fixed
+
+- **`MEDIA_RECOMMENDATION_FIELDS` syntax error** — fixed a malformed GraphQL fragment
+  introduced in v2.1.0 that could cause recommendation queries to fail
+  ([@AsMurphy-student](https://github.com/AsMurphy-student), [#86](https://github.com/gonzyui/ani-client/pull/86))
+- **Integration test failure on `getReview()`** — resolved a `Not Found` error in the
+  integration test suite caused by an invalid review ID in the test fixture
+  ([#87](https://github.com/gonzyui/ani-client/issues/87))
+- **`AniListError.captureStackTrace` type error** — replaced unsafe `Error as any` cast
+  with a type-safe `'captureStackTrace' in Error` guard, eliminating the TypeScript
+  compiler error under strict mode
+
+### Chores
+
+- Updated pnpm lockfile
+- Added `SECURITY.md` with vulnerability reporting guidelines
+- Updated `README.md` and `CONTRIBUTING.md`
+
+### Docs
+
+- Added `guide/error-handling.md` — full guide on `AniListError`, status codes,
+  rate limit errors, network failures, and global error monitoring via hooks
+
 ## [2.1.0] — 2026-04-28
 
 ### Added
