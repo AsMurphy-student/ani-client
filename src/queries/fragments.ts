@@ -117,18 +117,24 @@ export const MEDIA_RECOMMENDATION_FIELDS = `
     title { romaji english native userPreferred }
     type
     format
-    coverImage { large medium }
+    coverImage { extraLarge large medium color }
     averageScore
     meanScore
    	episodes
    	chapters
    	volumes
-    nextAiringEpisode
+    nextAiringEpisode {
+      id
+      airingAt
+      episode
+      mediaId
+      timeUntilAiring
+    }
    	season
    	seasonYear
-   	startDate
-   	endDate
-   	studios
+   	startDate { year month day }
+    endDate { year month day }
+   	studios { nodes { id name isAnimationStudio siteUrl } }
    	genres
     siteUrl
   }

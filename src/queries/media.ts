@@ -98,7 +98,7 @@ query (
       timeUntilAiring
       episode
       mediaId
-      media(isAdult: $isAdult) {
+      media {
         ${MEDIA_FIELDS_BASE}
       }
     }
