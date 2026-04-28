@@ -13,8 +13,11 @@ export class AniListError extends Error {
     this.status = status;
     this.errors = errors;
     Object.setPrototypeOf(this, AniListError.prototype);
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, AniListError);
+    type ErrorWithCaptureStackTrace = typeof Error & {
+      captureStackTrace(target: object, fn: object): void;
+    };
+    if ("captureStackTrace" in Error) {
+      (Error as ErrorWithCaptureStackTrace).captureStackTrace(this, AniListError);
     }
   }
 }

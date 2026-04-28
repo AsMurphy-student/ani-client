@@ -460,9 +460,12 @@ describe("AniListClient (integration)", () => {
       expect(typeof result.results[0].body).toBe("string");
     });
 
-    it("getReview(1) returns a review", async () => {
-      const review = await client.getReview(1);
-      expect(review.id).toBe(1);
+    it("getReview() returns a review", async () => {
+      const searchResult = await client.searchReviews({ mediaId: 1, perPage: 1 });
+      expect(searchResult.results.length).toBeGreaterThan(0);
+
+      const review = await client.getReview(searchResult.results[0].id);
+      expect(review.id).toBe(searchResult.results[0].id);
       expect(typeof review.summary).toBe("string");
       expect(typeof review.body).toBe("string");
       expect(review.user).toBeDefined();

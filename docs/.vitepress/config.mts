@@ -113,6 +113,7 @@ export default defineConfig({
             { text: "Event Hooks", link: "/guide/event-hooks" },
             { text: "Markdown Parser", link: "/guide/markdown-parser" },
             { text: "Cookbook", link: "/guide/cookbook" },
+            { text: "Error Handling", link: "/guide/error-handling" },
           ],
         },
       ],
