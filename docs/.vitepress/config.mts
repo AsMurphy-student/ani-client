@@ -81,7 +81,13 @@ export default defineConfig({
     nav: [
       { text: "Home", link: "/" },
       { text: "Guide", link: "/guide/introduction" },
-      { text: "API", link: "/reference/api" },
+      {
+        text: "Reference",
+        items: [
+          { text: "Client API", link: "/reference/api" },
+          { text: "Types & Enums", link: "/reference/types" },
+        ],
+      },
       { text: "Showcase", link: "/showcase" },
       { text: "Changelog", link: "/changelog" },
     ],
@@ -103,17 +109,22 @@ export default defineConfig({
             { text: "Relations & Includes", link: "/guide/includes" },
             { text: "Batch Queries", link: "/guide/batch-queries" },
             { text: "Pagination", link: "/guide/pagination" },
+            { text: "Markdown Parser", link: "/guide/markdown-parser" },
+            { text: "Error Handling", link: "/guide/error-handling" },
+          ],
+        },
+        {
+          text: "Performance",
+          items: [
+            { text: "Caching Strategies", link: "/guide/caching" },
+            { text: "Rate Limiting & Retries", link: "/guide/rate-limiting" },
           ],
         },
         {
           text: "Advanced",
           items: [
-            { text: "Caching", link: "/guide/caching" },
-            { text: "Rate Limiting & Retries", link: "/guide/rate-limiting" },
             { text: "Event Hooks", link: "/guide/event-hooks" },
-            { text: "Markdown Parser", link: "/guide/markdown-parser" },
             { text: "Cookbook", link: "/guide/cookbook" },
-            { text: "Error Handling", link: "/guide/error-handling" },
           ],
         },
       ],
