@@ -56,7 +56,7 @@ import type {
   WeeklySchedule,
 } from "../types";
 import { chunk, normalizeQuery, validateIds } from "../utils";
-
+import type { ClientBase } from "./base";
 import * as characterMethods from "./character";
 import * as mediaMethods from "./media";
 import * as reviewMethods from "./review";
@@ -64,7 +64,6 @@ import * as staffMethods from "./staff";
 import * as studioMethods from "./studio";
 import * as threadMethods from "./thread";
 import * as userMethods from "./user";
-import type { ClientBase } from "./base";
 
 const DEFAULT_API_URL = "https://graphql.anilist.co";
 
