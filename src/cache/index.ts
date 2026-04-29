@@ -173,3 +173,5 @@ export class MemoryCache implements CacheAdapter {
     return toDelete.length;
   }
 }
+
+export * from "./normalized";

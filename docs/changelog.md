@@ -14,6 +14,11 @@ head:
 
 ## [2.1.2] — 2026-04-29
 
+### Added
+
+- **Apollo-Style Normalized Cache** — added an opt-in `NormalizedCache` that extracts and flattens GraphQL entities by `__typename` and `id`. This guarantees absolute data consistency across different queries (e.g., `getMedia` and `searchMedia` sharing the same entity) and reduces memory footprint for overlapping payloads.
+- **Fragment updates** — all internal GraphQL fragments now request `__typename` to support type-aware normalization.
+
 ### Fixed
 
 - **Stale-While-Revalidate (SWR) background refresh** — fixed an issue where `MemoryCache` correctly returned stale data within the SWR window, but the client failed to actually trigger the background network request to revalidate it.

@@ -25,6 +25,7 @@ query (
       mediaId
       media {
         
+  __typename
   id
   idMal
   title { romaji english native userPreferred }
@@ -78,6 +79,7 @@ query ($idMal: Int!, $type: MediaType) {
   Media(idMal: $idMal, type: $type) {
     
   
+  __typename
   id
   idMal
   title { romaji english native userPreferred }
@@ -124,6 +126,7 @@ query ($idMal: Int!, $type: MediaType) {
     edges {
       relationType(version: 2)
       node {
+        __typename
         id
         title { romaji english native userPreferred }
         type
@@ -203,6 +206,7 @@ query (
       sort: $sort
     ) {
       
+  __typename
   id
   idMal
   title { romaji english native userPreferred }
@@ -256,6 +260,7 @@ query ($search: String, $sort: [StudioSort], $page: Int, $perPage: Int) {
     pageInfo { total perPage currentPage lastPage hasNextPage }
     studios(search: $search, sort: $sort) {
       
+  __typename
   id
   name
   isAnimationStudio
@@ -264,6 +269,7 @@ query ($search: String, $sort: [StudioSort], $page: Int, $perPage: Int) {
   media(page: 1, perPage: 25, sort: POPULARITY_DESC) {
     pageInfo { total perPage currentPage lastPage hasNextPage }
     nodes {
+      __typename
       id
       title { romaji english native userPreferred }
       type
@@ -296,6 +302,7 @@ query (
       sort: TRENDING_DESC
     ) {
       
+  __typename
   id
   idMal
   title { romaji english native userPreferred }
@@ -346,6 +353,7 @@ exports[`query snapshots > buildBatchCharacterQuery matches snapshot 1`] = `
 "query {
   c0: Character(id: 1) { 
   
+  __typename
   id
   name { first middle last full native alternative }
   image { large medium }
@@ -360,6 +368,7 @@ exports[`query snapshots > buildBatchCharacterQuery matches snapshot 1`] = `
   
   media(perPage: 10) {
     nodes {
+      __typename
       id
       title { romaji english native userPreferred }
       type
@@ -371,6 +380,7 @@ exports[`query snapshots > buildBatchCharacterQuery matches snapshot 1`] = `
  }
   c1: Character(id: 40) { 
   
+  __typename
   id
   name { first middle last full native alternative }
   image { large medium }
@@ -385,6 +395,7 @@ exports[`query snapshots > buildBatchCharacterQuery matches snapshot 1`] = `
   
   media(perPage: 10) {
     nodes {
+      __typename
       id
       title { romaji english native userPreferred }
       type
@@ -396,6 +407,7 @@ exports[`query snapshots > buildBatchCharacterQuery matches snapshot 1`] = `
  }
   c2: Character(id: 100) { 
   
+  __typename
   id
   name { first middle last full native alternative }
   image { large medium }
@@ -410,6 +422,7 @@ exports[`query snapshots > buildBatchCharacterQuery matches snapshot 1`] = `
   
   media(perPage: 10) {
     nodes {
+      __typename
       id
       title { romaji english native userPreferred }
       type
@@ -426,6 +439,7 @@ exports[`query snapshots > buildBatchMediaQuery matches snapshot 1`] = `
 "query {
   m0: Media(id: 1) { 
   
+  __typename
   id
   idMal
   title { romaji english native userPreferred }
@@ -472,6 +486,7 @@ exports[`query snapshots > buildBatchMediaQuery matches snapshot 1`] = `
     edges {
       relationType(version: 2)
       node {
+        __typename
         id
         title { romaji english native userPreferred }
         type
@@ -504,6 +519,7 @@ exports[`query snapshots > buildBatchMediaQuery matches snapshot 1`] = `
  }
   m1: Media(id: 20) { 
   
+  __typename
   id
   idMal
   title { romaji english native userPreferred }
@@ -550,6 +566,7 @@ exports[`query snapshots > buildBatchMediaQuery matches snapshot 1`] = `
     edges {
       relationType(version: 2)
       node {
+        __typename
         id
         title { romaji english native userPreferred }
         type
@@ -582,6 +599,7 @@ exports[`query snapshots > buildBatchMediaQuery matches snapshot 1`] = `
  }
   m2: Media(id: 5735) { 
   
+  __typename
   id
   idMal
   title { romaji english native userPreferred }
@@ -628,6 +646,7 @@ exports[`query snapshots > buildBatchMediaQuery matches snapshot 1`] = `
     edges {
       relationType(version: 2)
       node {
+        __typename
         id
         title { romaji english native userPreferred }
         type
@@ -664,6 +683,7 @@ exports[`query snapshots > buildBatchMediaQuery matches snapshot 1`] = `
 exports[`query snapshots > buildBatchStaffQuery matches snapshot 1`] = `
 "query {
   s0: Staff(id: 95001) { 
+  __typename
   id
   name { first middle last full native }
   language
@@ -681,6 +701,7 @@ exports[`query snapshots > buildBatchStaffQuery matches snapshot 1`] = `
   siteUrl
  }
   s1: Staff(id: 95002) { 
+  __typename
   id
   name { first middle last full native }
   language
@@ -705,6 +726,7 @@ exports[`query snapshots > buildMediaByIdQuery with all includes matches snapsho
 query ($id: Int!) {
   Media(id: $id) {
     
+  __typename
   id
   idMal
   title { romaji english native userPreferred }
@@ -751,6 +773,7 @@ query ($id: Int!) {
     edges {
       relationType(version: 2)
       node {
+        __typename
         id
         title { romaji english native userPreferred }
         type
@@ -786,6 +809,7 @@ query ($id: Int!) {
         role
         node {
           
+  __typename
   id
   name { first middle last full native alternative }
   image { large medium }
@@ -800,6 +824,7 @@ query ($id: Int!) {
         }
             voiceActors {
               
+  __typename
   id
   name { first middle last full native userPreferred }
   languageV2
@@ -817,6 +842,7 @@ query ($id: Int!) {
         role
         node {
           
+  __typename
   id
   name { first middle last full native }
   language
@@ -840,9 +866,11 @@ query ($id: Int!) {
     recommendations(perPage: 5, sort: [RATING_DESC]) {
       nodes {
         
+  __typename
   id
   rating
   mediaRecommendation {
+    __typename
     id
     title { romaji english native userPreferred }
     type
@@ -901,6 +929,7 @@ exports[`query snapshots > buildMediaByIdQuery with relations: false matches sna
 query ($id: Int!) {
   Media(id: $id) {
     
+  __typename
   id
   idMal
   title { romaji english native userPreferred }
@@ -953,6 +982,7 @@ query ($id: Int!) {
   Media(id: $id) {
     
   
+  __typename
   id
   idMal
   title { romaji english native userPreferred }
@@ -999,6 +1029,7 @@ query ($id: Int!) {
     edges {
       relationType(version: 2)
       node {
+        __typename
         id
         title { romaji english native userPreferred }
         type
@@ -1038,6 +1069,7 @@ exports[`query snapshots > buildStudioByIdQuery() default matches snapshot 1`] =
 query ($id: Int!) {
   Studio(id: $id) {
     
+  __typename
   id
   name
   isAnimationStudio
@@ -1046,6 +1078,7 @@ query ($id: Int!) {
   media(page: 1, perPage: 25, sort: POPULARITY_DESC) {
     pageInfo { total perPage currentPage lastPage hasNextPage }
     nodes {
+      __typename
       id
       title { romaji english native userPreferred }
       type
@@ -1072,6 +1105,7 @@ query ($id: Int!) {
       pageInfo { total perPage currentPage lastPage hasNextPage }
       nodes {
         
+  __typename
   id
   idMal
   title { romaji english native userPreferred }
