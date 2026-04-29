@@ -10,13 +10,13 @@ describe("NormalizedCache", () => {
 
   it("normalizes and merges entities with id and __typename", () => {
     const cache = new NormalizedCache();
-    
+
     cache.set("query1", {
       anime: {
         __typename: "Media",
         id: 1,
         title: "Cowboy Bebop",
-      }
+      },
     });
 
     expect(cache.stats.entitiesCount).toBe(1);
@@ -26,11 +26,11 @@ describe("NormalizedCache", () => {
         __typename: "Media",
         id: 1,
         episodes: 26,
-      }
+      },
     });
 
     // query1 should now have the episodes field because they share the same entity
-    expect(cache.get<{ anime: any }>("query1")?.anime).toEqual({
+    expect(cache.get<{ anime: Record<string, unknown> }>("query1")?.anime).toEqual({
       __typename: "Media",
       id: 1,
       title: "Cowboy Bebop",
@@ -43,43 +43,43 @@ describe("NormalizedCache", () => {
     cache.set("query", {
       list: [
         { __typename: "Character", id: 10, name: "Spike" },
-        { __typename: "Character", id: 11, name: "Faye" }
-      ]
+        { __typename: "Character", id: 11, name: "Faye" },
+      ],
     });
 
     expect(cache.stats.entitiesCount).toBe(2);
     expect(cache.get("query")).toEqual({
       list: [
         { __typename: "Character", id: 10, name: "Spike" },
-        { __typename: "Character", id: 11, name: "Faye" }
-      ]
+        { __typename: "Character", id: 11, name: "Faye" },
+      ],
     });
   });
 
   it("handles circular references gracefully", () => {
     const cache = new NormalizedCache();
-    
+
     // Simulate a GraphQL response with a circular reference
     // In reality JSON.stringify would fail on this before it gets to the cache if it was real circular,
     // but NormalizedCache handles __ref cycles during denormalization
-    const media = { __typename: "Media", id: 1, characters: [] as any[] };
+    const media: Record<string, unknown> = { __typename: "Media", id: 1, characters: [] };
     const char = { __typename: "Character", id: 10, media: media };
-    media.characters.push(char);
+    (media.characters as Record<string, unknown>[]).push(char);
 
     cache.set("query", media);
 
-    const result: any = cache.get("query");
-    
+    const result = cache.get<{ __typename: string; characters: { __typename: string; media: unknown }[] }>("query");
+
     // It should denormalize the first level and return null for the cycle to prevent infinite loops
-    expect(result.__typename).toBe("Media");
-    expect(result.characters[0].__typename).toBe("Character");
-    expect(result.characters[0].media).toBeNull();
+    expect(result?.__typename).toBe("Media");
+    expect(result?.characters[0].__typename).toBe("Character");
+    expect(result?.characters[0].media).toBeNull();
   });
 
   it("returns undefined if an entity goes missing", () => {
     const cache = new NormalizedCache();
     cache.set("query", {
-      anime: { __typename: "Media", id: 1, title: "Test" }
+      anime: { __typename: "Media", id: 1, title: "Test" },
     });
 
     // Manually break the cache
@@ -105,17 +105,17 @@ describe("NormalizedCache", () => {
     const cache = new NormalizedCache({ ttl: 50 });
     cache.set("k", "v");
     expect(cache.get("k")).toBe("v");
-    
-    await new Promise(r => setTimeout(r, 80));
+
+    await new Promise((r) => setTimeout(r, 80));
     expect(cache.get("k")).toBeUndefined();
   });
 
   it("handles staleWhileRevalidateMs", async () => {
     const cache = new NormalizedCache({ ttl: 50, staleWhileRevalidateMs: 100 });
     cache.set("k", "v");
-    
-    await new Promise(r => setTimeout(r, 80));
-    
+
+    await new Promise((r) => setTimeout(r, 80));
+
     const meta = cache.getWithMeta("k");
     expect(meta?.data).toBe("v");
     expect(meta?.stale).toBe(true);
@@ -140,7 +140,7 @@ describe("NormalizedCache", () => {
 
     cache.resetStats();
     expect(cache.stats.hits).toBe(0);
-    
+
     cache.clear();
     expect(cache.size).toBe(0);
   });
@@ -155,16 +155,16 @@ describe("NormalizedCache", () => {
     const cache = new NormalizedCache();
     cache.set("media:1", "v");
     cache.set("user:1", "v");
-    
+
     const removed = cache.invalidate(/^media/);
     expect(removed).toBe(1);
     expect(cache.get("media:1")).toBeUndefined();
     expect(cache.get("user:1")).toBe("v");
-    
+
     cache.invalidate("user");
     expect(cache.get("user:1")).toBeUndefined();
   });
-  
+
   it("deletes by key", () => {
     const cache = new NormalizedCache();
     cache.set("k", "v");
