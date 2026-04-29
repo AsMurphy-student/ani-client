@@ -132,6 +132,7 @@ query ($idMal: Int!, $type: MediaType) {
         type
         format
         status
+        description(asHtml: false)
         startDate { year month day }
         endDate { year month day }
         season
@@ -492,6 +493,7 @@ exports[`query snapshots > buildBatchMediaQuery matches snapshot 1`] = `
         type
         format
         status
+        description(asHtml: false)
         startDate { year month day }
         endDate { year month day }
         season
@@ -572,6 +574,7 @@ exports[`query snapshots > buildBatchMediaQuery matches snapshot 1`] = `
         type
         format
         status
+        description(asHtml: false)
         startDate { year month day }
         endDate { year month day }
         season
@@ -652,6 +655,7 @@ exports[`query snapshots > buildBatchMediaQuery matches snapshot 1`] = `
         type
         format
         status
+        description(asHtml: false)
         startDate { year month day }
         endDate { year month day }
         season
@@ -779,6 +783,7 @@ query ($id: Int!) {
         type
         format
         status
+        description(asHtml: false)
         startDate { year month day }
         endDate { year month day }
         season
@@ -875,6 +880,8 @@ query ($id: Int!) {
     title { romaji english native userPreferred }
     type
     format
+    status
+    description(asHtml: false)
     coverImage { extraLarge large medium color }
     averageScore
     meanScore
@@ -1035,6 +1042,7 @@ query ($id: Int!) {
         type
         format
         status
+        description(asHtml: false)
         startDate { year month day }
         endDate { year month day }
         season

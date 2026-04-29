@@ -86,6 +86,7 @@ export const RELATIONS_FIELDS = `
         type
         format
         status
+        description(asHtml: false)
         startDate { year month day }
         endDate { year month day }
         season
@@ -122,6 +123,8 @@ export const MEDIA_RECOMMENDATION_FIELDS = `
     title { romaji english native userPreferred }
     type
     format
+    status
+    description(asHtml: false)
     coverImage { extraLarge large medium color }
     averageScore
     meanScore
