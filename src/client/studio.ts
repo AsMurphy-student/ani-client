@@ -5,6 +5,7 @@ import type { PagedResult, SearchStudioOptions, Studio, StudioIncludeOptions } f
 import { clampPerPage, validateId } from "../utils";
 import type { ClientBase } from "./base";
 
+/** @internal Fetch a studio by AniList ID, optionally including its media catalogue. */
 export async function getStudio(client: ClientBase, id: number, include?: StudioIncludeOptions): Promise<Studio> {
   validateId(id, "studioId");
   if (include?.media) {
@@ -17,6 +18,7 @@ export async function getStudio(client: ClientBase, id: number, include?: Studio
   return data.Studio;
 }
 
+/** @internal Search for animation studios by name. */
 export async function searchStudios(
   client: ClientBase,
   options: SearchStudioOptions = {},

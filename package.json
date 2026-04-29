@@ -10,6 +10,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
+    },
+    "./redis": {
+      "types": "./dist/redis.d.ts",
+      "import": "./dist/redis.mjs",
+      "require": "./dist/redis.js"
     }
   },
   "files": [

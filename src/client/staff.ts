@@ -5,6 +5,7 @@ import type { PagedResult, SearchStaffOptions, Staff, StaffIncludeOptions } from
 import { clampPerPage, validateId } from "../utils";
 import type { ClientBase } from "./base";
 
+/** @internal Fetch a staff member by AniList ID, optionally including media credits. */
 export async function getStaff(client: ClientBase, id: number, include?: StaffIncludeOptions): Promise<Staff> {
   validateId(id, "staffId");
   if (include?.media) {
@@ -16,6 +17,7 @@ export async function getStaff(client: ClientBase, id: number, include?: StaffIn
   return data.Staff;
 }
 
+/** @internal Search for staff (voice actors, directors, etc.) by name. */
 export async function searchStaff(client: ClientBase, options: SearchStaffOptions = {}): Promise<PagedResult<Staff>> {
   const { query: search, page = 1, perPage = 20, sort } = options;
   return client.pagedRequest<Staff>(

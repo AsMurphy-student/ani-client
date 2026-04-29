@@ -64,6 +64,7 @@ import * as staffMethods from "./staff";
 import * as studioMethods from "./studio";
 import * as threadMethods from "./thread";
 import * as userMethods from "./user";
+import type { ClientBase } from "./base";
 
 const DEFAULT_API_URL = "https://graphql.anilist.co";
 
@@ -89,7 +90,7 @@ const LIB_VERSION = typeof __VERSION__ !== "undefined" ? __VERSION__ : "dev";
  * });
  * ```
  */
-export class AniListClient {
+export class AniListClient implements ClientBase {
   private readonly apiUrl: string;
   private readonly headers: Record<string, string>;
   private readonly cacheAdapter: CacheAdapter;

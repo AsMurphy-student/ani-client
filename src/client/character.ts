@@ -10,6 +10,7 @@ import type { Character, CharacterIncludeOptions, PagedResult, SearchCharacterOp
 import { clampPerPage, validateId } from "../utils";
 import type { ClientBase } from "./base";
 
+/** @internal Fetch a character by AniList ID, optionally including voice actors. */
 export async function getCharacter(
   client: ClientBase,
   id: number,
@@ -21,6 +22,7 @@ export async function getCharacter(
   return data.Character;
 }
 
+/** @internal Search for characters by name. */
 export async function searchCharacters(
   client: ClientBase,
   options: SearchCharacterOptions = {},

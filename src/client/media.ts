@@ -37,6 +37,7 @@ import { MediaSort, MediaType } from "../types";
 import { clampPerPage, validateId } from "../utils";
 import type { ClientBase } from "./base";
 
+/** @internal Fetch a single media entry by AniList ID with optional includes. */
 export async function getMedia(client: ClientBase, id: number, include?: MediaIncludeOptions): Promise<Media> {
   validateId(id, "mediaId");
   const query = buildMediaByIdQuery(include);
@@ -44,6 +45,7 @@ export async function getMedia(client: ClientBase, id: number, include?: MediaIn
   return data.Media;
 }
 
+/** @internal Fetch paginated characters for a media entry. */
 export async function getMediaCharacters(
   client: ClientBase,
   mediaId: number,
@@ -59,6 +61,7 @@ export async function getMediaCharacters(
   return { pageInfo: data.Media.characters.pageInfo, results: data.Media.characters.edges };
 }
 
+/** @internal Fetch paginated staff for a media entry. */
 export async function getMediaStaff(
   client: ClientBase,
   mediaId: number,
@@ -75,6 +78,7 @@ export async function getMediaStaff(
   return { pageInfo: data.Media.staff.pageInfo, results: data.Media.staff.edges };
 }
 
+/** @internal Fetch a media entry by its MyAnimeList ID. */
 export async function getMediaByMalId(client: ClientBase, malId: number, type?: MediaType): Promise<Media> {
   validateId(malId, "malId");
   const data = await client.request<{ Media: Media }>(QUERY_MEDIA_BY_MAL_ID, {
@@ -84,6 +88,7 @@ export async function getMediaByMalId(client: ClientBase, malId: number, type?: 
   return data.Media;
 }
 
+/** @internal Search for anime or manga with optional filters. */
 export async function searchMedia(client: ClientBase, options: SearchMediaOptions = {}): Promise<PagedResult<Media>> {
   const {
     query: search,
@@ -114,6 +119,7 @@ export async function searchMedia(client: ClientBase, options: SearchMediaOption
   );
 }
 
+/** @internal Get currently trending anime or manga. */
 export async function getTrending(client: ClientBase, options: GeneralMediaQueryOptions): Promise<PagedResult<Media>> {
   const { type = MediaType.ANIME, isAdult = false, idNotIn = [], page = 1, perPage = 20 } = options;
   return client.pagedRequest<Media>(
@@ -123,16 +129,19 @@ export async function getTrending(client: ClientBase, options: GeneralMediaQuery
   );
 }
 
+/** @internal Get the most popular anime or manga. */
 export async function getPopular(client: ClientBase, options: GeneralMediaQueryOptions): Promise<PagedResult<Media>> {
   const { type = MediaType.ANIME, isAdult = false, idNotIn = [], page = 1, perPage = 20 } = options;
   return searchMedia(client, { type, isAdult, idNotIn, sort: [MediaSort.POPULARITY_DESC], page, perPage });
 }
 
+/** @internal Get the highest-rated anime or manga. */
 export async function getTopRated(client: ClientBase, options: GeneralMediaQueryOptions): Promise<PagedResult<Media>> {
   const { type = MediaType.ANIME, isAdult = false, idNotIn = [], page = 1, perPage = 20 } = options;
   return searchMedia(client, { type, isAdult, idNotIn, sort: [MediaSort.SCORE_DESC], page, perPage });
 }
 
+/** @internal Get recently aired anime episodes. */
 export async function getAiredEpisodes(
   client: ClientBase,
   options: GetAiringOptions = {},
@@ -152,6 +161,7 @@ export async function getAiredEpisodes(
   );
 }
 
+/** @internal Get currently releasing manga sorted by last update. */
 export async function getRecentlyUpdatedManga(
   client: ClientBase,
   options: GetRecentChaptersOptions = {},
@@ -168,6 +178,7 @@ export async function getRecentlyUpdatedManga(
   );
 }
 
+/** @internal Get upcoming (not yet released) media. */
 export async function getPlanning(client: ClientBase, options: GetPlanningOptions = {}): Promise<PagedResult<Media>> {
   return client.pagedRequest<Media>(
     QUERY_PLANNING,
@@ -183,6 +194,7 @@ export async function getPlanning(client: ClientBase, options: GetPlanningOption
   );
 }
 
+/** @internal Get user recommendations for a specific media entry. */
 export async function getRecommendations(
   client: ClientBase,
   mediaId: number,
@@ -209,6 +221,7 @@ export async function getRecommendations(
   };
 }
 
+/** @internal Get anime or manga for a specific season and year. */
 export async function getMediaBySeason(client: ClientBase, options: GetSeasonOptions): Promise<PagedResult<Media>> {
   return client.pagedRequest<Media>(
     QUERY_MEDIA_BY_SEASON,
@@ -226,6 +239,7 @@ export async function getMediaBySeason(client: ClientBase, options: GetSeasonOpt
   );
 }
 
+/** @internal Get the detailed airing schedule for a given week, grouped by day. */
 export async function getWeeklySchedule(
   client: ClientBase,
   date: Date = new Date(),
