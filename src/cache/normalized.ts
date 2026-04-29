@@ -160,6 +160,7 @@ export class NormalizedCache implements CacheAdapter {
     if (this.maxSize > 0 && this.queryStore.size >= this.maxSize) {
       const firstKey = this.queryStore.keys().next().value;
       if (firstKey !== undefined) this.queryStore.delete(firstKey);
+      this.gc();
     }
 
     this.queryStore.set(key, { data: normalizedData, expiresAt: Date.now() + this.ttl });
@@ -211,5 +212,45 @@ export class NormalizedCache implements CacheAdapter {
     this._hits = 0;
     this._misses = 0;
     this._stales = 0;
+  }
+
+  /**
+   * Garbage-collect orphaned entities that are no longer referenced by any query.
+   * Called automatically on LRU eviction to prevent unbounded entity store growth.
+   */
+  gc(): number {
+    const referencedRefs = new Set<string>();
+    const collectRefs = (data: unknown): void => {
+      if (Array.isArray(data)) {
+        for (const item of data) collectRefs(item);
+        return;
+      }
+      if (data !== null && typeof data === "object") {
+        const obj = data as Record<string, unknown>;
+        if (typeof obj.__ref === "string") {
+          referencedRefs.add(obj.__ref);
+          const entity = this.entityStore.get(obj.__ref);
+          if (entity && !referencedRefs.has(`_visited:${obj.__ref}`)) {
+            referencedRefs.add(`_visited:${obj.__ref}`);
+            collectRefs(entity);
+          }
+          return;
+        }
+        for (const v of Object.values(obj)) collectRefs(v);
+      }
+    };
+
+    for (const entry of this.queryStore.values()) {
+      collectRefs(entry.data);
+    }
+
+    let removed = 0;
+    for (const ref of this.entityStore.keys()) {
+      if (!referencedRefs.has(ref)) {
+        this.entityStore.delete(ref);
+        removed++;
+      }
+    }
+    return removed;
   }
 }

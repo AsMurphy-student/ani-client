@@ -1,0 +1,57 @@
+name: Feature request
+description: Suggest an improvement or new capability for ani-client.
+title: "[feat]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the suggestion.
+
+        Please explain the use case clearly so the feature can be evaluated properly.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / use case
+      description: What are you trying to do that is currently difficult or impossible?
+      placeholder: I need a way to...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the API or behavior you would like to see.
+      placeholder: Add a new method like...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What other approaches did you consider?
+      placeholder: I tried...
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Include examples, links, or anything that helps explain the request.
+      placeholder: Links, screenshots, code snippets, etc.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Before submitting
+      options:
+        - label: I have checked that this feature does not already exist.
+          required: true
+        - label: I have explained the use case clearly.
+          required: true

@@ -12,6 +12,30 @@ head:
 
 # Changelog
 
+## [2.1.3] — 2026-04-29
+
+### Added
+
+- **`NormalizedCache` introduction** — added a new Apollo-style normalized cache implementation with entity merging, SWR support, and cache metadata.
+
+### Changed
+
+- **`Redis` entrypoint packaging** — adjusted the package build so the Redis entrypoint is not included by default and is only exposed through its dedicated export.
+
+### Fixed
+
+- **`searchReviews` perPage validation** — `perPage` is now clamped to the AniList maximum (50), consistent with all other paginated methods.
+- **`getWeeklySchedule` missing parameter** — exposed the `idNotIn` parameter to the public API so users can exclude specific media IDs from the schedule.
+- **`NormalizedCache` SWR revalidation bug** — fixed background revalidation behavior for stale cache entries.
+- **`NormalizedCache` GC coverage** — added tests for orphan cleanup and stale entity removal.
+- **`MemoryCache` orphaned JSDoc** — removed a stale documentation block left over from a previous refactor.
+- **`AniListClientOptions.rateLimit` JSDoc** — corrected the documented default from `85 req/min` to the actual value of `25 req/min`.
+
+### Documentation
+
+- **GitHub contribution templates** — added issue and pull request templates to improve contribution workflow.
+
+::: details View release notes for version [2.1.2] — 2026-04-29
 ## [2.1.2] — 2026-04-29
 
 ### Added
@@ -33,6 +57,8 @@ head:
 ### Internal
 
 - **Codebase cleanup** — removed all inline comments (`//`) from the source code, retaining only structural JSDoc (`/** */`) for cleaner code distribution.
+
+:::
 
 ::: details View release notes for version [2.1.1] — 2026-04-28
 ## [2.1.1] — 2026-04-28

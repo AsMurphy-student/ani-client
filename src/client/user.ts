@@ -19,6 +19,7 @@ import type {
 import { clampPerPage, validateId } from "../utils";
 import type { ClientBase } from "./base";
 
+/** @internal Fetch a user by AniList ID or username. */
 export async function getUser(client: ClientBase, idOrName: number | string): Promise<User> {
   if (typeof idOrName === "number") {
     validateId(idOrName, "userId");
@@ -29,11 +30,13 @@ export async function getUser(client: ClientBase, idOrName: number | string): Pr
   return data.User;
 }
 
+/** @internal Search for AniList users by name. */
 export async function searchUsers(client: ClientBase, options: SearchUserOptions = {}): Promise<PagedResult<User>> {
   const { query: search, page = 1, perPage = 20, sort } = options;
   return client.pagedRequest<User>(QUERY_USER_SEARCH, { search, sort, page, perPage: clampPerPage(perPage) }, "users");
 }
 
+/** @internal Get a user's anime or manga list with optional filters. */
 export async function getUserMediaList(
   client: ClientBase,
   options: GetUserMediaListOptions,
@@ -67,6 +70,7 @@ interface RawFavourites {
   studios?: { nodes: UserFavorites["studios"] };
 }
 
+/** @internal Fetch a user's favorite anime, manga, characters, staff, and studios. */
 export async function getUserFavorites(
   client: ClientBase,
   idOrName: number | string,

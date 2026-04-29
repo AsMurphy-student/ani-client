@@ -4,12 +4,14 @@ import { ThreadSort } from "../types";
 import { clampPerPage, validateId } from "../utils";
 import type { ClientBase } from "./base";
 
+/** @internal Fetch a forum thread by AniList ID. */
 export async function getThread(client: ClientBase, id: number): Promise<Thread> {
   validateId(id, "threadId");
   const data = await client.request<{ Thread: Thread }>(QUERY_THREAD_BY_ID, { id });
   return data.Thread;
 }
 
+/** @internal Get recent forum threads with optional search, media, and category filters. */
 export async function getRecentThreads(
   client: ClientBase,
   options: SearchThreadOptions = {},

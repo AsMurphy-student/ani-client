@@ -56,7 +56,7 @@ import type {
   WeeklySchedule,
 } from "../types";
 import { chunk, normalizeQuery, validateIds } from "../utils";
-
+import type { ClientBase } from "./base";
 import * as characterMethods from "./character";
 import * as mediaMethods from "./media";
 import * as reviewMethods from "./review";
@@ -89,7 +89,7 @@ const LIB_VERSION = typeof __VERSION__ !== "undefined" ? __VERSION__ : "dev";
  * });
  * ```
  */
-export class AniListClient {
+export class AniListClient implements ClientBase {
   private readonly apiUrl: string;
   private readonly headers: Record<string, string>;
   private readonly cacheAdapter: CacheAdapter;
@@ -340,8 +340,8 @@ export class AniListClient {
   }
 
   /** Get the detailed schedule for the current week, sorted by day. */
-  async getWeeklySchedule(date?: Date): Promise<WeeklySchedule> {
-    return mediaMethods.getWeeklySchedule(this, date);
+  async getWeeklySchedule(date?: Date, idNotIn?: number[]): Promise<WeeklySchedule> {
+    return mediaMethods.getWeeklySchedule(this, date, idNotIn);
   }
 
   /** Get upcoming (not yet released) media. */

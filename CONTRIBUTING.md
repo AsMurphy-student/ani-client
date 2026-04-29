@@ -2,6 +2,14 @@
 
 Thanks for your interest in contributing! This document covers everything you need to get started.
 
+## Reporting issues
+
+Please use the GitHub issue templates when possible. They help include the version, runtime, and reproduction details needed to investigate problems quickly.
+
+## Pull requests
+
+Please use the pull request template and make sure `pnpm lint`, `pnpm typecheck`, and `pnpm test` pass before requesting review.
+
 ## Prerequisites
 
 - **Node.js** ≥ 20

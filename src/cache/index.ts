@@ -51,12 +51,9 @@ export class MemoryCache implements CacheAdapter {
   }
 
   /**
-   * Retrieve a cached value, or `undefined` if missing / expired.
+   * Retrieve a cached value and its stale status.
    * With stale-while-revalidate enabled, returns stale data within the grace window
    * and flags it so the caller can refresh in the background.
-   */
-  /**
-   * Retrieve a cached value and its stale status.
    */
   getWithMeta<T>(key: string): { data: T; stale: boolean } | undefined {
     if (!this.enabled) return undefined;

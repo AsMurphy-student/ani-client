@@ -1,6 +1,6 @@
 {
   "name": "ani-client",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "description": "A simple and typed client to fetch anime, manga, characters and user data from AniList",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -10,6 +10,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
+    },
+    "./redis": {
+      "types": "./dist/redis.d.ts",
+      "import": "./dist/redis.mjs",
+      "require": "./dist/redis.js"
     }
   },
   "files": [

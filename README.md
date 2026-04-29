@@ -236,7 +236,13 @@ Full API reference, configuration options, and guides (caching, pagination, hook
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup, coding standards, and PR guidelines.
+Contributions are welcome.
+
+Before opening an issue or a pull request, please read:
+- [CONTRIBUTING.md](CONTRIBUTING.md)
+- [SECURITY.md](SECURITY.md)
+
+This repository also includes GitHub issue templates and a pull request template to help keep reports and contributions consistent.
 
 ## License
 

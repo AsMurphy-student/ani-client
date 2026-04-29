@@ -172,3 +172,102 @@ describe("NormalizedCache", () => {
     expect(cache.get("k")).toBeUndefined();
   });
 });
+
+it("garbage-collects orphaned entities after query deletion", () => {
+  const cache = new NormalizedCache();
+
+  cache.set("query1", {
+    anime: {
+      __typename: "Media",
+      id: 1,
+      title: "Cowboy Bebop",
+      characters: [
+        { __typename: "Character", id: 10, name: "Spike Spiegel" },
+        { __typename: "Character", id: 11, name: "Faye Valentine" },
+      ],
+    },
+  });
+
+  expect(cache.stats.entitiesCount).toBe(3);
+
+  cache.delete("query1");
+  const removed = cache.gc();
+
+  expect(removed).toBe(3);
+  expect(cache.stats.entitiesCount).toBe(0);
+});
+
+it("keeps entities that are still referenced by another cached query", () => {
+  const cache = new NormalizedCache();
+
+  const media = {
+    __typename: "Media",
+    id: 1,
+    title: "Cowboy Bebop",
+    characters: [{ __typename: "Character", id: 10, name: "Spike Spiegel" }],
+  };
+
+  cache.set("query1", { anime: media });
+  cache.set("query2", {
+    featured: {
+      __typename: "Media",
+      id: 1,
+    },
+  });
+
+  expect(cache.stats.entitiesCount).toBe(2);
+
+  cache.delete("query1");
+  const removed = cache.gc();
+
+  expect(removed).toBe(0);
+  expect(cache.stats.entitiesCount).toBe(2);
+  expect(cache.get<{ featured: { title: string } }>("query2")?.featured.title).toBe("Cowboy Bebop");
+});
+
+it("removes only entities that are no longer reachable from remaining queries", () => {
+  const cache = new NormalizedCache();
+
+  cache.set("query1", {
+    anime: {
+      __typename: "Media",
+      id: 1,
+      title: "Cowboy Bebop",
+      characters: [{ __typename: "Character", id: 10, name: "Spike Spiegel" }],
+    },
+  });
+
+  cache.set("query2", {
+    anime: {
+      __typename: "Media",
+      id: 2,
+      title: "Samurai Champloo",
+    },
+  });
+
+  expect(cache.stats.entitiesCount).toBe(3);
+
+  cache.delete("query1");
+  const removed = cache.gc();
+
+  expect(removed).toBe(2);
+  expect(cache.stats.entitiesCount).toBe(1);
+  expect(cache.get<{ anime: { title: string } }>("query2")?.anime.title).toBe("Samurai Champloo");
+});
+
+it("returns 0 when gc has nothing to remove", () => {
+  const cache = new NormalizedCache();
+
+  cache.set("query", {
+    anime: {
+      __typename: "Media",
+      id: 1,
+      title: "Cowboy Bebop",
+    },
+  });
+
+  const removed = cache.gc();
+
+  expect(removed).toBe(0);
+  expect(cache.stats.entitiesCount).toBe(1);
+});
