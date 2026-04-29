@@ -12,6 +12,13 @@ head:
 
 # Changelog
 
+## [2.1.2] — 2026-04-29
+
+### Fixed
+
+- **Stale-While-Revalidate (SWR) background refresh** — fixed an issue where `MemoryCache` correctly returned stale data within the SWR window, but the client failed to actually trigger the background network request to revalidate it.
+- **`CacheAdapter` interface** — added optional `getWithMeta` method to support advanced cache adapters that can communicate stale status to the client.
+
 ## [2.1.1] — 2026-04-28
 
 ### Fixed

@@ -138,10 +138,29 @@ export class AniListClient {
   async request<T>(query: string, variables: Record<string, unknown> = {}): Promise<T> {
     const cacheKey = MemoryCache.key(query, variables);
 
-    const cached = await this.cacheAdapter.get<T>(cacheKey);
+    let cached: T | undefined;
+    let isStale = false;
+
+    if (this.cacheAdapter.getWithMeta) {
+      const res = await this.cacheAdapter.getWithMeta<T>(cacheKey);
+      if (res) {
+        cached = res.data;
+        isStale = res.stale;
+      }
+    } else {
+      cached = await this.cacheAdapter.get<T>(cacheKey);
+    }
+
     if (cached !== undefined) {
+      if (isStale) {
+        // Fire and forget background revalidation
+        this.executeRequest<T>(query, variables, cacheKey).catch((err) => {
+          this.logger?.error("Background revalidation failed", { error: (err as Error).message, cacheKey });
+        });
+      }
+
       this.hooks.onCacheHit?.(cacheKey);
-      this.logger?.debug("Cache hit", { cacheKey });
+      this.logger?.debug("Cache hit", { cacheKey, isStale });
       const meta: ResponseMeta = { durationMs: 0, fromCache: true };
       this._lastRequestMeta = meta;
       this.hooks.onResponse?.(query, 0, true);

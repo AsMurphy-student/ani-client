@@ -55,7 +55,10 @@ export class MemoryCache implements CacheAdapter {
    * With stale-while-revalidate enabled, returns stale data within the grace window
    * and flags it so the caller can refresh in the background.
    */
-  get<T>(key: string): T | undefined {
+  /**
+   * Retrieve a cached value and its stale status.
+   */
+  getWithMeta<T>(key: string): { data: T; stale: boolean } | undefined {
     if (!this.enabled) return undefined;
     const entry = this.store.get(key);
     if (!entry) {
@@ -68,7 +71,7 @@ export class MemoryCache implements CacheAdapter {
         this.store.delete(key);
         this.store.set(key, entry);
         this._stales++;
-        return entry.data as T;
+        return { data: entry.data as T, stale: true };
       }
       this.store.delete(key);
       this._misses++;
@@ -77,7 +80,12 @@ export class MemoryCache implements CacheAdapter {
     this.store.delete(key);
     this.store.set(key, entry);
     this._hits++;
-    return entry.data as T;
+    return { data: entry.data as T, stale: false };
+  }
+
+  get<T>(key: string): T | undefined {
+    const res = this.getWithMeta<T>(key);
+    return res ? res.data : undefined;
   }
 
   /** Store a value in the cache. */
