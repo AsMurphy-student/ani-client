@@ -1,0 +1,103 @@
+name: Bug report
+description: Report a reproducible bug or unexpected behavior in ani-client.
+title: "[bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug.
+
+        Please provide a minimal reproduction and the exact environment details so the issue can be diagnosed quickly.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: A short description of the problem.
+      placeholder: The cache does not invalidate stale entries after...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Provide the smallest possible code snippet or steps that reproduce the issue.
+      placeholder: |
+        ```ts
+        const client = new AniListClient();
+        ...
+        ```
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+      placeholder: The request should return...
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What actually happened?
+      placeholder: Instead, it throws...
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: ani-client version
+      placeholder: 2.1.3
+    validations:
+      required: true
+
+  - type: input
+    id: runtime
+    attributes:
+      label: Runtime
+      description: Node.js, Bun, Deno, browser, etc.
+      placeholder: Node.js 22.0.0
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment details
+      description: Add any relevant details about your setup.
+      placeholder: |
+        OS:
+        Package manager:
+        TypeScript version:
+        Vitest version:
+        Biome version:
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / stack trace
+      description: Paste any relevant logs, error messages, or stack traces.
+      render: shell
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Before submitting
+      options:
+        - label: I have searched the existing issues.
+          required: true
+        - label: I have provided a minimal reproduction.
+          required: true
+        - label: I can reproduce this on the latest version.
+          required: true
