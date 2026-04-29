@@ -52,7 +52,29 @@ console.log(stats);
 ```
 
 ::: tip
-`cacheStats` is only available with the default memory cache — it returns `undefined` when using a custom `cacheAdapter`.
+`cacheStats` is only available with the default memory cache and `NormalizedCache` — it returns `undefined` when using a custom `cacheAdapter`.
+:::
+
+## Normalized Cache
+
+For advanced use-cases where you want perfect data consistency across all queries, you can opt into using the `NormalizedCache`. This cache extracts entities (like `Media` or `Character`) from the GraphQL responses based on their `__typename` and `id`, and stores them flat.
+
+```typescript
+import { AniListClient, NormalizedCache } from "ani-client";
+
+const client = new AniListClient({
+  cacheAdapter: new NormalizedCache({
+    ttl: 1000 * 60 * 60, // 1 hour
+    staleWhileRevalidateMs: 1000 * 60,
+  }),
+});
+
+// If getMedia(1) and searchMedia({ query: "Cowboy Bebop" }) both fetch the same anime, 
+// they will share the exact same entity in memory.
+```
+
+::: warning
+`NormalizedCache` traverses every request and response to normalize and denormalize data. While it heavily reduces duplicate objects in memory and guarantees consistency, it uses slightly more CPU than the default `MemoryCache`.
 :::
 
 ## Redis Cache

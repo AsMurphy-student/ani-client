@@ -3,6 +3,7 @@
  * Does NOT include tags, studios, trailer, synonyms, or nextAiringEpisode.
  */
 export const MEDIA_FIELDS_LIGHT = `
+  __typename
   id
   idMal
   title { romaji english native userPreferred }
@@ -31,6 +32,7 @@ export const MEDIA_FIELDS_LIGHT = `
 
 /** Core media fields — always returned. Does NOT include relations (opt-in via include). */
 export const MEDIA_FIELDS_BASE = `
+  __typename
   id
   idMal
   title { romaji english native userPreferred }
@@ -78,6 +80,7 @@ export const RELATIONS_FIELDS = `
     edges {
       relationType(version: 2)
       node {
+        __typename
         id
         title { romaji english native userPreferred }
         type
@@ -110,9 +113,11 @@ export const RELATIONS_FIELDS = `
 
 /** Media Recommendation fields - used for when fetching recommendation for a specific media entry */
 export const MEDIA_RECOMMENDATION_FIELDS = `
+  __typename
   id
   rating
   mediaRecommendation {
+    __typename
     id
     title { romaji english native userPreferred }
     type
@@ -148,6 +153,7 @@ export const MEDIA_FIELDS = `
 
 /** Character fields without back-reference to media (used when embedding characters inside a Media query). */
 export const CHARACTER_FIELDS_COMPACT = `
+  __typename
   id
   name { first middle last full native alternative }
   image { large medium }
@@ -163,6 +169,7 @@ export const CHARACTER_FIELDS_COMPACT = `
 const CHARACTER_MEDIA_NODES = `
   media(perPage: 10) {
     nodes {
+      __typename
       id
       title { romaji english native userPreferred }
       type
@@ -174,6 +181,7 @@ const CHARACTER_MEDIA_NODES = `
 
 /** Compact voice actor fields — lightweight subset for embedding inside character edges. */
 export const VOICE_ACTOR_FIELDS_COMPACT = `
+  __typename
   id
   name { first middle last full native userPreferred }
   languageV2
@@ -190,6 +198,7 @@ const CHARACTER_MEDIA_EDGES_WITH_VA = `
         ${VOICE_ACTOR_FIELDS_COMPACT}
       }
       node {
+        __typename
         id
         title { romaji english native userPreferred }
         type
@@ -211,6 +220,7 @@ export const CHARACTER_FIELDS_WITH_VA = `
 `;
 
 export const STAFF_FIELDS = `
+  __typename
   id
   name { first middle last full native }
   language
@@ -231,6 +241,7 @@ export const STAFF_FIELDS = `
 export const STAFF_MEDIA_FIELDS = `
   staffMedia(perPage: $perPage, sort: [POPULARITY_DESC]) {
     nodes {
+      __typename
       id
       title { romaji english native userPreferred }
       type
@@ -270,6 +281,7 @@ export const STAFF_MEDIA_FIELDS = `
 `;
 
 export const USER_FIELDS = `
+  __typename
   id
   name
   about(asHtml: false)
@@ -292,6 +304,7 @@ export const USER_FAVORITES_FIELDS = `
   favourites {
     anime(perPage: 25) {
       nodes {
+        __typename
         id
         title { romaji english native userPreferred }
         coverImage { large medium }
@@ -302,6 +315,7 @@ export const USER_FAVORITES_FIELDS = `
     }
     manga(perPage: 25) {
       nodes {
+        __typename
         id
         title { romaji english native userPreferred }
         coverImage { large medium }
@@ -312,6 +326,7 @@ export const USER_FAVORITES_FIELDS = `
     }
     characters(perPage: 25) {
       nodes {
+        __typename
         id
         name { full native }
         image { large medium }
@@ -320,6 +335,7 @@ export const USER_FAVORITES_FIELDS = `
     }
     staff(perPage: 25) {
       nodes {
+        __typename
         id
         name { full native }
         image { large medium }
@@ -328,6 +344,7 @@ export const USER_FAVORITES_FIELDS = `
     }
     studios(perPage: 25) {
       nodes {
+        __typename
         id
         name
         siteUrl
@@ -337,6 +354,7 @@ export const USER_FAVORITES_FIELDS = `
 `;
 
 export const MEDIA_LIST_FIELDS = `
+  __typename
   id
   mediaId
   status
@@ -357,6 +375,7 @@ export const MEDIA_LIST_FIELDS = `
 `;
 
 export const STUDIO_FIELDS = `
+  __typename
   id
   name
   isAnimationStudio
@@ -365,6 +384,7 @@ export const STUDIO_FIELDS = `
   media(page: 1, perPage: 25, sort: POPULARITY_DESC) {
     pageInfo { total perPage currentPage lastPage hasNextPage }
     nodes {
+      __typename
       id
       title { romaji english native userPreferred }
       type
@@ -376,6 +396,7 @@ export const STUDIO_FIELDS = `
 `;
 
 export const THREAD_FIELDS = `
+  __typename
   id
   title
   body(asHtml: false)
@@ -392,20 +413,24 @@ export const THREAD_FIELDS = `
   updatedAt
   siteUrl
   user {
+    __typename
     id
     name
     avatar { large medium }
   }
   replyUser {
+    __typename
     id
     name
     avatar { large medium }
   }
   categories {
+    __typename
     id
     name
   }
   mediaCategories {
+    __typename
     id
     title { romaji english native userPreferred }
     type
@@ -413,6 +438,7 @@ export const THREAD_FIELDS = `
     siteUrl
   }
   likes {
+    __typename
     id
     name
   }

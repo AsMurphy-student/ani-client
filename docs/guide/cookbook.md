@@ -144,6 +144,27 @@ async function getCachedAnime(id: number) {
 }
 ```
 
+### Apollo-Style Normalized Cache
+
+For absolute data consistency across all queries, use the `NormalizedCache`. It extracts entities by `__typename` and `id`, ensuring the same entity (e.g., a specific Media) is only stored once in memory.
+
+```typescript
+import { AniListClient, NormalizedCache } from "ani-client";
+
+const normalizedClient = new AniListClient({
+  cacheAdapter: new NormalizedCache({
+    ttl: 1000 * 60 * 60, // 1 hour
+    staleWhileRevalidateMs: 1000 * 60 * 5 // 5 minutes grace period
+  })
+});
+
+async function testNormalizedCache() {
+  const anime = await normalizedClient.getMedia(1); // Fetches Cowboy Bebop
+  // searchMedia will use the EXACT same object reference in memory for Cowboy Bebop!
+  const results = await normalizedClient.searchMedia({ query: "Cowboy Bebop" });
+}
+```
+
 ### Short-term Caching for Search Results
 
 ```typescript

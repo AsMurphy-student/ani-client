@@ -33,6 +33,13 @@ export interface ExternalLink {
 export interface CacheAdapter {
   /** Retrieve a cached value, or `undefined` if missing / expired. */
   get<T>(key: string): T | undefined | Promise<T | undefined>;
+  /**
+   * Retrieve a cached value along with its stale status (for stale-while-revalidate).
+   * If implemented, the client will use this to trigger background revalidation.
+   */
+  getWithMeta?<T>(
+    key: string,
+  ): { data: T; stale: boolean } | undefined | Promise<{ data: T; stale: boolean } | undefined>;
   /** Store a value in the cache. */
   set<T>(key: string, data: T): void | Promise<void>;
   /** Remove a specific entry. Returns `true` if the key existed. */

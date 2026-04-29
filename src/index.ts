@@ -1,4 +1,4 @@
-export { type CacheStats, MemoryCache } from "./cache";
+export { type CacheStats, MemoryCache, NormalizedCache } from "./cache";
 export { RedisCache, type RedisCacheOptions, type RedisLikeClient } from "./cache/redis";
 export { AniListClient } from "./client";
 export { AniListError } from "./errors";

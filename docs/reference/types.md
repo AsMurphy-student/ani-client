@@ -423,6 +423,7 @@ Interface for custom cache implementations (e.g. Redis, SQLite):
 ```typescript
 interface CacheAdapter {
   get<T>(key: string): T | undefined | Promise<T | undefined>;
+  getWithMeta?<T>(key: string): { data: T; stale: boolean } | undefined | Promise<{ data: T; stale: boolean } | undefined>;
   set<T>(key: string, data: T): void | Promise<void>;
   delete(key: string): boolean | Promise<boolean>;
   clear(): void | Promise<void>;
