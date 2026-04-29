@@ -28,11 +28,13 @@ head:
 
 - **Cookbook** — added a complete recipe for configuring and using the new `NormalizedCache`.
 - **Navigation** — grouped API reference items in a top navigation dropdown and restructured the sidebar into clearer *Core Features*, *Performance*, and *Advanced* sections.
+- **Changelog formatting** — older release notes are now wrapped in collapsible accordions to improve page readability and scrolling.
 
 ### Internal
 
 - **Codebase cleanup** — removed all inline comments (`//`) from the source code, retaining only structural JSDoc (`/** */`) for cleaner code distribution.
 
+::: details View release notes for version [2.1.1] — 2026-04-28
 ## [2.1.1] — 2026-04-28
 
 ### Fixed
@@ -58,6 +60,9 @@ head:
 - Added `guide/error-handling.md` — full guide on `AniListError`, status codes,
   rate limit errors, network failures, and global error monitoring via hooks
 
+:::
+
+::: details View release notes for version [2.1.0] — 2026-04-28
 ## [2.1.0] — 2026-04-28
 
 ### Added
@@ -79,6 +84,9 @@ head:
 - **Test coverage** — Added 5 new unit tests for review functionality
 - **Integration tests** — Added review API integration tests
 
+:::
+
+::: details View release notes for version [2.0.4] — 2026-04-28
 ## [2.0.4] — 2026-04-28
 
 ### Added
@@ -96,12 +104,18 @@ head:
 
 - **Documentation updates** — Updated docs with new parameter information.
 
+:::
+
+::: details View release notes for version [2.0.3] — 2026-04-27
 ## [2.0.3] — 2026-04-27
 
 ### Added
 
 - **Paginated media relationships** — Added `getMediaCharacters()` and `getMediaStaff()` for fetching more than 25 characters or staff members on a media entry.
 
+:::
+
+::: details View release notes for version [2.0.0] — 2026-04-25
 ## [2.0.0] — 2026-04-25
 
 ### Breaking Changes
@@ -133,6 +147,9 @@ head:
 - **Dependency Updates** — All development dependencies have been updated to their latest versions.
 - **Docs Polish** — Refreshed README content and documentation footer links.
 
+:::
+
+::: details View release notes for version [1.9.0] — 2026-04-21
 ## [1.9.0] — 2026-04-21
 
 
@@ -140,6 +157,9 @@ head:
 - **Array support for `format` filter** — The `format` option in `SearchMediaOptions` now accepts an array of `MediaFormat` (`MediaFormat | MediaFormat[]`), allowing multi-format searches.
 - **`countryOfOrigin` filter** — Added the `countryOfOrigin` string property to `SearchMediaOptions` to filter media by country code (e.g. "JP", "KR", "CN").
 
+:::
+
+::: details View release notes for version [1.8.1] — 2026-03-05
 ## [1.8.1] — 2026-03-05
 
 ### Fixed
@@ -159,6 +179,9 @@ head:
 - Added 12 new unit tests for all bug fixes (chunk guard, non-JSON response, retry fallback, error types, cache invalidation).
 - Test count: **230 unit tests** across 13 test files.
 
+:::
+
+::: details View release notes for version [1.8.0] — 2026-03-04
 ## [1.8.0] — 2026-03-04
 
 ### Added
@@ -187,6 +210,9 @@ head:
 - `executeBatch` cast (`as T`) to maintain type safety with strict index access.
 - `MemoryCache.clear()` now also resets statistics counters.
 
+:::
+
+::: details View release notes for version [1.7.0] — 2026-03-04
 ## [1.7.0] — 2026-03-04
 
 ### Breaking Changes
@@ -214,6 +240,9 @@ head:
 ### Deprecated
 - **`getAiredChapters()`** — Renamed to `getRecentlyUpdatedManga()`. The old name is kept as a deprecated alias and will be removed in v2.
 
+:::
+
+::: details View release notes for version [1.6.1] — 2026-03-03
 ## [1.6.1] — 2026-03-03
 
 ### Breaking Changes
@@ -249,6 +278,9 @@ head:
 - **`cacheSize()`** — Updated all references from property to async method.
 - **`destroy()`** — Updated description to include rate-limiter timer cleanup.
 
+:::
+
+::: details View release notes for version [1.6.0] — 2026-03-02
 ## [1.6.0] — 2026-03-02
 
 ### Added
@@ -286,6 +318,9 @@ head:
 - **`getTags()` section** — Fixed missing method header in API Reference (was merged with `getGenres()`).
 - **`AniListClientOptions.signal`** — Documented in both API Reference and Types & Enums.
 
+:::
+
+::: details View release notes for version [1.5.1] — 2026-02-26
 ## [1.5.1] — 2026-02-26
 
 ### Added
@@ -304,6 +339,9 @@ head:
 - **`getUserByName()`** — Removed in favor of overloaded `getUser(idOrName)`.
 - **`StudioDetail`** — Removed this deprecated type alias completely. Use the unified `Studio` interface instead.
 
+:::
+
+::: details View release notes for version [1.5.0] — 2026-02-26
 ## [1.5.0] — 2026-02-26
 
 ### Added
@@ -330,6 +368,9 @@ head:
 ### Removed
 - **`vue` devDependency** — VitePress installs it as a transitive dependency.
 
+:::
+
+::: details View release notes for version [1.4.4] — 2026-02-24
 ## [1.4.4] — 2026-02-24
 
 ### Added
@@ -349,6 +390,9 @@ head:
 - **`package.json` `homepage`** — Now points to the documentation site (`https://docs-aniclient.gonzyuidev.xyz/`) instead of the GitHub README.
 - **`sideEffects: false`** — Added to `package.json` for better bundler tree-shaking.
 
+:::
+
+::: details View release notes for version [1.4.3] — 2026-02-24
 ## [1.4.3] — 2026-02-24
 
 ### Added
@@ -364,6 +408,9 @@ head:
 - **Redis Cache `getSize` leak** — Fixed an issue in `RedisCache` where `getSize` used `KEYS *` instead of `SCAN`, potentially blocking the Redis server. It now correctly uses `collectKeys()`.
 - **`AniListError` instanceof check** — Added `Object.setPrototypeOf(this, AniListError.prototype);` in the `AniListError` constructor to ensure that `err instanceof AniListError` works correctly across more Node/TypeScript compilation targets.
 
+:::
+
+::: details View release notes for version [1.4.2] — 2026-02-23
 ## [1.4.2] — 2026-02-23
 
 ### Added
@@ -373,6 +420,9 @@ head:
 - **Unit tests** — Tests for `getStaff` with and without media include option.
 - **Integration test** — Smoke test for `getStaff` with `{ media: true }`.
 
+:::
+
+::: details View release notes for version [1.4.1] — 2026-02-22
 ## [1.4.1] — 2026-02-22
 
 ### Added
@@ -386,6 +436,9 @@ head:
 
 - **`searchStaff` query used wrong sort type** — The GraphQL variable was declared as `[CharacterSort]` instead of `[StaffSort]`, causing the API to reject requests with a sort parameter.
 
+:::
+
+::: details View release notes for version [1.4.0] — 2026-02-22
 ## [1.4.0] — 2026-02-22
 
 ### Added
@@ -423,6 +476,9 @@ head:
 
 - **`pnpm-workspace.yaml`** — Removed (not a monorepo).
 
+:::
+
+::: details View release notes for version [1.3.0] — 2026-02-21
 ## [1.3.0] — 2026-02-21
 
 ### Added
@@ -445,6 +501,11 @@ head:
 - Cache eviction strategy from FIFO to LRU.
 - `clearCache()` now returns `Promise<void>` (backward-compatible when not awaited).
 
+:::
+
+::: details View release notes for version [1.2.0]
 ## [1.2.0]
 
 Initial public release.
+
+:::
