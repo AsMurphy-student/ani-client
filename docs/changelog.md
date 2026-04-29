@@ -29,6 +29,10 @@ head:
 - **Cookbook** — added a complete recipe for configuring and using the new `NormalizedCache`.
 - **Navigation** — grouped API reference items in a top navigation dropdown and restructured the sidebar into clearer *Core Features*, *Performance*, and *Advanced* sections.
 
+### Internal
+
+- **Codebase cleanup** — removed all inline comments (`//`) from the source code, retaining only structural JSDoc (`/** */`) for cleaner code distribution.
+
 ## [2.1.1] — 2026-04-28
 
 ### Fixed

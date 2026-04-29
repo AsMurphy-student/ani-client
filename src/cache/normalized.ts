@@ -43,7 +43,6 @@ export class NormalizedCache implements CacheAdapter {
     if (data !== null && typeof data === "object") {
       const obj = data as Record<string, unknown>;
 
-      // If it's an entity with an ID and __typename
       if (typeof obj.__typename === "string" && (typeof obj.id === "number" || typeof obj.id === "string")) {
         const ref = `${obj.__typename}:${obj.id}`;
 
@@ -53,13 +52,12 @@ export class NormalizedCache implements CacheAdapter {
         }
 
         const existing = this.entityStore.get(ref) || {};
-        // Merge the newly fetched fields with existing ones
+
         this.entityStore.set(ref, { ...existing, ...normalizedObj });
 
         return { __ref: ref };
       }
 
-      // Plain object
       const result: Record<string, unknown> = {};
       for (const [k, v] of Object.entries(obj)) {
         result[k] = this.normalize(v);
@@ -80,12 +78,11 @@ export class NormalizedCache implements CacheAdapter {
       if (typeof obj.__ref === "string") {
         const ref = obj.__ref;
         if (seen.has(ref)) {
-          // Circular reference protection. We return a shallow un-expanded reference to break the cycle.
           return { __ref: ref };
         }
         seen.add(ref);
         const entity = this.entityStore.get(ref);
-        if (!entity) return undefined; // Entity missing from cache
+        if (!entity) return undefined;
 
         const result = this.denormalize(entity, seen);
         seen.delete(ref);
@@ -95,7 +92,7 @@ export class NormalizedCache implements CacheAdapter {
       const result: Record<string, unknown> = {};
       for (const [k, v] of Object.entries(obj)) {
         const denormalized = this.denormalize(v, seen);
-        if (denormalized === undefined) return undefined; // Missing nested reference
+        if (denormalized === undefined) return undefined;
         result[k] = denormalized;
       }
       return result;
@@ -124,16 +121,13 @@ export class NormalizedCache implements CacheAdapter {
       }
     }
 
-    // Denormalize the data
     const denormalized = this.denormalize(entry.data);
     if (denormalized === undefined) {
-      // Something was missing in the entity store
       this.queryStore.delete(key);
       this._misses++;
       return undefined;
     }
 
-    // Update LRU position
     this.queryStore.delete(key);
     this.queryStore.set(key, entry);
 
@@ -154,7 +148,6 @@ export class NormalizedCache implements CacheAdapter {
   set<T>(key: string, data: T): void {
     if (!this.enabled) return;
 
-    // Normalizing extracts entities to entityStore and replaces them with __ref
     const normalizedData = this.normalize(data);
 
     this.queryStore.delete(key);

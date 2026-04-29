@@ -153,7 +153,6 @@ export class AniListClient {
 
     if (cached !== undefined) {
       if (isStale) {
-        // Fire and forget background revalidation
         this.executeRequest<T>(query, variables, cacheKey).catch((err) => {
           this.logger?.error("Background revalidation failed", { error: (err as Error).message, cacheKey });
         });
