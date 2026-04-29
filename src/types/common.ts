@@ -154,7 +154,7 @@ export interface AniListClientOptions {
   cache?: CacheOptions;
   /** Custom cache adapter (e.g. RedisCache). Takes precedence over `cache`. */
   cacheAdapter?: CacheAdapter;
-  /** Rate limiter configuration (enabled by default, 85 req/min) */
+  /** Rate limiter configuration (enabled by default, 25 req/min) */
   rateLimit?: RateLimitOptions;
   /** Event hooks for logging, debugging, and monitoring */
   hooks?: AniListHooks;

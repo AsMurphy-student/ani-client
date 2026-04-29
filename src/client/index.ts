@@ -340,8 +340,8 @@ export class AniListClient {
   }
 
   /** Get the detailed schedule for the current week, sorted by day. */
-  async getWeeklySchedule(date?: Date): Promise<WeeklySchedule> {
-    return mediaMethods.getWeeklySchedule(this, date);
+  async getWeeklySchedule(date?: Date, idNotIn?: number[]): Promise<WeeklySchedule> {
+    return mediaMethods.getWeeklySchedule(this, date, idNotIn);
   }
 
   /** Get upcoming (not yet released) media. */

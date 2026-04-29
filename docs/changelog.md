@@ -12,6 +12,16 @@ head:
 
 # Changelog
 
+## [2.1.3] — 2026-04-29
+
+### Fixed
+
+- **`searchReviews` perPage validation** — `perPage` is now clamped to the AniList maximum (50), consistent with all other paginated methods.
+- **`getWeeklySchedule` missing parameter** — exposed the `idNotIn` parameter to the public API so users can exclude specific media IDs from the schedule.
+- **`MemoryCache` orphaned JSDoc** — removed a stale documentation block left over from a previous refactor.
+- **`AniListClientOptions.rateLimit` JSDoc** — corrected the documented default from `85 req/min` to the actual value of `25 req/min`.
+
+::: details View release notes for version [2.1.2] — 2026-04-29
 ## [2.1.2] — 2026-04-29
 
 ### Added
@@ -33,6 +43,8 @@ head:
 ### Internal
 
 - **Codebase cleanup** — removed all inline comments (`//`) from the source code, retaining only structural JSDoc (`/** */`) for cleaner code distribution.
+
+:::
 
 ::: details View release notes for version [2.1.1] — 2026-04-28
 ## [2.1.1] — 2026-04-28
