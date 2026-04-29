@@ -36,11 +36,16 @@ export class NormalizedCache implements CacheAdapter {
   }
 
   /** Normalizes a GraphQL response, extracting entities and returning a tree of references. */
-  private normalize(data: unknown): unknown {
+  private normalize(data: unknown, seen = new WeakSet<object>()): unknown {
     if (Array.isArray(data)) {
-      return data.map((item) => this.normalize(item));
+      if (seen.has(data)) return null;
+      seen.add(data);
+      return data.map((item) => this.normalize(item, seen));
     }
     if (data !== null && typeof data === "object") {
+      if (seen.has(data)) return null;
+      seen.add(data);
+
       const obj = data as Record<string, unknown>;
 
       if (typeof obj.__typename === "string" && (typeof obj.id === "number" || typeof obj.id === "string")) {
@@ -48,7 +53,7 @@ export class NormalizedCache implements CacheAdapter {
 
         const normalizedObj: Record<string, unknown> = {};
         for (const [k, v] of Object.entries(obj)) {
-          normalizedObj[k] = this.normalize(v);
+          normalizedObj[k] = this.normalize(v, seen);
         }
 
         const existing = this.entityStore.get(ref) || {};
@@ -60,7 +65,7 @@ export class NormalizedCache implements CacheAdapter {
 
       const result: Record<string, unknown> = {};
       for (const [k, v] of Object.entries(obj)) {
-        result[k] = this.normalize(v);
+        result[k] = this.normalize(v, seen);
       }
       return result;
     }
