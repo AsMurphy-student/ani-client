@@ -204,9 +204,7 @@ it("keeps entities that are still referenced by another cached query", () => {
     __typename: "Media",
     id: 1,
     title: "Cowboy Bebop",
-    characters: [
-      { __typename: "Character", id: 10, name: "Spike Spiegel" },
-    ],
+    characters: [{ __typename: "Character", id: 10, name: "Spike Spiegel" }],
   };
 
   cache.set("query1", { anime: media });
@@ -235,9 +233,7 @@ it("removes only entities that are no longer reachable from remaining queries", 
       __typename: "Media",
       id: 1,
       title: "Cowboy Bebop",
-      characters: [
-        { __typename: "Character", id: 10, name: "Spike Spiegel" },
-      ],
+      characters: [{ __typename: "Character", id: 10, name: "Spike Spiegel" }],
     },
   });
 
