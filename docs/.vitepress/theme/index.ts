@@ -4,6 +4,7 @@ import DefaultTheme from "vitepress/theme";
 import { h } from "vue";
 import InstallBlock from "./InstallBlock.vue";
 import ShowcaseGrid from "./ShowcaseGrid.vue";
+import "./custom.css";
 
 export default {
   extends: DefaultTheme,
