@@ -2,9 +2,10 @@
 // biome-ignore lint: ignore
 const projects = [
   {
-    title: "Seiyuu Tree (声の木)",
+    title: "Seiyuu Tree",
+    subtitle: "声の木",
     description:
-      "Visual Seiyuu Relationship Tree. Explore the connections between your favorite anime characters and their legendary Japanese voice actors.",
+      "Visual seiyuu relationship tree. Explore the connections between anime characters and their Japanese voice actors.",
     url: "https://seiyuu-tree.vercel.app/",
     version: "2.0.2",
     author: "gonzyui",
@@ -23,26 +24,27 @@ const projects = [
       rel="noopener noreferrer"
       class="showcase-card"
     >
-      <div class="card-header">
-        <div class="card-title-row">
+      <div class="card-head">
+        <div class="title-block">
           <h3>{{ project.title }}</h3>
-          <span class="version-badge">{{ project.version }}</span>
+          <span v-if="project.subtitle" class="subtitle">{{ project.subtitle }}</span>
         </div>
+        <span class="version-badge">v{{ project.version }}</span>
       </div>
 
-      <div class="card-body">
-        <p>{{ project.description }}</p>
-      </div>
+      <p class="description">{{ project.description }}</p>
 
-      <div class="card-footer">
+      <div class="card-foot">
         <div class="author">
           <img :src="project.avatar" :alt="project.author" class="author-avatar" />
-          <span>
-            By <strong>@{{ project.author }}</strong>
-          </span>
+          <span class="author-name">@{{ project.author }}</span>
         </div>
-
-        <span class="visit-link">Visit Project →</span>
+        <span class="arrow" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="7" y1="17" x2="17" y2="7" />
+            <polyline points="7 7 17 7 17 17" />
+          </svg>
+        </span>
       </div>
     </a>
 
@@ -50,28 +52,26 @@ const projects = [
       href="https://github.com/gonzyui/ani-client/pulls"
       target="_blank"
       rel="noopener noreferrer"
-      class="showcase-card"
+      class="showcase-card is-cta"
     >
-      <div class="card-header">
-        <div class="card-title-row">
-          <h3>Want your projects to appear ?</h3>
-          <span class="version-badge">2.X.X</span>
+      <div class="card-head">
+        <div class="title-block">
+          <h3>Built something with ani-client?</h3>
         </div>
       </div>
 
-      <div class="card-body">
-        <p>Open a pull request to get your projects listed here!</p>
-      </div>
+      <p class="description">
+        Get your project featured here. Open a pull request with a short description and a link — that's it.
+      </p>
 
-      <div class="card-footer">
-        <div class="author">
-          <img src="https://github.com/gonzyui.png" alt="gonzyui" class="author-avatar" />
-          <span>
-            By <strong>@gonzyui</strong>
-          </span>
-        </div>
-
-        <span class="visit-link">Open a PR →</span>
+      <div class="card-foot">
+        <span class="cta-text">Submit via pull request</span>
+        <span class="arrow" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="7" y1="17" x2="17" y2="7" />
+            <polyline points="7 7 17 7 17 17" />
+          </svg>
+        </span>
       </div>
     </a>
   </div>
@@ -80,134 +80,159 @@ const projects = [
 <style scoped>
 .showcase-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 1.5rem;
-  margin-top: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
 }
 
 .showcase-card {
   display: flex;
   flex-direction: column;
+  gap: 14px;
   height: 100%;
-  padding: 1.5rem;
+  padding: 22px;
+  background-color: var(--vp-c-bg);
   border: 1px solid var(--vp-c-border);
-  border-radius: 16px;
-  background-color: var(--vp-c-bg-soft);
-  box-shadow:
-    0 4px 6px -1px rgb(0 0 0 / 10%),
-    0 2px 4px -1px rgb(0 0 0 / 6%);
+  border-radius: 12px;
   color: inherit;
   text-decoration: none;
   transition:
-    transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
-    box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
-    border-color 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
-    background-color 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border-color 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    background-color 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .showcase-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--vp-c-brand-1);
-  background-color: var(--vp-c-bg-soft-up);
-  box-shadow:
-    0 10px 15px -3px rgb(0 0 0 / 10%),
-    0 4px 6px -2px rgb(0 0 0 / 5%);
+  border-color: var(--ac-brand-400, #38bdff);
+  background-color: var(--vp-c-bg-soft);
+  transform: translateY(-1px);
 }
 
-.card-title-row {
+.card-head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
+  gap: 12px;
 }
 
-.card-header h3 {
+.title-block {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.card-head h3 {
   margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+  letter-spacing: -0.015em;
   color: var(--vp-c-text-1);
-  font-size: 1.3rem;
-  font-weight: 700;
-  transition: color 0.25s ease;
+  line-height: 1.3;
 }
 
-.showcase-card:hover .card-header h3 {
-  color: var(--vp-c-brand-1);
+.subtitle {
+  font-size: 13px;
+  color: var(--vp-c-text-3);
+  font-weight: 400;
+  letter-spacing: -0.005em;
 }
 
 .version-badge {
-  padding: 0.2rem 0.6rem;
-  border: 1px solid var(--vp-c-brand-1);
-  border-radius: 8px;
-  background-color: var(--vp-c-brand-dimm);
-  color: var(--vp-c-brand-1);
-  font-size: 0.75rem;
-  font-weight: 700;
+  flex-shrink: 0;
+  padding: 3px 8px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 6px;
+  background-color: var(--vp-c-bg-soft);
+  color: var(--vp-c-text-2);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--vp-font-family-mono);
+  letter-spacing: -0.01em;
 }
 
-.card-body {
-  margin-top: 1rem;
+.description {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--vp-c-text-2);
   flex-grow: 1;
 }
 
-.card-body p {
-  margin: 0;
-  color: var(--vp-c-text-2);
-  font-size: 0.95rem;
-  line-height: 1.6;
-}
-
-.card-footer {
+.card-foot {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 1.5rem;
-  padding-top: 1rem;
+  gap: 12px;
+  padding-top: 14px;
   border-top: 1px solid var(--vp-c-divider);
-  color: var(--vp-c-text-2);
-  font-size: 0.9rem;
+  font-size: 13px;
 }
 
 .author {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
 }
 
 .author-avatar {
-  width: 24px;
-  height: 24px;
-  border: 1px solid var(--vp-c-divider);
+  width: 22px;
+  height: 22px;
   border-radius: 999px;
+  border: 1px solid var(--vp-c-divider);
+  flex-shrink: 0;
 }
 
-.visit-link {
-  transform: translateX(-10px);
-  opacity: 0;
-  color: var(--vp-c-brand-1);
+.author-name {
+  color: var(--vp-c-text-2);
+  font-weight: 500;
+  font-family: var(--vp-font-family-mono);
+  font-size: 12.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cta-text {
+  color: var(--vp-c-text-2);
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  color: var(--vp-c-text-3);
+  transition: color 180ms ease, transform 180ms ease;
+}
+
+.showcase-card:hover .arrow {
+  color: var(--ac-brand-500, #02a9ff);
+  transform: translate(2px, -2px);
+}
+
+.is-cta {
+  border-style: dashed;
+  background-color: transparent;
+}
+
+.is-cta .card-head h3 {
+  color: var(--vp-c-text-2);
   font-weight: 600;
-  transition:
-    transform 0.3s ease,
-    opacity 0.3s ease;
 }
 
-.showcase-card:hover .visit-link {
-  transform: translateX(0);
-  opacity: 1;
+.is-cta:hover .card-head h3 {
+  color: var(--vp-c-text-1);
 }
 
-@media (width <= 640px) {
+@media (max-width: 640px) {
   .showcase-grid {
     grid-template-columns: 1fr;
-  }
-
-  .card-title-row,
-  .card-footer {
-    gap: 0.75rem;
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .visit-link {
-    transform: none;
-    opacity: 1;
   }
 }
 </style>

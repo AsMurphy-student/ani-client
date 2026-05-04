@@ -10,6 +10,8 @@
 > A fully typed, zero-dependency client for the [AniList](https://anilist.co) GraphQL API.  
 > Supports Node.js, Bun, Deno, and modern browsers.
 
+> 📌 **Note** – thanks for **1K+ downloads** this month on `npm` 🎉
+
 ## Features
 
 - **Zero dependencies** — uses the native `fetch` API

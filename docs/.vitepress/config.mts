@@ -29,7 +29,7 @@ export default defineConfig({
     ["link", { rel: "icon", href: "/assets/favicon.ico", type: "image/x-icon" }],
     ["link", { rel: "apple-touch-icon", href: "/assets/logo.png" }],
 
-    ["meta", { name: "theme-color", content: "#3451b2" }],
+    ["meta", { name: "theme-color", content: "#02a9ff" }],
     ["meta", { name: "author", content: "gonzyui" }],
     [
       "meta",
